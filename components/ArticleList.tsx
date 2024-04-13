@@ -1,20 +1,23 @@
 "use client";
 
+import { LIMIT } from "@/lib/constant";
 import { fetcher } from "@/lib/fetcher";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import useSWR from "swr";
 import ArticleTable from "./ArticleTable";
 import ErrorMessage from "./ErrorMessage";
 import MyLoader from "./MyLoader";
-import MyPagination from "./MyPagination";
+import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
-import { LIMIT } from "@/lib/constant";
 
 type Props = {
-  currentPage: number;
   userStore: Store;
 };
 
-const ArticleList = ({ currentPage, userStore }: Props) => {
+const ArticleList = ({ userStore }: Props) => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   const {
     data: articles,
     isLoading: articlesLoading,
@@ -30,8 +33,7 @@ const ArticleList = ({ currentPage, userStore }: Props) => {
     error: articlesCountError,
   } = useSWR(`/api/articles/count?storeId=${userStore.id}`, fetcher);
 
-  console.log("ART", articles);
-  console.log("COUNT", articlesCount);
+  const totalPages = Math.ceil(articlesCount / (LIMIT || 1));
 
   return (
     <div className="overflow-x-auto mt-4">
@@ -49,13 +51,24 @@ const ArticleList = ({ currentPage, userStore }: Props) => {
           )}
         </CardContent>
         {articles && articlesCount > LIMIT && (
-          <CardFooter>
-            <MyPagination
-              currentPage={currentPage}
-              totalItems={articlesCount}
-              path="/articles"
-              limit={LIMIT}
-            />
+          <CardFooter className="flex justify-center space-x-4">
+            <Button
+              variant={"outline"}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage == 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant={"outline"} disabled>
+              Page {currentPage} / {totalPages}
+            </Button>
+            <Button
+              variant={"outline"}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage == totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </CardFooter>
         )}
       </Card>

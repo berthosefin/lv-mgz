@@ -16,7 +16,7 @@ type Props = {
 const ArticleTable = ({ articles }: Props) => {
   if (!articles || !articles.length) {
     return (
-      <div className="text-muted-foreground flex items-center">
+      <div className="text-muted-foreground flex items-center mb-6">
         <AlertCircle size={16} className="mr-2" />
         Aucun article enregistré pour le moment
       </div>

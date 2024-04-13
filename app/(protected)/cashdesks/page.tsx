@@ -5,14 +5,7 @@ import { getUserData } from "@/lib/users";
 import { ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 
-type Props = {
-  searchParams: {
-    page: string;
-  };
-};
-
-export default async function CashDeskPage({ searchParams }: Props) {
-  const currentPage = Number(searchParams?.page) || 1;
+export default async function CashDeskPage() {
   const userData: User = await getUserData();
   const userCashDesk: CashDesk = userData.store.cashDesk;
 
@@ -28,7 +21,7 @@ export default async function CashDeskPage({ searchParams }: Props) {
         </Button>
       </div>
       <CashDesk userCashDesk={userCashDesk} />
-      <TransactionList userCashDesk={userCashDesk} currentPage={currentPage} />
+      <TransactionList userCashDesk={userCashDesk} />
     </>
   );
 }

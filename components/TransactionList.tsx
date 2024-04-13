@@ -2,13 +2,15 @@
 
 import { LIMIT } from "@/lib/constant";
 import { fetcher } from "@/lib/fetcher";
-import { FileDown, Filter } from "lucide-react";
+import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import { ChevronLeft, ChevronRight, FileDown, Filter } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import ErrorMessage from "./ErrorMessage";
 import MyLoader from "./MyLoader";
-import MyPagination from "./MyPagination";
 import TransactionTable from "./TransactionTable";
 import { Button } from "./ui/button";
 import {
@@ -19,16 +21,13 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Input } from "./ui/input";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { format } from "date-fns";
 
 type Props = {
-  currentPage: number;
   userCashDesk: CashDesk;
 };
 
-const TransactionList = ({ currentPage, userCashDesk }: Props) => {
+const TransactionList = ({ userCashDesk }: Props) => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const router = useRouter();
@@ -111,6 +110,8 @@ const TransactionList = ({ currentPage, userCashDesk }: Props) => {
     doc.save(`liste_des_transactions_du_${startDate}_au_${endDate}.pdf`);
   };
 
+  const totalPages = Math.ceil(transactionsCount / (LIMIT || 1));
+
   return (
     <div className="overflow-x-auto mt-4">
       <Card>
@@ -156,13 +157,24 @@ const TransactionList = ({ currentPage, userCashDesk }: Props) => {
           )}
         </CardContent>
         {transactions && transactionsCount > LIMIT && (
-          <CardFooter>
-            <MyPagination
-              currentPage={currentPage}
-              totalItems={transactionsCount}
-              path="/cashdesks"
-              limit={LIMIT}
-            />
+          <CardFooter className="flex justify-center space-x-4">
+            <Button
+              variant={"outline"}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage == 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant={"outline"} disabled>
+              Page {currentPage} / {totalPages}
+            </Button>
+            <Button
+              variant={"outline"}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage == totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </CardFooter>
         )}
       </Card>

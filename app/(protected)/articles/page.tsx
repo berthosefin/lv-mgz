@@ -4,14 +4,7 @@ import { getUserData } from "@/lib/users";
 import { HandCoins, Plus } from "lucide-react";
 import Link from "next/link";
 
-type Props = {
-  searchParams: {
-    page: string;
-  };
-};
-
-export default async function Article({ searchParams }: Props) {
-  const currentPage = Number(searchParams?.page) || 1;
+export default async function Article() {
   const userData: User = await getUserData();
   const userStore: Store = userData.store;
 
@@ -34,7 +27,7 @@ export default async function Article({ searchParams }: Props) {
           </Button>
         </div>
       </div>
-      <ArticleList userStore={userStore} currentPage={currentPage} />
+      <ArticleList userStore={userStore} />
     </>
   );
 }
