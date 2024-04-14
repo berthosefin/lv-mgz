@@ -55,12 +55,6 @@ const TransactionList = ({ userCashDesk }: Props) => {
     fetcher
   );
 
-  const handleFilter = () => {
-    setStartDate(startDate);
-    setEndDate(endDate);
-    router.push(`/cashdesks?page=1`);
-  };
-
   const handleExportToPDF = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -133,14 +127,9 @@ const TransactionList = ({ userCashDesk }: Props) => {
                   onChange={(e) => setEndDate(e.target.value)}
                 />
                 {startDate && endDate && (
-                  <>
-                    <Button onClick={handleFilter}>
-                      <Filter size={16} />
-                    </Button>
-                    <Button onClick={handleExportToPDF}>
-                      <FileDown size={16} />
-                    </Button>
-                  </>
+                  <Button onClick={handleExportToPDF}>
+                    <FileDown size={16} />
+                  </Button>
                 )}
               </div>
             </div>
