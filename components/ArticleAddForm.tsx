@@ -50,13 +50,6 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      purchasePrice: 0,
-      sellingPrice: 0,
-      stock: 0,
-      unit: "",
-    },
   });
 
   const { watch } = form;

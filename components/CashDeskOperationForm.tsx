@@ -46,7 +46,6 @@ const CashDeskOperationForm = ({
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { amount: 0, label: "" },
   });
 
   const { watch } = form;
