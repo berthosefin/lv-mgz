@@ -62,7 +62,19 @@ const StockChart = ({ userStore }: { userStore: Store }) => {
   const labels = articles.map((article: Article) => article.name);
   const data = articles.map((article: Article) => article.stock);
 
-  const barColor = theme !== "dark" ? "#000" : "#fff";
+  let barColor: string;
+
+  switch (theme) {
+    case "light":
+      barColor = "#000";
+      break;
+    case "dark":
+      barColor = "#fff";
+      break;
+    default:
+      barColor = "#ef4444";
+      break;
+  }
 
   const options = {
     scales: {
