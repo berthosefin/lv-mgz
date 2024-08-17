@@ -10,7 +10,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LV MGZ",
+  title: "Chez RAKOTO",
   description: "Powered by Thos",
 };
 

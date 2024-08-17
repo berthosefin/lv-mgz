@@ -28,39 +28,15 @@ export const getArticlesCount = async (storeId: string) => {
   return res.json();
 };
 
-export const getMinStockArticle = (articles: Article[]) => {
-  const minStockArticle = articles.reduce(
-    (minArticle: Article | null, currentArticle: Article) => {
-      if (!minArticle) {
-        return currentArticle;
-      } else {
-        return currentArticle.stock < minArticle.stock
-          ? currentArticle
-          : minArticle;
-      }
-    },
-    null
-  );
+export async function getLowStockArticles(storeId: string) {
+  let apiUrl = `${API_URL}/articles/low?storeId=${storeId}`;
 
-  return minStockArticle;
-};
+  const res = await fetch(apiUrl, { cache: "no-store" });
 
-export const getMaxStockArticle = (articles: Article[]) => {
-  const maxStockArticle = articles.reduce(
-    (maxArticle: Article | null, currentArticle: Article) => {
-      if (!maxArticle) {
-        return currentArticle;
-      } else {
-        return currentArticle.stock > maxArticle.stock
-          ? currentArticle
-          : maxArticle;
-      }
-    },
-    null
-  );
+  if (!res.ok) throw new Error("failed to LowStockArticles");
 
-  return maxStockArticle;
-};
+  return res.json();
+}
 
 export const getArticle = async (id: string) => {
   const res = await fetch(`${API_URL}/articles/${id}`, {

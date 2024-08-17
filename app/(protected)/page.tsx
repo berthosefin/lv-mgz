@@ -9,14 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getArticlesCount, getLowStockArticles } from "@/lib/articles";
+import { calculateMonthlyData } from "@/lib/calculate";
 import {
-  getAllArticles,
-  getArticlesCount,
-  getMaxStockArticle,
-  getMinStockArticle,
-} from "@/lib/articles";
-import { getAllTransactions } from "@/lib/transactions";
+  getAllTransactions,
+  getTransactionsMonthlySummary,
+} from "@/lib/transactions";
 import { getUserData } from "@/lib/users";
+import { Article } from "@prisma/client";
 import {
   Activity,
   ArrowUpRight,
@@ -32,14 +32,27 @@ export default async function Home() {
   const userStore: Store = userData.store;
   const userCashDesk: CashDesk = userData.store.cashDesk;
 
-  const [articles, articlesCount, transactions] = await Promise.all([
-    getAllArticles(userStore.id),
+  const [
+    articlesCount,
+    transactions,
+    transactionsMonthlySummary,
+    lowStockArticles,
+  ] = await Promise.all([
     getArticlesCount(userStore.id),
     getAllTransactions(userCashDesk.id, 1, 5),
+    getTransactionsMonthlySummary(userStore.id, new Date().getFullYear()),
+    getLowStockArticles(userStore.id),
   ]);
 
-  const minStockArticle = getMinStockArticle(articles);
-  const maxStockArticle = getMaxStockArticle(articles);
+  // Utilisez la fonction pour obtenir les données calculées
+  const {
+    currentMonthRevenue,
+    revenueDifference,
+    currentMonthSales,
+    salesDifference,
+    currentMonthPurchases,
+    purchasesDifference,
+  } = calculateMonthlyData(transactionsMonthlySummary);
 
   return (
     <>
@@ -56,31 +69,55 @@ export default async function Home() {
         <div className="w-full lg:w-1/4">
           <MyCard
             title={`Total Revenue`}
-            value={`500 000`}
-            description={`+20.1% depuis le mois dernier`}
+            value={`${currentMonthRevenue.toLocaleString("fr-FR")} MGA`}
+            description={`${
+              revenueDifference > 0
+                ? `+${revenueDifference.toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+                : `-${Math.abs(revenueDifference).toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+            }`}
             icon={<DollarSign />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
             title={`Résumé des Ventes`}
-            value={`300`}
-            description={`+19% depuis le mois dernier`}
+            value={`${currentMonthSales.toLocaleString("fr-FR")} MGA`}
+            description={`${
+              salesDifference > 0
+                ? `+${salesDifference.toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+                : `-${Math.abs(salesDifference).toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+            }`}
             icon={<CreditCard />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
             title={`Résumé des Approvisionnements`}
-            value={`250`}
-            description={`+180.1% depuis le mois dernier`}
+            value={`${currentMonthPurchases.toLocaleString("fr-FR")} MGA`}
+            description={`${
+              purchasesDifference > 0
+                ? `+${purchasesDifference.toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+                : `-${Math.abs(purchasesDifference).toLocaleString(
+                    "fr-FR"
+                  )} MGA depuis le mois dernier`
+            }`}
             icon={<Plus />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
             title={`Résumé des Stocks`}
-            value={`500`}
+            value={`${articlesCount}`}
             description={`Produits en Stock`}
             icon={<Activity />}
           />
@@ -90,7 +127,7 @@ export default async function Home() {
       <div className="flex flex-col space-y-4 mt-4 lg:flex-row lg:space-y-0 lg:space-x-4">
         {/* SalesChart */}
         <Card className="w-full lg:w-1/2">
-          <SalesChart />
+          <SalesChart transactionsMonthlySummary={transactionsMonthlySummary} />
         </Card>
 
         {/* Lasts transactions */}
@@ -119,21 +156,33 @@ export default async function Home() {
           <CardHeader>
             <div className="flex">
               <div className="flex flex-col gap-2">
-                <CardTitle>Alertes de Stock</CardTitle>
+                <CardTitle>Alertes des Stocks</CardTitle>
                 <CardDescription>
                   Article en cours d&apos;epuisement de stock.
                 </CardDescription>
               </div>
               <Button asChild size="sm" className="ml-auto gap-1">
                 <Link href="/articles">
-                  Voir page des article
+                  Voir page des articles
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            Pas encore d&apos;article en cours d&apos;epuisement de stock.
+            {lowStockArticles.length > 0 ? (
+              <ul>
+                {lowStockArticles.map((article: Article) => (
+                  <li key={article.id}>
+                    {article.name} - {article.stock} en stock
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <span className="text-muted-foreground">
+                Pas encore d&apos;articles en cours d&apos;épuisement de stock.
+              </span>
+            )}
           </CardContent>
         </Card>
       </div>

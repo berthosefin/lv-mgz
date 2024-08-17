@@ -56,22 +56,50 @@ export const getTransactionsCount = async (
   return res.json();
 };
 
-export const getTransactionsTotalIn = async (transactions: Transaction[]) => {
-  const totalIn = transactions.reduce(
-    (total: number, transaction: Transaction) =>
-      transaction.type === "IN" ? total + transaction.amount : total,
-    0
-  );
+export const getTransactionsMonthlySummary = async (
+  storeId: string,
+  year: number
+) => {
+  let apiUrl = `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${year}`;
 
-  return totalIn;
+  const res = await fetch(apiUrl, {
+    cache: "no-store",
+  });
+
+  if (!res.ok)
+    throw new Error("failed to fetch the monthly summary of transactions");
+
+  return res.json();
 };
 
-export const getTransactionsTotalOut = async (transactions: Transaction[]) => {
-  const totalOut = transactions.reduce(
-    (total: number, transaction: Transaction) =>
-      transaction.type === "OUT" ? total + transaction.amount : total,
-    0
-  );
+export const getTransactionsTotalIn = async (
+  cashDeskId: string,
+  startDate: Date,
+  endDate: Date
+) => {
+  let apiUrl = `${API_URL}/transactions/totalIn?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`;
 
-  return totalOut;
+  const res = await fetch(apiUrl, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error("failed to fetch total in");
+
+  return res.json();
+};
+
+export const getTransactionsTotalOut = async (
+  cashDeskId: string,
+  startDate: Date,
+  endDate: Date
+) => {
+  let apiUrl = `${API_URL}/transactions/totalOut?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`;
+
+  const res = await fetch(apiUrl, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error("failed to fetch total out");
+
+  return res.json();
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
+import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -16,36 +16,58 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-];
+import { calculateMonthlyData } from "@/lib/calculate";
 
+// Configuration du graphique
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  sales: {
+    label: "Ventes",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
+  purchases: {
+    label: "Approvisionnements",
     color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
 
-export function SalesChart() {
+type Props = {
+  transactionsMonthlySummary: {
+    month: string;
+    sales: number;
+    purchases: number;
+  }[];
+};
+
+export function SalesChart({ transactionsMonthlySummary }: Props) {
+  const currentYear = new Date().getFullYear();
+
+  const { revenueDifference } = calculateMonthlyData(
+    transactionsMonthlySummary
+  );
+
+  // Transformation des données pour Recharts
+  const transformedData = transactionsMonthlySummary.map(
+    (item: any, index: number) => ({
+      month: new Date(currentYear, index).toLocaleString("fr-FR", {
+        month: "long",
+      }),
+      sales: item.sales,
+      purchases: item.purchases,
+    })
+  );
+
+  const isGrowth = revenueDifference > 0;
+  const isNeutral = revenueDifference === 0;
+
   return (
     <>
       <CardHeader>
         <CardTitle>Graphiques des Ventes et Approvisionnements</CardTitle>
-        <CardDescription>Janvier - Juin 2024</CardDescription>
+        <CardDescription>Janvier - Décembre {currentYear}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={transformedData}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="month"
@@ -58,14 +80,29 @@ export function SalesChart() {
               cursor={false}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            <Bar dataKey="sales" fill="var(--color-sales)" radius={4} />
+            <Bar dataKey="purchases" fill="var(--color-purchases)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Accroissement de 5.2% ce mois ci <TrendingUp className="h-4 w-4" />
+          {isNeutral ? (
+            <>
+              Le revenu est stable ce mois-ci <Activity className="h-4 w-4" />
+            </>
+          ) : isGrowth ? (
+            <>
+              Accroissement du revenu de {revenueDifference.toLocaleString()}{" "}
+              MGA ce mois-ci <TrendingUp className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Décroissement du revenu de{" "}
+              {Math.abs(revenueDifference).toLocaleString()} MGA ce mois-ci{" "}
+              <TrendingDown className="h-4 w-4" />
+            </>
+          )}
         </div>
         <div className="leading-none text-muted-foreground">
           Affichage des ventes par rapport aux approvisionnements

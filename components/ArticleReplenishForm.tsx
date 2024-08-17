@@ -138,6 +138,7 @@ const ArticleReplenishForm = ({ articleId, userCashDesk }: Props) => {
                       handleReplenishQuantityChange(e.target.value);
                       field.onChange(e);
                     }}
+                    disabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
