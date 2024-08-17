@@ -1,7 +1,14 @@
 import MyCard from "@/components/MyCard";
-import StockChart from "@/components/StockChart";
+import { SalesChart } from "@/components/SalesChart";
 import TransactionTable from "@/components/TransactionTable";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   getAllArticles,
   getArticlesCount,
@@ -11,12 +18,14 @@ import {
 import { getAllTransactions } from "@/lib/transactions";
 import { getUserData } from "@/lib/users";
 import {
-  AlertTriangle,
+  Activity,
   ArrowUpRight,
-  ShoppingBasket,
+  CreditCard,
+  DollarSign,
+  Plus,
   Store,
-  Wallet,
 } from "lucide-react";
+import Link from "next/link";
 
 export default async function Home() {
   const userData: User = await getUserData();
@@ -46,60 +55,85 @@ export default async function Home() {
       <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/4">
           <MyCard
-            title={`Article${articlesCount >= 1 ? "s" : ""} dans le magasin`}
-            value={articlesCount.toString()}
-            icon={<ShoppingBasket />}
+            title={`Total Revenue`}
+            value={`500 000`}
+            description={`+20.1% depuis le mois dernier`}
+            icon={<DollarSign />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
-            title={`${
-              minStockArticle
-                ? `Stock min: ${minStockArticle.name}`
-                : "Aucun article enregistré"
-            }`}
-            value={minStockArticle ? minStockArticle.stock.toString() : "0"}
-            icon={<AlertTriangle />}
+            title={`Résumé des Ventes`}
+            value={`300`}
+            description={`+19% depuis le mois dernier`}
+            icon={<CreditCard />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
-            title={`${
-              maxStockArticle
-                ? `Stock max: ${maxStockArticle.name}`
-                : "Aucun article enregistré"
-            }`}
-            value={maxStockArticle ? maxStockArticle.stock.toString() : "0"}
-            icon={<ArrowUpRight />}
+            title={`Résumé des Approvisionnements`}
+            value={`250`}
+            description={`+180.1% depuis le mois dernier`}
+            icon={<Plus />}
           />
         </div>
         <div className="w-full lg:w-1/4">
           <MyCard
-            title="Solde de caisse"
-            value={userCashDesk.currentAmount.toLocaleString() + " MGA"}
-            icon={<Wallet />}
+            title={`Résumé des Stocks`}
+            value={`500`}
+            description={`Produits en Stock`}
+            icon={<Activity />}
           />
         </div>
       </div>
 
       <div className="flex flex-col space-y-4 mt-4 lg:flex-row lg:space-y-0 lg:space-x-4">
-        {/* StockChart */}
+        {/* SalesChart */}
         <Card className="w-full lg:w-1/2">
-          <CardHeader>
-            <CardTitle>Stituation des stocks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <StockChart userStore={userStore} />
-          </CardContent>
+          <SalesChart />
         </Card>
 
         {/* Lasts transactions */}
         <Card className="w-full lg:w-1/2">
           <CardHeader>
-            <CardTitle>Liste des 5 dernières transactions</CardTitle>
+            <div className="flex">
+              <div className="flex flex-col gap-2">
+                <CardTitle>Transactions</CardTitle>
+                <CardDescription>Historique des Transactions.</CardDescription>
+              </div>
+              <Button asChild size="sm" className="ml-auto gap-1">
+                <Link href="/cashdesks">
+                  Voir tout
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <TransactionTable transactions={transactions} />
+          </CardContent>
+        </Card>
+
+        {/* Alert */}
+        <Card className="w-full lg:w-1/2">
+          <CardHeader>
+            <div className="flex">
+              <div className="flex flex-col gap-2">
+                <CardTitle>Alertes de Stock</CardTitle>
+                <CardDescription>
+                  Article en cours d&apos;epuisement de stock.
+                </CardDescription>
+              </div>
+              <Button asChild size="sm" className="ml-auto gap-1">
+                <Link href="/articles">
+                  Voir page des article
+                  <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            Pas encore d&apos;article en cours d&apos;epuisement de stock.
           </CardContent>
         </Card>
       </div>
