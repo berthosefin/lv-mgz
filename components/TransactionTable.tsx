@@ -26,8 +26,7 @@ const TransactionTable = ({ transactions }: Props) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[24px]">#</TableHead>
-          <TableHead className="w-[100px]">Libellé</TableHead>
+          <TableHead className="w-[96px]">Libellé</TableHead>
           <TableHead>Article(s)</TableHead>
           <TableHead className="text-end">Montant</TableHead>
           <TableHead className="text-end">Date</TableHead>
@@ -39,9 +38,6 @@ const TransactionTable = ({ transactions }: Props) => {
             key={transaction.id}
             className={transaction.type === "OUT" ? "text-destructive" : ""}
           >
-            <TableCell className="font-medium">
-              {transaction.type === "IN" ? "+" : "-"}
-            </TableCell>
             <TableCell>
               {transaction.label === "STOCK IN"
                 ? "Achat"
@@ -51,12 +47,16 @@ const TransactionTable = ({ transactions }: Props) => {
             </TableCell>
             <TableCell>
               {transaction.articles.length > 0 ? (
-                transaction.articles.map((article, index) => (
-                  <span key={index}>
-                    {article.name}
-                    {index !== transaction.articles.length - 1 && ", "}
-                  </span>
-                ))
+                <>
+                  {transaction.articles.slice(0, 3).map((article, index) => (
+                    <span key={index}>
+                      {article.name}
+                      {index !== transaction.articles.slice(0, 3).length - 1 &&
+                        ", "}
+                    </span>
+                  ))}
+                  {transaction.articles.length > 3 && " ..."}
+                </>
               ) : (
                 <span className="line-through">Article</span>
               )}
@@ -66,7 +66,7 @@ const TransactionTable = ({ transactions }: Props) => {
               <span className="ml-2">MGA</span>
             </TableCell>
             <TableCell className="text-end">
-              {new Date(transaction.createdAt).toLocaleString("fr-FR")}
+              {new Date(transaction.createdAt).toLocaleDateString("fr-FR")}
             </TableCell>
           </TableRow>
         ))}

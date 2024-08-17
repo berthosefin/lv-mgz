@@ -131,7 +131,7 @@ export default async function Home() {
         </Card>
 
         {/* Lasts transactions */}
-        <Card className="w-full lg:w-1/2">
+        <Card className="w-full lg:w-2/3">
           <CardHeader>
             <div className="flex">
               <div className="flex flex-col gap-2">
@@ -152,14 +152,12 @@ export default async function Home() {
         </Card>
 
         {/* Alert */}
-        <Card className="w-full lg:w-1/2">
+        <Card className="w-full lg:w-1/3">
           <CardHeader>
             <div className="flex">
               <div className="flex flex-col gap-2">
-                <CardTitle>Alertes des Stocks</CardTitle>
-                <CardDescription>
-                  Article en cours d&apos;epuisement de stock.
-                </CardDescription>
+                <CardTitle>Alertes</CardTitle>
+                <CardDescription>Epuisement de stock.</CardDescription>
               </div>
               <Button asChild size="sm" className="ml-auto gap-1">
                 <Link href="/articles">
