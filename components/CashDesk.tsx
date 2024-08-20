@@ -1,5 +1,4 @@
 import {
-  getAllTransactions,
   getTransactionsTotalIn,
   getTransactionsTotalOut,
 } from "@/lib/transactions";
@@ -10,7 +9,6 @@ const CashDesk = async ({ userCashDesk }: { userCashDesk: CashDesk }) => {
   const currentYear = new Date().getFullYear();
   const startDate = new Date(`${currentYear}-01-01T00:00:00Z`);
   const endDate = new Date(`${currentYear + 1}-01-01T00:00:00Z`);
-  const transactions = await getAllTransactions(userCashDesk.id);
   const totalIn = await getTransactionsTotalIn(
     userCashDesk.id,
     startDate,

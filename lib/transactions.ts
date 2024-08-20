@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 const API_URL = process.env.API_URL;
 
 export const getAllTransactions = async (
@@ -7,6 +9,8 @@ export const getAllTransactions = async (
   startDate?: string,
   endDate?: string
 ) => {
+  const access_token = cookies().get("access_token");
+
   let apiUrl = `${API_URL}/transactions`;
 
   const params = new URLSearchParams();
@@ -29,6 +33,9 @@ export const getAllTransactions = async (
 
   const res = await fetch(apiUrl, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token?.value}`,
+    },
   });
 
   if (!res.ok) throw new Error("failed to fetch all transactions");
@@ -41,6 +48,8 @@ export const getTransactionsCount = async (
   startDate?: string,
   endDate?: string
 ) => {
+  const access_token = cookies().get("access_token");
+
   let apiUrl = `${API_URL}/transactions/count?cashDeskId=${cashDeskId}`;
 
   if (startDate && endDate) {
@@ -49,6 +58,9 @@ export const getTransactionsCount = async (
 
   const res = await fetch(apiUrl, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token?.value}`,
+    },
   });
 
   if (!res.ok) throw new Error("failed to fetch the count of transactions");
@@ -60,10 +72,15 @@ export const getTransactionsMonthlySummary = async (
   storeId: string,
   year: number
 ) => {
+  const access_token = cookies().get("access_token");
+
   let apiUrl = `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${year}`;
 
   const res = await fetch(apiUrl, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token?.value}`,
+    },
   });
 
   if (!res.ok)
@@ -77,10 +94,14 @@ export const getTransactionsTotalIn = async (
   startDate: Date,
   endDate: Date
 ) => {
+  const access_token = cookies().get("access_token");
   let apiUrl = `${API_URL}/transactions/totalIn?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`;
 
   const res = await fetch(apiUrl, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token?.value}`,
+    },
   });
 
   if (!res.ok) throw new Error("failed to fetch total in");
@@ -93,10 +114,14 @@ export const getTransactionsTotalOut = async (
   startDate: Date,
   endDate: Date
 ) => {
+  const access_token = cookies().get("access_token");
   let apiUrl = `${API_URL}/transactions/totalOut?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`;
 
   const res = await fetch(apiUrl, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token?.value}`,
+    },
   });
 
   if (!res.ok) throw new Error("failed to fetch total out");

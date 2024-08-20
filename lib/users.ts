@@ -1,22 +1,25 @@
-import { validateRequest } from "./auth";
+import { jwtDecode } from "jwt-decode";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL;
 
-export const getUser = async (username: string) => {
-  const res = await fetch(`${API_URL}/users/${username}`, {
+export const getUser = async () => {
+  const access_token = cookies().get("access_token");
+
+  if (!access_token) {
+    throw new Error("Access token is missing");
+  }
+
+  const decodedToken: any = jwtDecode(access_token.value);
+
+  const res = await fetch(`${API_URL}/users/${decodedToken.username}`, {
     cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${access_token.value}`,
+    },
   });
 
   if (!res.ok) throw new Error("failed to fetch user");
 
   return res.json();
-};
-
-export const getUserData = async () => {
-  const { user } = await validateRequest();
-  if (!user) throw new Error("User not authenticated");
-
-  const userData: User = await getUser(user.username);
-
-  return userData;
 };

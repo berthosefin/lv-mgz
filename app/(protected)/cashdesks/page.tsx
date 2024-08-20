@@ -1,12 +1,12 @@
 import CashDesk from "@/components/CashDesk";
 import TransactionList from "@/components/TransactionList";
 import { Button } from "@/components/ui/button";
-import { getUserData } from "@/lib/users";
+import { getUser } from "@/lib/users";
 import { ArrowLeftRight } from "lucide-react";
 import Link from "next/link";
 
 export default async function CashDeskPage() {
-  const userData: User = await getUserData();
+  const userData: User = await getUser();
   const userCashDesk: CashDesk = userData.store.cashDesk;
 
   return (

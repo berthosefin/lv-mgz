@@ -15,7 +15,7 @@ import {
   getAllTransactions,
   getTransactionsMonthlySummary,
 } from "@/lib/transactions";
-import { getUserData } from "@/lib/users";
+import { getUser } from "@/lib/users";
 import { Article } from "@prisma/client";
 import {
   Activity,
@@ -28,7 +28,7 @@ import {
 import Link from "next/link";
 
 export default async function Home() {
-  const userData: User = await getUserData();
+  const userData: User = await getUser();
   const userStore: Store = userData.store;
   const userCashDesk: CashDesk = userData.store.cashDesk;
 

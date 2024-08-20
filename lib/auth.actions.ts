@@ -1,12 +1,9 @@
 "use server";
 
-import { lucia, validateRequest } from "@/lib/auth";
-import { generateId } from "lucia";
+import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { Argon2id } from "oslo/password";
-import { createUser } from "./users.actions";
-import { getUser } from "./users";
+
+const API_URL = process.env.API_URL;
 
 export const signup = async (data: {
   username: string;
@@ -15,84 +12,96 @@ export const signup = async (data: {
 }) => {
   const { username, password, storeName } = data;
 
-  const hashedPassword = await new Argon2id().hash(password);
-  const userId = generateId(15);
-
   try {
-    await createUser({
-      id: userId,
-      username,
-      password: hashedPassword,
-      storeName,
+    // Appel à l'API NestJS pour créer un nouvel utilisateur
+    const response = await fetch(`${API_URL}/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password, storeName }),
     });
 
-    const session = await lucia.createSession(userId, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
-  } catch (error: any) {
-    if (error.message === "failed to create user") {
+    if (!response.ok) {
+      const errorData = await response.json();
       return {
         error:
-          "Ce mom d'utilisateur ou nom de magasin est déjà utilisé. Veuillez en choisir un autre.",
+          errorData.message ||
+          "Une erreur inattendue s'est produite lors de l'inscription.",
       };
     }
+
+    // Décoder le token pour obtenir l'ID utilisateur
+    const { access_token } = await response.json();
+    cookies().set("access_token", access_token, { path: "/" });
+    const decodedToken: any = jwtDecode(access_token);
+    const userId = decodedToken.sub;
+
+    // Retourner les détails de l'utilisateur
+    const user = { id: userId, username };
+    return { user };
+  } catch (error) {
     return {
       error: "Une erreur inattendue s'est produite lors de l'inscription.",
     };
   }
-
-  return { user: { id: userId, username } };
 };
 
 export const login = async (data: { username: string; password: string }) => {
   const { username, password } = data;
 
-  const existingUser = await getUser(username);
-  if (!existingUser) {
-    return {
-      error: "Incorrect username or password",
-    };
-  }
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username, password }),
+    });
 
-  const validPassword = await new Argon2id().verify(
-    existingUser.hashed_password,
-    password
-  );
-  if (!validPassword) {
-    return {
-      error: "Incorrect username or password",
-    };
-  }
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { error: errorData.message || "Incorrect username or password" };
+    }
 
-  const session = await lucia.createSession(existingUser.id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes
-  );
-  return { user: { id: existingUser.id, username: existingUser.username } };
+    const responseData = await response.json();
+    const { access_token } = responseData; // Assurez-vous que la propriété correspond à celle de la réponse
+    if (typeof access_token !== "string") {
+      throw new Error("Invalid token format");
+    }
+    cookies().set("access_token", access_token, { path: "/" });
+    const decodedToken: any = jwtDecode(access_token);
+    const userId = decodedToken.sub;
+
+    // Retourner les détails de l'utilisateur
+    const user = { id: userId, username };
+    return { user };
+  } catch (error) {
+    return { error: "An unexpected error occurred during login." };
+  }
 };
 
 export const logout = async () => {
-  const { session } = await validateRequest();
-  if (!session) {
-    return {
-      error: "Unauthorized",
-    };
+  const access_token = cookies().get("access_token");
+
+  try {
+    if (access_token) {
+      // Appel à l'API NestJS pour invalider le token côté serveur
+      await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${access_token.value}`,
+        },
+      });
+    }
+
+    cookies().set("access_token", "", {
+      path: "/",
+      expires: new Date(0),
+    });
+
+    return { success: true };
+  } catch (error) {
+    return { error: "An error occurred while logging out." };
   }
-
-  await lucia.invalidateSession(session.id);
-
-  const sessionCookie = lucia.createBlankSessionCookie();
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes
-  );
-  return redirect("/login");
 };

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL;
 
@@ -25,10 +26,13 @@ type ReplenishArticleDataType = {
 };
 
 export const addArticle = async (articleData: ArticleDataType) => {
+  const access_token = cookies().get("access_token");
+
   const res = await fetch(`${API_URL}/articles`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
     },
     body: JSON.stringify(articleData),
   });
@@ -40,10 +44,13 @@ export const addArticle = async (articleData: ArticleDataType) => {
 };
 
 export const sellArticle = async (sellArticleData: SellArticleDataType) => {
+  const access_token = cookies().get("access_token");
+
   const res = await fetch(`${API_URL}/articles/sell`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
     },
     body: JSON.stringify(sellArticleData),
   });
@@ -58,10 +65,13 @@ export const replenishArticle = async (
   id: string,
   replenishArticleData: ReplenishArticleDataType
 ) => {
+  const access_token = cookies().get("access_token");
+
   const res = await fetch(`${API_URL}/articles/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
     },
     body: JSON.stringify(replenishArticleData),
   });

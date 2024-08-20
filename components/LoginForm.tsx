@@ -49,12 +49,13 @@ const LoginForm = () => {
     setBtnLoading(true);
 
     try {
-      const res = await login(values);
-      if (res && res.error) {
+      const res = await login(values); // Utilise la nouvelle fonction login
+
+      if (res.error) {
         setErrorMessage(res.error);
       } else if (res.user) {
         setErrorMessage("");
-        setUser(res.user.id, res.user.username);
+        setUser(res.user.id, res.user.username); // Ajoutez d'autres détails utilisateur si nécessaire
         toast({
           description: `Bienvenue ${res.user.username} !`,
         });
@@ -62,7 +63,7 @@ const LoginForm = () => {
         router.push("/");
       }
     } catch (error) {
-      setErrorMessage("Incorrect username or password.");
+      setErrorMessage("Une erreur inattendue s'est produite.");
     }
 
     setBtnLoading(false);

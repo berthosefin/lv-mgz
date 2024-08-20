@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
 
@@ -21,6 +21,7 @@ const Navbar = () => {
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const pathname = usePathname();
+  const router = useRouter();
   const isProtected = pathname !== "/login" && pathname !== "/signup";
 
   const isNavLinkActive = (path: string) => {
@@ -36,13 +37,21 @@ const Navbar = () => {
   async function onSubmit() {
     setBtnLoading(true);
 
-    await logout();
+    const result = await logout();
 
     setBtnLoading(false);
 
-    toast({
-      description: `Compte déconnecté avec succès !`,
-    });
+    if (result.success) {
+      toast({
+        description: `Compte déconnecté avec succès !`,
+      });
+      router.push("/login");
+    } else {
+      toast({
+        description: `Erreur lors de la déconnexion.`,
+        variant: "destructive",
+      });
+    }
   }
 
   return (

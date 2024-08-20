@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUserData } from "@/lib/users";
+import { getUser } from "@/lib/users";
 
 type Props = {
   params: {
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default async function ReplenishArticle({ params }: Props) {
-  const userData: User = await getUserData();
+  const userData: User = await getUser();
   const userCashDesk: CashDesk = userData.store.cashDesk;
 
   return (

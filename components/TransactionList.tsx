@@ -5,7 +5,7 @@ import { fetcher } from "@/lib/fetcher";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ChevronLeft, ChevronRight, FileDown, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";

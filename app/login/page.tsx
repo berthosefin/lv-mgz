@@ -7,16 +7,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { validateRequest } from "@/lib/auth";
 import { UserPlus } from "lucide-react";
-import { redirect } from "next/navigation";
 
 export default async function Page() {
-  const { user } = await validateRequest();
-  if (user) {
-    return redirect("/");
-  }
-
   return (
     <Card className="w-[350px] mx-auto">
       <CardHeader>

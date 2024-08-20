@@ -1,11 +1,11 @@
 import ArticleList from "@/components/ArticleList";
 import { Button } from "@/components/ui/button";
-import { getUserData } from "@/lib/users";
+import { getUser } from "@/lib/users";
 import { HandCoins, Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function Article() {
-  const userData: User = await getUserData();
+  const userData: User = await getUser();
   const userStore: Store = userData.store;
 
   return (
