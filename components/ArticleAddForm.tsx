@@ -25,7 +25,13 @@ const formSchema = z.object({
   name: z.string(),
   purchasePrice: z.coerce.number(),
   sellingPrice: z.coerce.number(),
-  stock: z.coerce.number(),
+  stock: z.coerce
+    .number()
+    .int()
+    .max(
+      2147483647,
+      "La valeur du stock doit être inférieure à 2,147,483,647."
+    ),
   unit: z.string(),
   storeId: z.optional(z.string()),
 });
@@ -37,7 +43,7 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
   const router = useRouter();
 
   const userStore = userData.store;
-  const userCashDesk = userData.store.cashDesk;
+  // const userCashDesk = userData.store.cashDesk;
 
   const { data: articles, error: articlesError } = useSWR(
     `/api/articles?storeId=${userStore.id}`,
@@ -68,29 +74,29 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
     }
   };
 
-  const handlePurchasePriceChange = async (value: string) => {
-    const purchasePrice = parseFloat(value);
-    const stockValue = watch("stock");
-    const totalCost = stockValue * purchasePrice;
+  // const handlePurchasePriceChange = async (value: string) => {
+  //   const purchasePrice = parseFloat(value);
+  //   const stockValue = watch("stock");
+  //   const totalCost = stockValue * purchasePrice;
 
-    if (totalCost > userCashDesk.currentAmount) {
-      setErrorMessage("Solde insuffisant dans la caisse.");
-    } else {
-      setErrorMessage("");
-    }
-  };
+  //   if (totalCost > userCashDesk.currentAmount) {
+  //     setErrorMessage("Solde insuffisant dans la caisse.");
+  //   } else {
+  //     setErrorMessage("");
+  //   }
+  // };
 
-  const handleStockChange = async (value: string) => {
-    const stockValue = parseInt(value);
-    const purchasePrice = watch("purchasePrice");
-    const totalCost = stockValue * purchasePrice;
+  // const handleStockChange = async (value: string) => {
+  //   const stockValue = parseInt(value);
+  //   const purchasePrice = watch("purchasePrice");
+  //   const totalCost = stockValue * purchasePrice;
 
-    if (totalCost > userCashDesk.currentAmount) {
-      setErrorMessage("Solde insuffisant dans la caisse.");
-    } else {
-      setErrorMessage("");
-    }
-  };
+  //   if (totalCost > userCashDesk.currentAmount) {
+  //     setErrorMessage("Solde insuffisant dans la caisse.");
+  //   } else {
+  //     setErrorMessage("");
+  //   }
+  // };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
@@ -148,7 +154,7 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
                   type="number"
                   placeholder="Prix d'achat (MGA)"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    handlePurchasePriceChange(e.target.value);
+                    // handlePurchasePriceChange(e.target.value);
                     field.onChange(e);
                   }}
                 />
@@ -191,7 +197,7 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
                       type="number"
                       placeholder="Stock initial"
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleStockChange(e.target.value);
+                        // handleStockChange(e.target.value);
                         field.onChange(e);
                       }}
                     />

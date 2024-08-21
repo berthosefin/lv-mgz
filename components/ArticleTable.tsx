@@ -6,8 +6,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { AlertCircle, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 type Props = {
   articles: Article[];
@@ -32,7 +40,7 @@ const ArticleTable = ({ articles }: Props) => {
           <TableHead>Unité</TableHead>
           <TableHead className="text-right">Prix d&apos;achat</TableHead>
           <TableHead className="text-right">Prix de vente</TableHead>
-          <TableHead className="w-[24px]"></TableHead>
+          <TableHead className="w-[48px]">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -53,9 +61,25 @@ const ArticleTable = ({ articles }: Props) => {
               <span className="ml-2">MGA</span>
             </TableCell>
             <TableCell>
-              <Link href={`/articles/${article.id}`}>
-                <RefreshCw size={12} />
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button aria-haspopup="true" size="icon" variant="ghost">
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem>
+                    <Link href={`/articles/${article.id}`}>
+                      Approvisionnement
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive font-bold">
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         ))}

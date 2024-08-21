@@ -24,7 +24,13 @@ import useSWR from "swr";
 import { z } from "zod";
 
 const formSchema = z.object({
-  replenishQuantity: z.coerce.number(),
+  replenishQuantity: z.coerce
+    .number()
+    .int()
+    .max(
+      2147483647,
+      "La valeur du stock doit être inférieure à 2,147,483,647."
+    ),
   cashDeskId: z.optional(z.string()),
 });
 
@@ -50,15 +56,15 @@ const ArticleReplenishForm = ({ articleId, userCashDesk }: Props) => {
     defaultValues: { replenishQuantity: 0 },
   });
 
-  const handleReplenishQuantityChange = (value: string) => {
-    const totalCost = parseInt(value) * article.purchasePrice;
+  // const handleReplenishQuantityChange = (value: string) => {
+  //   const totalCost = parseInt(value) * article.purchasePrice;
 
-    if (totalCost > userCashDesk.currentAmount) {
-      setErrorMessage("Solde insuffisant dans la caisse.");
-    } else {
-      setErrorMessage("");
-    }
-  };
+  //   if (totalCost > userCashDesk.currentAmount) {
+  //     setErrorMessage("Solde insuffisant dans la caisse.");
+  //   } else {
+  //     setErrorMessage("");
+  //   }
+  // };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
@@ -135,7 +141,7 @@ const ArticleReplenishForm = ({ articleId, userCashDesk }: Props) => {
                     type="number"
                     placeholder="Quantité"
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleReplenishQuantityChange(e.target.value);
+                      // handleReplenishQuantityChange(e.target.value);
                       field.onChange(e);
                     }}
                     disabled={isLoading}
