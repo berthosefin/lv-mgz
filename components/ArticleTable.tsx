@@ -6,16 +6,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, MoreHorizontal } from "lucide-react";
+import { AlertCircle, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 
 type Props = {
   articles: Article[];
@@ -61,25 +54,18 @@ const ArticleTable = ({ articles }: Props) => {
               <span className="ml-2">MGA</span>
             </TableCell>
             <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button aria-haspopup="true" size="icon" variant="ghost">
-                    <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Toggle menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem>
-                    <Link href={`/articles/${article.id}`}>
-                      Approvisionnement
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive font-bold">
-                    Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <span className="flex gap-2">
+                <Button asChild size={"icon"} variant={"secondary"}>
+                  <Link href={`/articles/${article.id}`}>
+                    <RefreshCw className="w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button asChild size={"icon"} variant={"destructive"}>
+                  <Link href={`#`}>
+                    <Trash className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </span>
             </TableCell>
           </TableRow>
         ))}
