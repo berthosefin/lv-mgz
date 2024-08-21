@@ -9,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { signup } from "@/lib/auth.actions";
-import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -40,7 +39,6 @@ const formSchema = z
 const SignupForm = () => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [btnLoading, setBtnLoading] = useState(false);
-  const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -64,16 +62,16 @@ const SignupForm = () => {
       password: confirmPassword,
       storeName,
     });
-    if (res && res.error) {
+
+    if (res.error) {
       setErrorMessage(res.error);
-    } else if (res.user) {
+    } else {
       setErrorMessage("");
-      setUser(res.user.id, res.user.username);
       toast({
-        description: `Compte utilisateur "${res.user.username}" crée avec succès !`,
+        description: `Compte utilisateur "${res.username}" crée avec succès !`,
       });
       form.reset();
-      router.push("/");
+      router.push("/login");
     }
 
     setBtnLoading(false);

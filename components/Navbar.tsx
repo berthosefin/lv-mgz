@@ -42,10 +42,10 @@ const Navbar = () => {
     setBtnLoading(false);
 
     if (result.success) {
+      router.push("/login");
       toast({
         description: `Compte déconnecté avec succès !`,
       });
-      router.push("/login");
     } else {
       toast({
         description: `Erreur lors de la déconnexion.`,

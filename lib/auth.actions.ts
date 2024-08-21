@@ -31,15 +31,8 @@ export const signup = async (data: {
       };
     }
 
-    // Décoder le token pour obtenir l'ID utilisateur
-    const { access_token } = await response.json();
-    cookies().set("access_token", access_token, { path: "/" });
-    const decodedToken: any = jwtDecode(access_token);
-    const userId = decodedToken.sub;
-
-    // Retourner les détails de l'utilisateur
-    const user = { id: userId, username };
-    return { user };
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
     return {
       error: "Une erreur inattendue s'est produite lors de l'inscription.",
@@ -64,12 +57,9 @@ export const login = async (data: { username: string; password: string }) => {
       return { error: errorData.message || "Incorrect username or password" };
     }
 
-    const responseData = await response.json();
-    const { access_token } = responseData; // Assurez-vous que la propriété correspond à celle de la réponse
-    if (typeof access_token !== "string") {
-      throw new Error("Invalid token format");
-    }
+    const { access_token, refresh_token } = await response.json();
     cookies().set("access_token", access_token, { path: "/" });
+    cookies().set("refresh_token", refresh_token, { path: "/" });
     const decodedToken: any = jwtDecode(access_token);
     const userId = decodedToken.sub;
 

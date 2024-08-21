@@ -1,11 +1,7 @@
 import { getUser } from "@/lib/users";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { username: string } }
-) {
-  const { username } = params;
-  const userData = await getUser(username);
+export async function GET() {
+  const userData = await getUser();
 
   return Response.json(userData);
 }

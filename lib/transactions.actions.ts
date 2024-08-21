@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL;
 
@@ -15,10 +16,13 @@ type TransactionDataType = {
 export const createTransaction = async (
   transactionData: TransactionDataType
 ) => {
+  const access_token = cookies().get("access_token");
+
   const res = await fetch(`${API_URL}/transactions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
     },
     body: JSON.stringify(transactionData),
   });
