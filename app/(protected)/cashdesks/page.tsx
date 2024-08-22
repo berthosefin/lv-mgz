@@ -1,9 +1,7 @@
 import CashDesk from "@/components/CashDesk";
 import TransactionList from "@/components/TransactionList";
-import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/users";
-import { ArrowLeftRight } from "lucide-react";
-import Link from "next/link";
+import { Wallet } from "lucide-react";
 
 export default async function CashDeskPage() {
   const userData: User = await getUser();
@@ -13,12 +11,16 @@ export default async function CashDeskPage() {
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Caisse</h1>
-        <Button asChild>
+        {/* <Button asChild>
           <Link href={"/cashdesks/operation"} className="btn">
             <ArrowLeftRight size={16} className="mr-2 h-4 w-4" />
             Dépot / Rétrait
           </Link>
-        </Button>
+        </Button> */}
+        <span className="flex gap-2">
+          <Wallet size={20} className="mr-2" />
+          {userData.store.name}
+        </span>
       </div>
       <CashDesk userCashDesk={userCashDesk} />
       <TransactionList userCashDesk={userCashDesk} />

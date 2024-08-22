@@ -14,6 +14,7 @@ import { useToast } from "./ui/use-toast";
 const NavLinks = [
   { name: "Home", path: "/" },
   { name: "Articles", path: "/articles" },
+  { name: "Commandes", path: "/orders" },
   { name: "Clients", path: "/clients" },
   { name: "Caisse", path: "/cashdesks" },
 ];

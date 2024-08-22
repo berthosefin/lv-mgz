@@ -33,7 +33,7 @@ const ClientTable = ({ clients }: Props) => {
           <TableHead>Phone</TableHead>
           <TableHead className="">Addresse d&apos;achat</TableHead>
           <TableHead className="">Ville</TableHead>
-          <TableHead className="">Actions</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -48,15 +48,15 @@ const ClientTable = ({ clients }: Props) => {
             <TableCell className="">{client.address}</TableCell>
             <TableCell className="">{client.city}</TableCell>
             <TableCell>
-              <span className="flex gap-2">
-                <Button asChild size={"icon"} variant={"secondary"}>
+              <span className="flex justify-end gap-2">
+                <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`/clients/${client.id}`}>
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"destructive"}>
+                <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`#`}>
-                    <Trash className="w-4 h-4" />
+                    <Trash className="w-4 h-4 text-destructive" />
                   </Link>
                 </Button>
               </span>

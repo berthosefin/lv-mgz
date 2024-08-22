@@ -56,11 +56,11 @@ const LoginForm = () => {
       } else if (res.user) {
         setErrorMessage("");
         setUser(res.user.id, res.user.username); // Ajoutez d'autres détails utilisateur si nécessaire
+        form.reset();
+        router.push("/");
         toast({
           description: `Bienvenue ${res.user.username} !`,
         });
-        form.reset();
-        router.push("/");
       }
     } catch (error) {
       setErrorMessage("Une erreur inattendue s'est produite.");

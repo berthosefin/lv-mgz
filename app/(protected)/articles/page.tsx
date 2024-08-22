@@ -1,7 +1,7 @@
 import ArticleList from "@/components/ArticleList";
 import { Button } from "@/components/ui/button";
 import { getUser } from "@/lib/users";
-import { HandCoins, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function Article() {
@@ -16,15 +16,15 @@ export default async function Article() {
           <Button asChild>
             <Link href={"/articles/add"} className="btn">
               <Plus size={16} className="mr-2 h-4 w-4" />
-              Ajouter un article
+              Nouvel article
             </Link>
           </Button>
-          <Button asChild>
+          {/* <Button asChild>
             <Link href={"/articles/sell"} className="btn">
               <HandCoins size={16} className="mr-2 h-4 w-4" />
               Vendre un article
             </Link>
-          </Button>
+          </Button> */}
         </div>
       </div>
       <ArticleList userStore={userStore} />

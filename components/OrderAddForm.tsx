@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/components/MyLoader";
 import {
   Form,
   FormControl,
@@ -9,22 +8,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { editClient } from "@/lib/clients.actions";
-import { fetcher } from "@/lib/fetcher";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Edit3 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import useSWR from "swr";
 import { z } from "zod";
 import ErrorMessage from "./ErrorMessage";
 import MyButton from "./MyButton";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
+import { addClient } from "@/lib/clients.actions";
 
 const formSchema = z.object({
-  name: z.string().optional(),
+  name: z.string(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),
@@ -32,65 +28,36 @@ const formSchema = z.object({
   storeId: z.string().optional(),
 });
 
-type Props = {
-  clientId: string;
-};
-
-const ClientEditForm = ({ clientId }: Props) => {
+const OrderAddForm = ({ userData }: { userData: User }) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
 
-  const {
-    data: client,
-    isLoading,
-    error: clientError,
-  } = useSWR(`/api/clients/${clientId}`, fetcher);
+  const userStore = userData.store;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
+      city: "Manakara",
     },
   });
-
-  // Update form values when client data is fetched
-  useEffect(() => {
-    if (client) {
-      form.reset(client); // Reset form with fetched client data
-    }
-  }, [client, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
 
-    await editClient(clientId, values);
+    values.storeId = userStore.id;
+
+    await addClient(values);
 
     toast({
-      title: `Client: ${values.name}`,
-      description: `La mise à jour des informations a été effectuée avec succès !`,
+      title: `Ajout d'un nouveau client: ${values.name}`,
+      description: `Le client a été ajouté avec succès !`,
     });
 
     form.reset();
     setBtnLoading(false);
     router.push("/clients");
-  }
-
-  if (clientError) {
-    return (
-      <div className="mt-4">
-        <ErrorMessage errorMessage="Erreur lors du chargement des informations sur le client" />
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return <Loader />; // Show loader while data is being fetched
   }
 
   return (
@@ -178,8 +145,7 @@ const ClientEditForm = ({ clientId }: Props) => {
         </div>
 
         <MyButton
-          icon={<Edit3 size={16} className="mr-2 h-4 w-4" />}
-          label="Modifier"
+          label="Ajouter"
           loading={btnLoading}
           errorMessage={errorMessage}
         />
@@ -188,4 +154,4 @@ const ClientEditForm = ({ clientId }: Props) => {
   );
 };
 
-export default ClientEditForm;
+export default OrderAddForm;

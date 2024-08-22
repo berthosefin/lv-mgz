@@ -33,7 +33,7 @@ const ArticleTable = ({ articles }: Props) => {
           <TableHead>Unité</TableHead>
           <TableHead className="text-right">Prix d&apos;achat</TableHead>
           <TableHead className="text-right">Prix de vente</TableHead>
-          <TableHead className="w-[48px]">Actions</TableHead>
+          <TableHead className="w-[48px] text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -55,14 +55,14 @@ const ArticleTable = ({ articles }: Props) => {
             </TableCell>
             <TableCell>
               <span className="flex gap-2">
-                <Button asChild size={"icon"} variant={"secondary"}>
+                <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`/articles/${article.id}`}>
                     <RefreshCw className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"destructive"}>
+                <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`#`}>
-                    <Trash className="w-4 h-4" />
+                    <Trash className="w-4 h-4 text-destructive" />
                   </Link>
                 </Button>
               </span>

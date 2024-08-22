@@ -15,13 +15,13 @@ export default async function SellArticle() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Vente d&apos;articles</CardTitle>
+        <CardTitle>Nouvelle commande</CardTitle>
       </CardHeader>
       <CardContent>
         <ArticleSellForm userData={userData} />
       </CardContent>
       <CardFooter className="flex justify-center">
-        <MyButtonBack path="/articles" name="List des articles" />
+        <MyButtonBack path="/orders" name="List des commandes" />
       </CardFooter>
     </Card>
   );

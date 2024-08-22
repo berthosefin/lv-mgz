@@ -183,7 +183,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
 
     setClientName("");
     setBtnLoading(false);
-    router.push("/articles");
+    router.push("/orders");
   };
 
   return (

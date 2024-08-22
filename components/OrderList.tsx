@@ -5,9 +5,9 @@ import { fetcher } from "@/lib/fetcher";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
-import ClientTable from "./ClientTable";
 import ErrorMessage from "./ErrorMessage";
 import MyLoader from "./MyLoader";
+import OrderTable from "./OrderTable";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 
@@ -15,42 +15,42 @@ type Props = {
   userStore: Store;
 };
 
-const ClientList = ({ userStore }: Props) => {
+const OrderList = ({ userStore }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const {
-    data: clients,
-    isLoading: clientsLoading,
-    error: clientsError,
+    data: orders,
+    isLoading: ordersLoading,
+    error: ordersError,
   } = useSWR(
-    `/api/clients?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
+    `/api/orders?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
     fetcher
   );
 
   const {
-    data: clientsCount,
-    isLoading: clientsCountLoading,
-    error: clientsCountError,
-  } = useSWR(`/api/clients/count?storeId=${userStore.id}`, fetcher);
+    data: ordersCount,
+    isLoading: ordersCountLoading,
+    error: ordersCountError,
+  } = useSWR(`/api/orders/count?storeId=${userStore.id}`, fetcher);
 
-  const totalPages = Math.ceil(clientsCount / (LIMIT || 1));
+  const totalPages = Math.ceil(ordersCount / (LIMIT || 1));
 
   return (
     <div className="overflow-x-auto mt-4">
       <Card>
         <CardHeader>
-          {(clientsError || clientsCountError) && (
-            <ErrorMessage errorMessage="Erreur lors du chargement des clients." />
+          {(ordersError || ordersCountError) && (
+            <ErrorMessage errorMessage="Erreur lors du chargement des commandes." />
           )}
         </CardHeader>
         <CardContent>
-          {clientsLoading || clientsCountLoading ? (
+          {ordersLoading || ordersCountLoading ? (
             <MyLoader />
           ) : (
-            <ClientTable clients={clients} />
+            <OrderTable orders={orders} />
           )}
         </CardContent>
-        {clients && clientsCount > LIMIT && (
+        {orders && ordersCount > LIMIT && (
           <CardFooter className="flex justify-center space-x-4">
             <Button
               variant={"outline"}
@@ -76,4 +76,4 @@ const ClientList = ({ userStore }: Props) => {
   );
 };
 
-export default ClientList;
+export default OrderList;
