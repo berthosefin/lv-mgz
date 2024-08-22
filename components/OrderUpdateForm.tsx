@@ -66,7 +66,7 @@ const OrderUpdateForm = ({ orderId }: Props) => {
     await updateOrder(orderId, values);
 
     toast({
-      title: `Mise à jour du commande de: ${values}`,
+      title: `Mise à jour du commande de: ${order.client.name}`,
       description: `La mise à jour a été effectuée avec succès !`,
     });
 
@@ -74,6 +74,8 @@ const OrderUpdateForm = ({ orderId }: Props) => {
     setBtnLoading(false);
     router.push("/orders");
   }
+
+  const isSwitchDisabled = (value: boolean) => value;
 
   if (orderError) {
     return (
@@ -126,6 +128,7 @@ const OrderUpdateForm = ({ orderId }: Props) => {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isSwitchDisabled(field.value)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -145,6 +148,7 @@ const OrderUpdateForm = ({ orderId }: Props) => {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isSwitchDisabled(field.value)}
                   />
                 </FormControl>
                 <FormMessage />

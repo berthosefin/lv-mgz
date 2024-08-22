@@ -29,7 +29,7 @@ export default async function UpdateOrder({ params }: Props) {
         <OrderUpdateForm orderId={params.id} />
       </CardContent>
       <CardFooter className="flex justify-center">
-        <MyButtonBack path="/articles" name="List des articles" />
+        <MyButtonBack path="/orders" name="List des commandes" />
       </CardFooter>
     </Card>
   );

@@ -14,12 +14,6 @@ type ArticleDataType = {
   storeId?: string;
 };
 
-type SellArticleDataType = {
-  articles: String[];
-  sellQuantities: number[];
-  cashDeskId: string;
-};
-
 type ReplenishArticleDataType = {
   replenishQuantity: number;
   cashDeskId?: string;
@@ -38,24 +32,6 @@ export const addArticle = async (articleData: ArticleDataType) => {
   });
 
   if (!res.ok) throw new Error("failed to add article");
-
-  revalidatePath("/articles");
-  return res.json();
-};
-
-export const sellArticle = async (sellArticleData: SellArticleDataType) => {
-  const access_token = cookies().get("access_token");
-
-  const res = await fetch(`${API_URL}/articles/sell`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${access_token?.value}`,
-    },
-    body: JSON.stringify(sellArticleData),
-  });
-
-  if (!res.ok) throw new Error("failed to sell articles");
 
   revalidatePath("/articles");
   return res.json();

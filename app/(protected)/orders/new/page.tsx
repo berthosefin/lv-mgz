@@ -1,5 +1,5 @@
-import ArticleSellForm from "@/components/ArticleSellForm";
 import MyButtonBack from "@/components/MyButtonBack";
+import OrderNewForm from "@/components/OrderNewForm";
 import {
   Card,
   CardContent,
@@ -18,7 +18,7 @@ export default async function SellArticle() {
         <CardTitle>Nouvelle commande</CardTitle>
       </CardHeader>
       <CardContent>
-        <ArticleSellForm userData={userData} />
+        <OrderNewForm userData={userData} />
       </CardContent>
       <CardFooter className="flex justify-center">
         <MyButtonBack path="/orders" name="List des commandes" />

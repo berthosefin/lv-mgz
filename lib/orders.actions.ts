@@ -5,9 +5,40 @@ import { cookies } from "next/headers";
 
 const API_URL = process.env.API_URL;
 
+type NewOrderDataType = {
+  storeId: string;
+  clientName: string;
+  isPaid: boolean;
+  isDelivered: boolean;
+  orderItems: {
+    articleId: string;
+    quantity: number;
+  }[];
+};
+
 type UpdateOrderDataType = {
   isPaid: boolean;
   isDelivered: boolean;
+};
+
+export const createOrder = async (sellArticleData: NewOrderDataType) => {
+  const access_token = cookies().get("access_token");
+
+  console.log(sellArticleData);
+
+  const res = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
+    },
+    body: JSON.stringify(sellArticleData),
+  });
+
+  if (!res.ok) throw new Error("failed to create order");
+
+  revalidatePath("/orders");
+  return res.json();
 };
 
 export const updateOrder = async (

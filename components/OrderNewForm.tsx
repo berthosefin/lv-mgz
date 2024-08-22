@@ -1,19 +1,7 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { sellArticle } from "@/lib/articles.actions";
-import { fetcher } from "@/lib/fetcher";
-import clsx from "clsx";
-import jsPDF from "jspdf";
-import { ShoppingCart } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import Select from "react-select";
-import useSWR from "swr";
-import ErrorMessage from "./ErrorMessage";
-import Loader from "./MyLoader";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -22,29 +10,43 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Check, FileDown, RotateCw, X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { fetcher } from "@/lib/fetcher";
+import clsx from "clsx";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Check, FileDown, RotateCw, ShoppingCart, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import Select from "react-select";
+import useSWR from "swr";
+import ErrorMessage from "./ErrorMessage";
+import Loader from "./MyLoader";
+import { createOrder } from "@/lib/orders.actions";
+import { Label } from "./ui/label";
+import { Checkbox } from "./ui/checkbox";
 
-type InvoiceItem = {
+type OrderItem = {
   articleId: string;
   quantity: number;
   sellingPrice: number;
 };
 
-const ArticleSellForm = ({ userData }: { userData: User }) => {
+const OrderNewForm = ({ userData }: { userData: User }) => {
   const [clientName, setClientName] = useState<string>("");
   const [selectedArticle, setSelectedArticle] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("");
-  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([]);
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const [isPaid, setIsPaid] = useState<boolean>(true);
+  const [isDelivered, setIsDelivered] = useState<boolean>(true);
   const { toast } = useToast();
   const router = useRouter();
 
   const userStore = userData.store;
-  const userCashDesk = userData.store.cashDesk;
 
   const {
     data: articles,
@@ -77,44 +79,39 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
     setClientName(e.target.value);
   };
 
-  const handleAddToInvoice = () => {
+  const handleAddToOrder = () => {
     const newQuantity = parseInt(quantity);
 
-    if (!selectedArticle || !newQuantity) {
+    if (!selectedArticle || !newQuantity || newQuantity <= 0) {
       setErrorMessage(
         "L'article est obligatoire et la quantité doit être supérieur à 0 !"
       );
-    } else {
-      setErrorMessage("");
+      return;
     }
 
-    if (selectedArticle && newQuantity > 0) {
-      const selectedArticleData = articles.find(
-        (article: Article) => article.id === selectedArticle
+    const selectedArticleData = articles.find(
+      (article: Article) => article.id === selectedArticle
+    );
+    if (selectedArticleData) {
+      const item: OrderItem = {
+        articleId: selectedArticleData.id,
+        quantity: newQuantity,
+        sellingPrice: selectedArticleData.sellingPrice,
+      };
+      setOrderItems([...orderItems, item]);
+      setTotalAmount(
+        totalAmount + newQuantity * selectedArticleData.sellingPrice
       );
-      if (selectedArticleData) {
-        const item: InvoiceItem = {
-          articleId: selectedArticleData.id,
-          quantity: newQuantity,
-          sellingPrice: selectedArticleData.sellingPrice,
-        };
-        setInvoiceItems([...invoiceItems, item]);
-        setTotalAmount(
-          totalAmount + newQuantity * selectedArticleData.sellingPrice
-        );
-      }
       setSelectedArticle("");
       setQuantity("");
     }
   };
 
   const handleRemoveItem = (indexToRemove: number) => {
-    setInvoiceItems(invoiceItems.filter((_, index) => index !== indexToRemove));
+    setOrderItems(orderItems.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleExportToPDF = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
+  const handleExportToPDF = () => {
     const doc = new jsPDF();
     const today = format(new Date(), "dd/MM/yyyy");
 
@@ -123,19 +120,13 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
     doc.text(`Date: ${today}`, 15, 22);
     doc.text(`FACTURE`, 90, 45);
 
-    const tableData = invoiceItems.map(
-      (invoice: InvoiceItem, index: number) => {
-        const { articleId, quantity, sellingPrice } = invoice;
-
-        const articleName = articles.find(
-          (article: Article) => article.id === articleId
-        )?.name;
-
-        const amount = quantity * sellingPrice;
-
-        return [index + 1, articleName, quantity, sellingPrice, amount];
-      }
-    );
+    const tableData = orderItems.map((item: OrderItem, index: number) => {
+      const articleName = articles.find(
+        (article: Article) => article.id === item.articleId
+      )?.name;
+      const amount = item.quantity * item.sellingPrice;
+      return [index + 1, articleName, item.quantity, item.sellingPrice, amount];
+    });
 
     const totalAmountRow = ["", "", "", "TOTAL", totalAmount];
     tableData.push(totalAmountRow);
@@ -162,28 +153,37 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
     doc.save(`facture_de_${clientName}_du_${today}.pdf`);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitOrder = async () => {
+    if (clientName.trim() === "") {
+      setErrorMessage("Le nom du client est obligatoire !");
+      return;
+    }
+
     setBtnLoading(true);
 
-    const articleIds = invoiceItems.map((item) => item.articleId);
-    const sellQuantities = invoiceItems.map((item) => item.quantity);
-
-    const sellArticleData = {
-      articles: articleIds,
-      sellQuantities: sellQuantities,
-      cashDeskId: userCashDesk.id,
+    const newOrder = {
+      storeId: userStore.id,
+      clientName,
+      isPaid,
+      isDelivered,
+      orderItems: orderItems.map((item) => ({
+        articleId: item.articleId,
+        quantity: item.quantity,
+      })),
     };
 
-    await sellArticle(sellArticleData);
-
-    toast({
-      title: `Vente d'article`,
-      description: `La vente d'article a été effectué avec succès !`,
-    });
-
-    setClientName("");
-    setBtnLoading(false);
-    router.push("/orders");
+    try {
+      await createOrder(newOrder);
+      toast({
+        title: "Nouvelle commande",
+        description: "La commande a été créée avec succès !",
+      });
+      router.push("/orders");
+    } catch (error) {
+      setErrorMessage("Erreur lors de la création de la commande.");
+    } finally {
+      setBtnLoading(false);
+    }
   };
 
   return (
@@ -198,12 +198,30 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
         <Loader />
       ) : (
         <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
-          <Input
-            className="lg:w-[180px]"
-            placeholder="Nom du client"
-            value={clientName}
-            onChange={handleClientNameChange}
-          />
+          <div className="flex space-x-4 items-center">
+            <Input
+              className="lg:w-[180px]"
+              placeholder="Nom du client"
+              value={clientName}
+              onChange={handleClientNameChange}
+            />
+            <Label className="flex items-center text-primary">
+              <Checkbox
+                checked={isPaid}
+                onCheckedChange={(checked) => setIsPaid(checked === true)}
+                className="mr-2"
+              />
+              Payé
+            </Label>
+            <Label className="flex items-center text-primary">
+              <Checkbox
+                checked={isDelivered}
+                onCheckedChange={(checked) => setIsDelivered(checked === true)}
+                className="mr-2"
+              />
+              Livré
+            </Label>
+          </div>
 
           <div className="flex flex-col space-y-4 lg:flex-row lg:justify-end lg:space-y-0 lg:space-x-4">
             <Select
@@ -223,7 +241,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
               options={articles
                 .filter(
                   (article: Article) =>
-                    !invoiceItems.some((item) => item.articleId === article.id)
+                    !orderItems.some((item) => item.articleId === article.id)
                 )
                 .map((article: Article) => ({
                   value: article.id,
@@ -234,7 +252,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
               placeholder="Selectionner un article"
               unstyled
               styles={{
-                control: (baseStyles, state) => ({
+                control: (baseStyles) => ({
                   ...baseStyles,
                   minHeight: "2.5rem",
                   height: "2.5rem",
@@ -291,7 +309,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
 
             <Button
               disabled={errorMessage ? true : false}
-              onClick={handleAddToInvoice}
+              onClick={handleAddToOrder}
             >
               <ShoppingCart size={16} />
             </Button>
@@ -299,7 +317,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
         </div>
       )}
 
-      {invoiceItems.length > 0 && (
+      {orderItems.length > 0 && (
         <Table className="mt-4">
           <TableHeader>
             <TableRow>
@@ -311,7 +329,7 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoiceItems.map((item, index) => (
+            {orderItems.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>
                   {
@@ -366,8 +384,10 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
                   </Button>
                 ) : (
                   <Button
-                    disabled={errorMessage ? true : false}
-                    onClick={handleSubmit}
+                    disabled={
+                      errorMessage || clientName.trim() === "" ? true : false
+                    }
+                    onClick={handleSubmitOrder}
                   >
                     <Check size={16} className="mr-2 h-4 w-4" />
                     Valider
@@ -382,4 +402,4 @@ const ArticleSellForm = ({ userData }: { userData: User }) => {
   );
 };
 
-export default ArticleSellForm;
+export default OrderNewForm;
