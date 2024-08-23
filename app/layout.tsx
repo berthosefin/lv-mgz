@@ -10,8 +10,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Chez RAKOTO",
-  description: "Powered by Thos",
+  title: "LV MGZ",
+  description: "Powered by Berthose Fin",
 };
 
 export default function RootLayout({

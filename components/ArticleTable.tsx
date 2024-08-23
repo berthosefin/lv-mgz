@@ -9,6 +9,7 @@ import {
 import { AlertCircle, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { removeArticle } from "@/lib/articles.actions";
 
 type Props = {
   articles: Article[];
@@ -60,10 +61,15 @@ const ArticleTable = ({ articles }: Props) => {
                     <RefreshCw className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"outline"}>
-                  <Link href={`#`}>
-                    <Trash className="w-4 h-4 text-destructive" />
-                  </Link>
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => {
+                    removeArticle(article.id);
+                  }}
+                  disabled
+                >
+                  <Trash className="w-4 h-4 text-destructive" />
                 </Button>
               </span>
             </TableCell>

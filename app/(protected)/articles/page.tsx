@@ -19,12 +19,6 @@ export default async function Article() {
               Nouvel article
             </Link>
           </Button>
-          {/* <Button asChild>
-            <Link href={"/articles/sell"} className="btn">
-              <HandCoins size={16} className="mr-2 h-4 w-4" />
-              Vendre un article
-            </Link>
-          </Button> */}
         </div>
       </div>
       <ArticleList userStore={userStore} />

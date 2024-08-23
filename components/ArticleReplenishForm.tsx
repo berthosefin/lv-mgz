@@ -36,10 +36,9 @@ const formSchema = z.object({
 
 type Props = {
   articleId: string;
-  userCashDesk: CashDesk;
 };
 
-const ArticleReplenishForm = ({ articleId, userCashDesk }: Props) => {
+const ArticleReplenishForm = ({ articleId }: Props) => {
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const { toast } = useToast();
@@ -56,20 +55,8 @@ const ArticleReplenishForm = ({ articleId, userCashDesk }: Props) => {
     defaultValues: { replenishQuantity: 0 },
   });
 
-  // const handleReplenishQuantityChange = (value: string) => {
-  //   const totalCost = parseInt(value) * article.purchasePrice;
-
-  //   if (totalCost > userCashDesk.currentAmount) {
-  //     setErrorMessage("Solde insuffisant dans la caisse.");
-  //   } else {
-  //     setErrorMessage("");
-  //   }
-  // };
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
-
-    values.cashDeskId = userCashDesk.id;
 
     await replenishArticle(articleId, values);
 

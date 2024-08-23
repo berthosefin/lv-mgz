@@ -16,7 +16,6 @@ type ArticleDataType = {
 
 type ReplenishArticleDataType = {
   replenishQuantity: number;
-  cashDeskId?: string;
 };
 
 export const addArticle = async (articleData: ArticleDataType) => {
@@ -53,6 +52,23 @@ export const replenishArticle = async (
   });
 
   if (!res.ok) throw new Error("failed to replenish article");
+
+  revalidatePath("/articles");
+  return res.json();
+};
+
+export const removeArticle = async (id: string) => {
+  const access_token = cookies().get("access_token");
+
+  const res = await fetch(`${API_URL}/articles/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("failed to remove article");
 
   revalidatePath("/articles");
   return res.json();

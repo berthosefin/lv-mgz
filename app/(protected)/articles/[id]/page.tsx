@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUser } from "@/lib/users";
 
 type Props = {
   params: {
@@ -16,9 +15,6 @@ type Props = {
 };
 
 export default async function ReplenishArticle({ params }: Props) {
-  const userData: User = await getUser();
-  const userCashDesk: CashDesk = userData.store.cashDesk;
-
   return (
     <Card className="w-[350px] mx-auto">
       <CardHeader>
@@ -27,10 +23,7 @@ export default async function ReplenishArticle({ params }: Props) {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ArticleReplenishForm
-          userCashDesk={userCashDesk}
-          articleId={params.id}
-        />
+        <ArticleReplenishForm articleId={params.id} />
       </CardContent>
       <CardFooter className="flex justify-center">
         <MyButtonBack path="/articles" name="List des articles" />
