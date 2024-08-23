@@ -9,6 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { getArticlesCount, getLowStockArticles } from "@/lib/articles";
 import { calculateMonthlyData } from "@/lib/calculate";
 import {
@@ -168,19 +176,31 @@ export default async function Home() {
             </div>
           </CardHeader>
           <CardContent>
-            {lowStockArticles.length > 0 ? (
-              <ul>
-                {lowStockArticles.map((article: Article) => (
-                  <li key={article.id}>
-                    {article.name} - {article.stock} en stock
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span className="text-muted-foreground">
-                Pas encore d&apos;articles en cours d&apos;épuisement de stock.
-              </span>
-            )}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Article</TableHead>
+                  <TableHead className="text-end">Stock</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {lowStockArticles.length > 0 ? (
+                  lowStockArticles.map((article: Article) => (
+                    <TableRow key={article.id}>
+                      <TableCell>{article.name}</TableCell>
+                      <TableCell className="text-end">
+                        {article.stock}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <span className="text-muted-foreground">
+                    Pas encore d&apos;articles en cours d&apos;épuisement de
+                    stock.
+                  </span>
+                )}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>
