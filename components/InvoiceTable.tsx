@@ -12,11 +12,11 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 
 type Props = {
-  orders: Order[];
+  invoices: Invoice[];
 };
 
-const OrderTable = ({ orders }: Props) => {
-  if (!orders || !orders.length) {
+const InvoiceTable = ({ invoices }: Props) => {
+  if (!invoices || !invoices.length) {
     return (
       <div className="text-muted-foreground flex items-center mb-6">
         <AlertCircle size={16} className="mr-2" />
@@ -29,50 +29,38 @@ const OrderTable = ({ orders }: Props) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="">Date</TableHead>
+          <TableHead>Date</TableHead>
           <TableHead>Nom du client</TableHead>
+          <TableHead>Montant</TableHead>
           <TableHead className="">Articles(s)</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead className="">Status</TableHead>
           <TableHead className="w-[48px] text-center">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {orders.map((order: Order) => (
-          <TableRow
-            key={order.id}
-            className={order.isPaid ? "" : "text-destructive"}
-          >
+        {invoices.map((invoice: Invoice) => (
+          <TableRow key={invoice.id}>
             <TableCell>
-              {new Date(order.updatedAt).toLocaleDateString("fr-FR")}
+              {new Date(invoice.updatedAt).toLocaleDateString("fr-FR")}
             </TableCell>
-            <TableCell>{order.client.name}</TableCell>
+            <TableCell>{invoice.client.name}</TableCell>
+            <TableCell>{invoice.amount.toLocaleString()} MGA</TableCell>
             <TableCell className="">
-              {order.orderItems.slice(0, 3).map((item, index) => (
+              {invoice.invoiceItems.slice(0, 3).map((item, index) => (
                 <span key={index}>
                   {item.article.name}
-                  {index < order.orderItems.slice(0, 3).length - 1 && ", "}
+                  {index < invoice.invoiceItems.slice(0, 3).length - 1 && ", "}
                 </span>
               ))}
-              {order.orderItems.length > 3 && " ..."}
+              {invoice.invoiceItems.length > 3 && " ..."}
             </TableCell>
             <TableCell>
-              <span className="flex gap-2">
-                {order.isPaid ? (
-                  <Badge>Payé</Badge>
-                ) : (
-                  <Badge variant={"destructive"}>Non payé</Badge>
-                )}
-                {order.isDelivered ? (
-                  <Badge>Livré</Badge>
-                ) : (
-                  <Badge variant={"destructive"}>Non livré</Badge>
-                )}
-              </span>
+              <Badge>{invoice.status}</Badge>
             </TableCell>
             <TableCell>
               <span className="flex gap-2">
                 <Button asChild size={"icon"} variant={"outline"}>
-                  <Link href={`/orders/${order.id}`}>
+                  <Link href={`/invoices/${invoice.id}`}>
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
@@ -90,4 +78,4 @@ const OrderTable = ({ orders }: Props) => {
   );
 };
 
-export default OrderTable;
+export default InvoiceTable;

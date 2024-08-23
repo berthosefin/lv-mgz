@@ -21,10 +21,8 @@ type UpdateOrderDataType = {
   isDelivered: boolean;
 };
 
-export const createOrder = async (sellArticleData: NewOrderDataType) => {
+export const createOrder = async (newOrderData: NewOrderDataType) => {
   const access_token = cookies().get("access_token");
-
-  console.log(sellArticleData);
 
   const res = await fetch(`${API_URL}/orders`, {
     method: "POST",
@@ -32,7 +30,7 @@ export const createOrder = async (sellArticleData: NewOrderDataType) => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${access_token?.value}`,
     },
-    body: JSON.stringify(sellArticleData),
+    body: JSON.stringify(newOrderData),
   });
 
   if (!res.ok) throw new Error("failed to create order");

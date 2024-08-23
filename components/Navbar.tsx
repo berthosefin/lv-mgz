@@ -16,6 +16,7 @@ const NavLinks = [
   { name: "Articles", path: "/articles" },
   { name: "Commandes", path: "/orders" },
   { name: "Clients", path: "/clients" },
+  { name: "Factures", path: "/invoices" },
   { name: "Caisse", path: "/cashdesks" },
 ];
 

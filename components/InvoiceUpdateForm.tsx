@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { fetcher } from "@/lib/fetcher";
-import { updateOrder } from "@/lib/orders.actions";
+import { updateInvoice } from "@/lib/invoices.actions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,66 +20,67 @@ import { z } from "zod";
 import ErrorMessage from "./ErrorMessage";
 import MyButton from "./MyButton";
 import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
-import { Separator } from "./ui/separator";
 
 const formSchema = z.object({
   isPaid: z.boolean(),
-  isDelivered: z.boolean(),
 });
 
 type Props = {
-  orderId: string;
+  invoiceId: string;
 };
 
-const OrderUpdateForm = ({ orderId }: Props) => {
+const InvoiceUpdateForm = ({ invoiceId }: Props) => {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [btnLoading, setBtnLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
 
   const {
-    data: order,
+    data: invoice,
     isLoading,
-    error: orderError,
-  } = useSWR(`/api/orders/${orderId}`, fetcher);
+    error: invoiceError,
+  } = useSWR(`/api/invoices/${invoiceId}`, fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      isPaid: false,
-      isDelivered: false,
-    },
   });
 
-  // Update form values when order data is fetched
+  // Update form values when invoice data is fetched
   useEffect(() => {
-    if (order) {
-      form.reset(order); // Reset form with fetched order data
+    if (invoice) {
+      form.reset({ isPaid: invoice.status === "Payé" }); // Reset form with fetched invoice data
     }
-  }, [order, form]);
+  }, [invoice, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
 
-    await updateOrder(orderId, values);
+    let status = values.isPaid ? "Payé" : "Non Payé";
 
-    toast({
-      title: `Mise à jour du commande de: ${order.client.name}`,
-      description: `La mise à jour a été effectuée avec succès !`,
-    });
+    try {
+      await updateInvoice(invoiceId, { status });
 
-    form.reset();
-    setBtnLoading(false);
-    router.push("/orders");
+      toast({
+        title: `Mise à jour de la facture de: ${invoice.client.name}`,
+        description: `La mise à jour a été effectuée avec succès !`,
+      });
+
+      form.reset();
+      router.push("/invoices");
+    } catch (error) {
+      setErrorMessage("Erreur lors de la mise à jour de la facture.");
+    } finally {
+      setBtnLoading(false);
+    }
   }
 
-  const isSwitchDisabled = (fieldName: keyof z.infer<typeof formSchema>) => {
-    return order ? order[fieldName] : true;
-  };
+  // Disable the switch if the invoice is already paid
+  const isSwitchDisabled = invoice?.status === "Payé";
 
-  if (orderError) {
+  if (invoiceError) {
     return (
       <div className="mt-4">
         <ErrorMessage errorMessage="Erreur lors du chargement des informations sur le commande" />
@@ -93,13 +94,15 @@ const OrderUpdateForm = ({ orderId }: Props) => {
 
   return (
     <>
-      <ScrollArea className="h-48 w-full rounded-md border mb-4">
+      <ScrollArea className="h-48 w-full rounded-md binvoice mb-4">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">
             Articles dans la commande de{" "}
-            <span className="text-primary font-bold">{order.client.name}</span>
+            <span className="text-primary font-bold">
+              {invoice.client.name}
+            </span>
           </h4>
-          {order.orderItems.map((item: any) => (
+          {invoice.invoiceItems.map((item: any) => (
             <div key={item.id} className="text-sm">
               <div className="flex justify-between">
                 <div>{item.article.name}</div>
@@ -122,35 +125,18 @@ const OrderUpdateForm = ({ orderId }: Props) => {
             control={form.control}
             name="isPaid"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <FormItem className="flex flex-row items-center justify-between rounded-lg binvoice p-4">
                 <div className="space-y-0.5">
-                  <FormLabel>Payé</FormLabel>
+                  <FormLabel>
+                    MONTANT: {invoice.amount.toLocaleString()} MGA
+                  </FormLabel>
                 </div>
+                <FormLabel>Payé</FormLabel>
                 <FormControl>
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    disabled={isSwitchDisabled("isPaid")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="isDelivered"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>Livré</FormLabel>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isSwitchDisabled("isDelivered")}
+                    disabled={isSwitchDisabled}
                   />
                 </FormControl>
                 <FormMessage />
@@ -169,4 +155,4 @@ const OrderUpdateForm = ({ orderId }: Props) => {
   );
 };
 
-export default OrderUpdateForm;
+export default InvoiceUpdateForm;
