@@ -24,7 +24,7 @@ import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
 
 const formSchema = z.object({
-  name: z.string().optional(),
+  name: z.string(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),

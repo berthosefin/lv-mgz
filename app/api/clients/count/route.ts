@@ -4,7 +4,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const storeId = searchParams.get("storeId");
 
-  const articlesCount = await getClientCount(storeId!);
+  const clientCount = await getClientCount(storeId!);
 
-  return Response.json(articlesCount);
+  return Response.json(clientCount);
 }

@@ -9,6 +9,7 @@ import {
 import { AlertCircle, Edit3, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { removeClient } from "@/lib/clients.actions";
 
 type Props = {
   clients: Client[];
@@ -54,10 +55,15 @@ const ClientTable = ({ clients }: Props) => {
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"outline"}>
-                  <Link href={`#`}>
-                    <Trash className="w-4 h-4 text-destructive" />
-                  </Link>
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => {
+                    removeClient(client.id);
+                  }}
+                  disabled
+                >
+                  <Trash className="w-4 h-4 text-destructive" />
                 </Button>
               </span>
             </TableCell>

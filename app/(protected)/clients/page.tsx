@@ -7,7 +7,6 @@ import React from "react";
 
 export default async function Client() {
   const userData: User = await getUser();
-  const userStore: Store = userData.store;
 
   return (
     <>
@@ -22,7 +21,7 @@ export default async function Client() {
           </Button>
         </div>
       </div>
-      <ClientList userStore={userStore} />
+      <ClientList userStore={userData.store} />
     </>
   );
 }

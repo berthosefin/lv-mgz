@@ -5,7 +5,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
-  const articleData = await getClient(id);
+  const clientData = await getClient(id);
 
-  return Response.json(articleData);
+  return Response.json(clientData);
 }
