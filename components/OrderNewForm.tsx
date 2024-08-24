@@ -163,7 +163,7 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
 
     const newOrder = {
       storeId: userStore.id,
-      clientName,
+      clientName: clientName.toLocaleLowerCase(),
       isPaid,
       isDelivered,
       orderItems: orderItems.map((item) => ({
@@ -361,13 +361,13 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
               <TableCell></TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center space-x-4">
-                  <Button
+                  {/* <Button
                     disabled={errorMessage || clientName == "" ? true : false}
                     onClick={handleExportToPDF}
                     variant="ghost"
                   >
                     <FileDown size={16} />
-                  </Button>
+                  </Button> */}
 
                   <div className="font-bold">
                     <span>TOTAL:</span>

@@ -26,7 +26,10 @@ const formSchema = z
       .string()
       .min(3)
       .max(31)
-      .regex(/^[a-z0-9_-]+$/),
+      .regex(/^[a-z0-9_-]+$/, {
+        message:
+          "Le nom d'utilisateur doit contenir uniquement des lettres minuscules, des chiffres, des tirets bas et des tirets.",
+      }),
     password: z.string().min(6).max(255),
     confirmPassword: z.string(),
     storeName: z.string().min(3).max(31),

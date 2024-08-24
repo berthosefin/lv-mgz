@@ -6,10 +6,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, Edit3, Trash } from "lucide-react";
+import { removeInvoice } from "@/lib/invoices.actions";
+import { AlertCircle, Edit3, FileDown, Trash } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import { generatePDF } from "@/lib/invoice2pdf";
 
 type Props = {
   invoices: Invoice[];
@@ -39,11 +41,14 @@ const InvoiceTable = ({ invoices }: Props) => {
       </TableHeader>
       <TableBody>
         {invoices.map((invoice: Invoice) => (
-          <TableRow key={invoice.id}>
+          <TableRow
+            key={invoice.id}
+            className={`${invoice.isPaid ? "" : "text-destructive"}`}
+          >
             <TableCell>
               {new Date(invoice.updatedAt).toLocaleDateString("fr-FR")}
             </TableCell>
-            <TableCell>{invoice.client.name}</TableCell>
+            <TableCell className="capitalize">{invoice.client.name}</TableCell>
             <TableCell>{invoice.amount.toLocaleString()} MGA</TableCell>
             <TableCell className="">
               {invoice.invoiceItems.slice(0, 3).map((item, index) => (
@@ -55,19 +60,37 @@ const InvoiceTable = ({ invoices }: Props) => {
               {invoice.invoiceItems.length > 3 && " ..."}
             </TableCell>
             <TableCell>
-              <Badge>{invoice.status}</Badge>
+              {invoice.isPaid ? (
+                <Badge>Payé</Badge>
+              ) : (
+                <Badge variant={"destructive"}>Non Payé</Badge>
+              )}
             </TableCell>
             <TableCell>
               <span className="flex gap-2">
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => {
+                    generatePDF(invoice);
+                  }}
+                >
+                  <FileDown className="w-4 h-4" />
+                </Button>
                 <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`/invoices/${invoice.id}`}>
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"outline"}>
-                  <Link href={`#`}>
-                    <Trash className="w-4 h-4 text-destructive" />
-                  </Link>
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => {
+                    removeInvoice(invoice.id);
+                  }}
+                  disabled
+                >
+                  <Trash className="w-4 h-4 text-destructive" />
                 </Button>
               </span>
             </TableCell>

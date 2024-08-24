@@ -16,7 +16,7 @@ export default async function Invoices() {
           <Button asChild>
             <Link href={"/invoices/headers"} className="btn">
               <FileText size={16} className="mr-2 h-4 w-4" />
-              En-têtes de facture
+              En-têtes des factures
             </Link>
           </Button>
         </div>

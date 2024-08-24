@@ -53,13 +53,6 @@ const InvoiceHeaderForm = ({ userData }: Props) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-    },
   });
 
   // Update form values when invoice data is fetched
@@ -100,70 +93,108 @@ const InvoiceHeaderForm = ({ userData }: Props) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 mx-auto max-w-md"
+        className="space-y-8 mx-auto max-w-lg"
       >
         {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
 
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom du invoice</FormLabel>
-              <FormControl>
-                <Input placeholder="Nom du invoice" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Section: Informations de base */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Informations de base</h3>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom du magasin</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nom du magasin" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Input placeholder="Status" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Téléphone</FormLabel>
-              <FormControl>
-                <Input placeholder="Téléphone" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <div className="flex space-x-4">
-          <div className="w-full">
+        {/* Section: Informations fiscales */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Informations fiscales</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
-              name="address"
+              name="nif"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Addresse</FormLabel>
+                  <FormLabel>NIF</FormLabel>
                   <FormControl>
-                    <Input placeholder="Addresse" {...field} />
+                    <Input placeholder="NIF" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="stat"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>STAT</FormLabel>
+                  <FormControl>
+                    <Input placeholder="STAT" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
+        </div>
 
-          <div className="w-full">
+        {/* Section: Détails de contact */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Détails de contact</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Adresse</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Adresse" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="city"
@@ -172,6 +203,34 @@ const InvoiceHeaderForm = ({ userData }: Props) => {
                   <FormLabel>Ville</FormLabel>
                   <FormControl>
                     <Input placeholder="Ville" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Téléphone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Téléphone" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

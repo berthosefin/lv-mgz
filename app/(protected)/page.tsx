@@ -194,10 +194,10 @@ export default async function Home() {
                     </TableRow>
                   ))
                 ) : (
-                  <span className="text-muted-foreground">
+                  <div className="text-muted-foreground py-4">
                     Pas encore d&apos;articles en cours d&apos;épuisement de
                     stock.
-                  </span>
+                  </div>
                 )}
               </TableBody>
             </Table>

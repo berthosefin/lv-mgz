@@ -2,6 +2,7 @@
 interface User {
   id: string;
   username: string;
+  hashedPassword: string;
   store: Store;
   createdAt: string;
   updatedAt: string;
@@ -23,7 +24,9 @@ interface Store {
   user: User; // Un magasin doit avoir un utilisateur associé
   cashDesk: CashDesk;
   articles: Article[];
-  Client: Client[];
+  clients: Client[];
+  orders: Order[];
+  invoices: Invoice[];
   createdAt: string;
   updatedAt: string;
 }
@@ -90,7 +93,6 @@ interface Order {
   id: string;
   clientId: string;
   client: Client; // Une commande est associée à un client
-  status: OrderStatus;
   isPaid: boolean;
   isDelivered: boolean;
   invoice?: Invoice;
@@ -114,12 +116,14 @@ interface OrderItem {
 // INVOICE
 interface Invoice {
   id: string;
+  storeId: string;
+  store: Store; // Une facture est associée à une commande
   orderId: string;
   order: Order; // Une facture est associée à une commande
   clientId: string;
   client: Client; // Une facture est associée à un client
   amount: number;
-  status: InvoiceStatus;
+  isPaid: boolean;
   invoiceItems: InvoiceItem[];
   createdAt: string;
   updatedAt: string;

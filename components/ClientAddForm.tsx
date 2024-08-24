@@ -38,9 +38,6 @@ const ClientAddForm = ({ userData }: { userData: User }) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      city: "Manakara",
-    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {

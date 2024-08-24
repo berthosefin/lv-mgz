@@ -41,7 +41,7 @@ const ArticleTable = ({ articles }: Props) => {
         {articles.map((article: Article) => (
           <TableRow
             key={article.id}
-            className={article.stock <= 0 ? "text-destructive" : ""}
+            className={article.stock <= 10 ? "text-destructive" : ""}
           >
             <TableCell>{article.name}</TableCell>
             <TableCell className="text-right">{article.stock}</TableCell>

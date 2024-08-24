@@ -59,3 +59,20 @@ export const updateOrder = async (
   revalidatePath("/orders");
   return res.json();
 };
+
+export const removeOrder = async (id: string) => {
+  const access_token = cookies().get("access_token");
+
+  const res = await fetch(`${API_URL}/orders/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("failed to remove order");
+
+  revalidatePath("/orders");
+  return res.json();
+};

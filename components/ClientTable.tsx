@@ -43,7 +43,7 @@ const ClientTable = ({ clients }: Props) => {
             key={client.id}
             // className={"text-destructive"}
           >
-            <TableCell>{client.name}</TableCell>
+            <TableCell className="capitalize">{client.name}</TableCell>
             <TableCell className="">{client.email}</TableCell>
             <TableCell>{client.phone}</TableCell>
             <TableCell className="">{client.address}</TableCell>

@@ -36,15 +36,9 @@ const TransactionTable = ({ transactions }: Props) => {
         {transactions.map((transaction) => (
           <TableRow
             key={transaction.id}
-            className={transaction.type === "IN" ? "text-primary" : ""}
+            className={transaction.type === "IN" ? "" : "text-destructive"}
           >
-            <TableCell>
-              {transaction.label === "STOCK IN"
-                ? "Achat"
-                : transaction.label === "STOCK OUT"
-                ? "Vente"
-                : transaction.label}
-            </TableCell>
+            <TableCell>{transaction.label}</TableCell>
             <TableCell>
               {transaction.articles.length > 0 ? (
                 <>

@@ -13,7 +13,7 @@ export default async function InvoiceHeader() {
   const userData: User = await getUser();
 
   return (
-    <Card className="w-[350px] mx-auto">
+    <Card className="w-[500px] mx-auto">
       <CardHeader>
         <CardTitle className="text-center">
           Informations sur le magasin

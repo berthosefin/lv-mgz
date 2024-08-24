@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { removeOrder } from "@/lib/orders.actions";
 import { AlertCircle, Edit3, Trash } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
@@ -45,7 +46,7 @@ const OrderTable = ({ orders }: Props) => {
             <TableCell>
               {new Date(order.updatedAt).toLocaleDateString("fr-FR")}
             </TableCell>
-            <TableCell>{order.client.name}</TableCell>
+            <TableCell className="capitalize">{order.client.name}</TableCell>
             <TableCell className="">
               {order.orderItems.slice(0, 3).map((item, index) => (
                 <span key={index}>
@@ -60,12 +61,12 @@ const OrderTable = ({ orders }: Props) => {
                 {order.isPaid ? (
                   <Badge>Payé</Badge>
                 ) : (
-                  <Badge variant={"destructive"}>Non payé</Badge>
+                  <Badge variant={"destructive"}>Non Payé</Badge>
                 )}
                 {order.isDelivered ? (
                   <Badge>Livré</Badge>
                 ) : (
-                  <Badge variant={"destructive"}>Non livré</Badge>
+                  <Badge variant={"destructive"}>Non Livré</Badge>
                 )}
               </span>
             </TableCell>
@@ -76,10 +77,15 @@ const OrderTable = ({ orders }: Props) => {
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button asChild size={"icon"} variant={"outline"}>
-                  <Link href={`#`}>
-                    <Trash className="w-4 h-4 text-destructive" />
-                  </Link>
+                <Button
+                  size={"icon"}
+                  variant={"outline"}
+                  onClick={() => {
+                    removeOrder(order.id);
+                  }}
+                  disabled
+                >
+                  <Trash className="w-4 h-4 text-destructive" />
                 </Button>
               </span>
             </TableCell>

@@ -29,7 +29,6 @@ const formSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
-  storeId: z.string().optional(),
 });
 
 type Props = {
@@ -50,13 +49,6 @@ const ClientEditForm = ({ clientId }: Props) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      city: "",
-    },
   });
 
   // Update form values when client data is fetched
@@ -150,9 +142,9 @@ const ClientEditForm = ({ clientId }: Props) => {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Addresse</FormLabel>
+                  <FormLabel>Adresse</FormLabel>
                   <FormControl>
-                    <Input placeholder="Addresse" {...field} />
+                    <Input placeholder="Adresse" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

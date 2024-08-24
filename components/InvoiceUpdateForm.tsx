@@ -46,22 +46,23 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      isPaid: false,
+    },
   });
 
   // Update form values when invoice data is fetched
   useEffect(() => {
     if (invoice) {
-      form.reset({ isPaid: invoice.status === "Payé" }); // Reset form with fetched invoice data
+      form.reset(invoice);
     }
   }, [invoice, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
 
-    let status = values.isPaid ? "Payé" : "Non Payé";
-
     try {
-      await updateInvoice(invoiceId, { status });
+      await updateInvoice(invoiceId, values);
 
       toast({
         title: `Mise à jour de la facture de: ${invoice.client.name}`,
@@ -77,8 +78,9 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
     }
   }
 
-  // Disable the switch if the invoice is already paid
-  const isSwitchDisabled = invoice?.status === "Payé";
+  const isSwitchDisabled = (fieldName: keyof z.infer<typeof formSchema>) => {
+    return invoice ? invoice[fieldName] : true;
+  };
 
   if (invoiceError) {
     return (
@@ -136,7 +138,7 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
-                    disabled={isSwitchDisabled}
+                    disabled={isSwitchDisabled("isPaid")}
                   />
                 </FormControl>
                 <FormMessage />

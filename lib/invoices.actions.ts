@@ -11,7 +11,7 @@ type NewInvoiceDataType = {
 };
 
 type UpdateInvoiceDataType = {
-  status: string;
+  isPaid: boolean;
 };
 
 export const createInvoice = async (sellArticleData: NewInvoiceDataType) => {
@@ -48,6 +48,23 @@ export const updateInvoice = async (
   });
 
   if (!res.ok) throw new Error("failed to update invoices");
+
+  revalidatePath("/invoices");
+  return res.json();
+};
+
+export const removeInvoice = async (id: string) => {
+  const access_token = cookies().get("access_token");
+
+  const res = await fetch(`${API_URL}/invoices/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${access_token?.value}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("failed to remove invoice");
 
   revalidatePath("/invoices");
   return res.json();

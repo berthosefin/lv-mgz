@@ -63,16 +63,21 @@ const OrderUpdateForm = ({ orderId }: Props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setBtnLoading(true);
 
-    await updateOrder(orderId, values);
+    try {
+      await updateOrder(orderId, values);
 
-    toast({
-      title: `Mise à jour du commande de: ${order.client.name}`,
-      description: `La mise à jour a été effectuée avec succès !`,
-    });
+      toast({
+        title: `Mise à jour du commande de: ${order.client.name}`,
+        description: `La mise à jour a été effectuée avec succès !`,
+      });
 
-    form.reset();
-    setBtnLoading(false);
-    router.push("/orders");
+      form.reset();
+      router.push("/orders");
+    } catch (error) {
+      setErrorMessage("Erreur lors de la mise à jour de la facture.");
+    } finally {
+      setBtnLoading(false);
+    }
   }
 
   const isSwitchDisabled = (fieldName: keyof z.infer<typeof formSchema>) => {
