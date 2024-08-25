@@ -11,12 +11,26 @@ import { AlertCircle, Edit3, Trash } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "./ui/use-toast";
 
 type Props = {
   orders: Order[];
 };
 
 const OrderTable = ({ orders }: Props) => {
+  const { toast } = useToast();
+
   if (!orders || !orders.length) {
     return (
       <div className="text-muted-foreground flex items-center mb-6">
@@ -25,6 +39,20 @@ const OrderTable = ({ orders }: Props) => {
       </div>
     );
   }
+
+  const handleRemoveClient = async (id: string) => {
+    try {
+      await removeOrder(id);
+      toast({
+        description: `La commande a été supprimé avec succès.`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: `La commande ne peut pas être supprimé car il a des commandes non payées ou non livrées.`,
+      });
+    }
+  };
 
   return (
     <Table>
@@ -77,16 +105,33 @@ const OrderTable = ({ orders }: Props) => {
                     <Edit3 className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button
-                  size={"icon"}
-                  variant={"outline"}
-                  onClick={() => {
-                    removeOrder(order.id);
-                  }}
-                  disabled
-                >
-                  <Trash className="w-4 h-4 text-destructive" />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size={"icon"} variant={"outline"}>
+                      <Trash className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Êtes-vous absolument sûr ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Cette action ne peut pas être annulée. Cela supprimera
+                        définitivement le client et ses données de nos serveurs.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleRemoveClient(order.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Supprimer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </span>
             </TableCell>
           </TableRow>

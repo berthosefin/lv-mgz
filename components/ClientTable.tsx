@@ -46,7 +46,6 @@ const ClientTable = ({ clients }: Props) => {
         description: `Le client a été supprimé avec succès.`,
       });
     } catch (error: any) {
-      console.error("Error removing client:", error);
       toast({
         variant: "destructive",
         description: `Le client ne peut pas être supprimé car il a des commandes non payées ou non livrées, ou des factures non payées.`,
