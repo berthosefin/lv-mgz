@@ -38,6 +38,7 @@ interface Article {
   purchasePrice: number;
   sellingPrice: number;
   stock: number;
+  notDelivered: number;
   unit: string;
   storeId: string;
   store: Store; // Un article doit appartenir à un magasin

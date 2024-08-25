@@ -58,6 +58,7 @@ model Article {
   purchasePrice Float
   sellingPrice  Float
   stock         Int
+  notDelivered  Int           @default(0)
   unit          String
   transactions  Transaction[]
   orderItems    OrderItem[]
@@ -140,7 +141,7 @@ model Invoice {
   order        Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId      String        @unique
   client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId     String        @unique
+  clientId     String
   store        Store?        @relation(fields: [storeId], references: [id])
   storeId      String?
   createdAt    DateTime      @default(now())
