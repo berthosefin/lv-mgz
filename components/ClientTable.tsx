@@ -44,10 +44,10 @@ const ClientTable = ({ clients }: Props) => {
             // className={"text-destructive"}
           >
             <TableCell className="capitalize">{client.name}</TableCell>
-            <TableCell className="">{client.email}</TableCell>
-            <TableCell>{client.phone}</TableCell>
-            <TableCell className="">{client.address}</TableCell>
-            <TableCell className="">{client.city}</TableCell>
+            <TableCell className="">{client.email || "N/A"}</TableCell>
+            <TableCell>{client.phone || "N/A"}</TableCell>
+            <TableCell className="">{client.address || "N/A"}</TableCell>
+            <TableCell className="">{client.city || "N/A"}</TableCell>
             <TableCell>
               <span className="flex justify-end gap-2">
                 <Button asChild size={"icon"} variant={"outline"}>

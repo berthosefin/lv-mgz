@@ -30,8 +30,9 @@ const ArticleTable = ({ articles }: Props) => {
       <TableHeader>
         <TableRow>
           <TableHead>Nom</TableHead>
-          <TableHead className="text-right">Stock</TableHead>
-          <TableHead className="text-right">Non Livré</TableHead>
+          <TableHead className="text-right">Stock virtuel</TableHead>
+          <TableHead className="text-right">Non livré</TableHead>
+          <TableHead className="text-right">Stock réel</TableHead>
           <TableHead>Unité</TableHead>
           <TableHead className="text-right">Prix d&apos;achat</TableHead>
           <TableHead className="text-right">Prix de vente</TableHead>
@@ -45,8 +46,11 @@ const ArticleTable = ({ articles }: Props) => {
             className={article.stock <= 10 ? "text-destructive" : ""}
           >
             <TableCell>{article.name}</TableCell>
-            <TableCell className="text-right">{article.stock}</TableCell>
+            <TableCell className="text-right">
+              {article.stock + article.notDelivered}
+            </TableCell>
             <TableCell className="text-right">{article.notDelivered}</TableCell>
+            <TableCell className="text-right">{article.stock}</TableCell>
             <TableCell>{article.unit}</TableCell>
             <TableCell className="text-right">
               {article.purchasePrice.toLocaleString()}
