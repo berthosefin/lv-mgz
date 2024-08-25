@@ -6,12 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { removeInvoice } from "@/lib/invoices.actions";
-import { AlertCircle, Edit3, FileDown, Trash } from "lucide-react";
+import { generatePDF } from "@/lib/invoice2pdf";
+import { AlertCircle, Edit3, FileDown } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { generatePDF } from "@/lib/invoice2pdf";
 
 type Props = {
   invoices: Invoice[];
@@ -68,15 +67,6 @@ const InvoiceTable = ({ invoices }: Props) => {
             </TableCell>
             <TableCell>
               <span className="flex gap-2">
-                <Button
-                  size={"icon"}
-                  variant={"outline"}
-                  onClick={() => {
-                    generatePDF(invoice);
-                  }}
-                >
-                  <FileDown className="w-4 h-4" />
-                </Button>
                 <Button asChild size={"icon"} variant={"outline"}>
                   <Link href={`/invoices/${invoice.id}`}>
                     <Edit3 className="w-4 h-4" />
@@ -86,11 +76,10 @@ const InvoiceTable = ({ invoices }: Props) => {
                   size={"icon"}
                   variant={"outline"}
                   onClick={() => {
-                    removeInvoice(invoice.id);
+                    generatePDF(invoice);
                   }}
-                  disabled
                 >
-                  <Trash className="w-4 h-4 text-destructive" />
+                  <FileDown className="w-4 h-4" />
                 </Button>
               </span>
             </TableCell>

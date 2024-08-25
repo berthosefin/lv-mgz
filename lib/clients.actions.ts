@@ -58,7 +58,7 @@ export const editClient = async (
 export const removeClient = async (id: string) => {
   const access_token = cookies().get("access_token");
 
-  const res = await fetch(`${API_URL}/client/${id}`, {
+  const res = await fetch(`${API_URL}/clients/${id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -68,6 +68,6 @@ export const removeClient = async (id: string) => {
 
   if (!res.ok) throw new Error("failed to remove client");
 
-  revalidatePath("/client");
+  revalidatePath("/clients");
   return res.json();
 };

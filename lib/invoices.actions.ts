@@ -52,20 +52,3 @@ export const updateInvoice = async (
   revalidatePath("/invoices");
   return res.json();
 };
-
-export const removeInvoice = async (id: string) => {
-  const access_token = cookies().get("access_token");
-
-  const res = await fetch(`${API_URL}/invoices/${id}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${access_token?.value}`,
-    },
-  });
-
-  if (!res.ok) throw new Error("failed to remove invoice");
-
-  revalidatePath("/invoices");
-  return res.json();
-};
