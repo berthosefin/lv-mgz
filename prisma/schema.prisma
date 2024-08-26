@@ -67,6 +67,9 @@ model Article {
   storeId       String
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  @@unique([name, storeId])
 }
 
 model Transaction {
@@ -104,6 +107,7 @@ model Client {
   storeId   String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([name, storeId])
 }
@@ -120,6 +124,7 @@ model Order {
   storeId     String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  canceledAt  DateTime?
 }
 
 model OrderItem {
