@@ -10,12 +10,26 @@ import { AlertCircle, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { removeArticle } from "@/lib/articles.actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "./ui/use-toast";
 
 type Props = {
   articles: Article[];
 };
 
 const ArticleTable = ({ articles }: Props) => {
+  const { toast } = useToast();
+
   if (!articles || !articles.length) {
     return (
       <div className="text-muted-foreground flex items-center mb-6">
@@ -24,6 +38,20 @@ const ArticleTable = ({ articles }: Props) => {
       </div>
     );
   }
+
+  const handleRemoveArticle = async (id: string) => {
+    try {
+      await removeArticle(id);
+      toast({
+        description: `L'article a été supprimé avec succès.`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: `L'article ne peut pas être supprimé car il y a des commandes liés à cet article.`,
+      });
+    }
+  };
 
   return (
     <Table>
@@ -67,16 +95,34 @@ const ArticleTable = ({ articles }: Props) => {
                     <RefreshCw className="w-4 h-4" />
                   </Link>
                 </Button>
-                <Button
-                  size={"icon"}
-                  variant={"outline"}
-                  onClick={() => {
-                    removeArticle(article.id);
-                  }}
-                  disabled
-                >
-                  <Trash className="w-4 h-4 text-destructive" />
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button size={"icon"} variant={"outline"}>
+                      <Trash className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Êtes-vous absolument sûr ?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Cette action ne peut pas être annulée. Cela supprimera
+                        définitivement l&apos;article et ses données de nos
+                        serveurs.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleRemoveArticle(article.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Supprimer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </span>
             </TableCell>
           </TableRow>

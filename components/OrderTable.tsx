@@ -118,7 +118,8 @@ const OrderTable = ({ orders }: Props) => {
                       </AlertDialogTitle>
                       <AlertDialogDescription>
                         Cette action ne peut pas être annulée. Cela supprimera
-                        définitivement le client et ses données de nos serveurs.
+                        définitivement la commande et ses données de nos
+                        serveurs.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
