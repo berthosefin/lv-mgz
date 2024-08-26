@@ -5,14 +5,19 @@ const API_URL = process.env.API_URL;
 export const getAllArticles = async (
   storeId: string,
   page?: number,
-  pageSize?: number
+  pageSize?: number,
+  search?: string
 ) => {
   const access_token = cookies().get("access_token");
 
   let apiUrl = `${API_URL}/articles?storeId=${storeId}`;
 
   if (page && pageSize) {
-    apiUrl = `${API_URL}/articles?storeId=${storeId}&page=${page}&pageSize=${pageSize}`;
+    apiUrl += `&page=${page}&pageSize=${pageSize}`;
+  }
+
+  if (search) {
+    apiUrl += `&search=${search}`; // Ajoutez le paramètre de recherche à l'URL
   }
 
   const res = await fetch(apiUrl, {
@@ -27,11 +32,17 @@ export const getAllArticles = async (
   return res.json();
 };
 
-export const getArticlesCount = async (storeId: string) => {
+export const getArticlesCount = async (storeId: string, search?: string) => {
   const access_token = cookies().get("access_token");
 
+  let apiUrl = `${API_URL}/articles/count?storeId=${storeId}`;
+
+  if (search) {
+    apiUrl += `&search=${search}`; // Ajoutez le paramètre de recherche à l'URL
+  }
+
   try {
-    const res = await fetch(`${API_URL}/articles/count?storeId=${storeId}`, {
+    const res = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${access_token?.value}`,
@@ -39,7 +50,7 @@ export const getArticlesCount = async (storeId: string) => {
     });
 
     if (!res.ok) {
-      const errorDetail = await res.text(); // Capturez plus de détails
+      const errorDetail = await res.text();
       throw new Error(`Failed to fetch the count of articles: ${errorDetail}`);
     }
 

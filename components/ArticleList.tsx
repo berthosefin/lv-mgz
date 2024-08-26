@@ -10,6 +10,8 @@ import ErrorMessage from "./ErrorMessage";
 import MyLoader from "./MyLoader";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { Input } from "./ui/input";
+import { useDebounce } from "use-debounce";
 
 type Props = {
   userStore: Store;
@@ -17,13 +19,17 @@ type Props = {
 
 const ArticleList = ({ userStore }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  // Appliquez le debounce au terme de recherche
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500 ms de délai
 
   const {
     data: articles,
     isLoading: articlesLoading,
     error: articlesError,
   } = useSWR(
-    `/api/articles?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
+    `/api/articles?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`,
     fetcher
   );
 
@@ -31,7 +37,10 @@ const ArticleList = ({ userStore }: Props) => {
     data: articlesCount,
     isLoading: articlesCountLoading,
     error: articlesCountError,
-  } = useSWR(`/api/articles/count?storeId=${userStore.id}`, fetcher);
+  } = useSWR(
+    `/api/articles/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`,
+    fetcher
+  );
 
   const totalPages = Math.ceil(articlesCount / (LIMIT || 1));
 
@@ -42,6 +51,13 @@ const ArticleList = ({ userStore }: Props) => {
           {(articlesError || articlesCountError) && (
             <ErrorMessage errorMessage="Erreur lors du chargement des articles." />
           )}
+          <Input
+            type="text"
+            placeholder="Rechercher un article..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:max-w-xs"
+          />
         </CardHeader>
         <CardContent>
           {articlesLoading || articlesCountLoading ? (

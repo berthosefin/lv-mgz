@@ -9,8 +9,9 @@ export async function GET(request: Request) {
   const pageSize = searchParams.get("pageSize")
     ? parseInt(searchParams.get("pageSize")!)
     : undefined;
+  const search = searchParams.get("search") || "";
 
-  const articles = await getAllArticles(storeId!, page, pageSize);
+  const articles = await getAllArticles(storeId!, page, pageSize, search);
 
   return Response.json(articles);
 }
