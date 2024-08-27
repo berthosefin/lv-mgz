@@ -5,14 +5,24 @@ const API_URL = process.env.API_URL;
 export const getAllInvoices = async (
   storeId: string,
   page?: number,
-  pageSize?: number
+  pageSize?: number,
+  clientName?: string,
+  isPaid?: string
 ) => {
   const access_token = cookies().get("access_token");
 
   let apiUrl = `${API_URL}/invoices?storeId=${storeId}`;
 
   if (page && pageSize) {
-    apiUrl = `${API_URL}/invoices?storeId=${storeId}&page=${page}&pageSize=${pageSize}`;
+    apiUrl += `&page=${page}&pageSize=${pageSize}`;
+  }
+
+  if (clientName) {
+    apiUrl += `&clientName=${clientName}`;
+  }
+
+  if (isPaid) {
+    apiUrl += `&isPaid=${isPaid}`;
   }
 
   const res = await fetch(apiUrl, {
@@ -27,11 +37,25 @@ export const getAllInvoices = async (
   return res.json();
 };
 
-export const getInvoiceCount = async (storeId: string) => {
+export const getInvoiceCount = async (
+  storeId: string,
+  clientName?: string,
+  isPaid?: string
+) => {
   const access_token = cookies().get("access_token");
 
+  let apiUrl = `${API_URL}/orders?storeId=${storeId}`;
+
+  if (clientName) {
+    apiUrl += `&clientName=${clientName}`;
+  }
+
+  if (isPaid) {
+    apiUrl += `&isPaid=${isPaid}`;
+  }
+
   try {
-    const res = await fetch(`${API_URL}/invoices/count?storeId=${storeId}`, {
+    const res = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${access_token?.value}`,

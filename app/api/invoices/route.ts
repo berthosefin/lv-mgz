@@ -9,8 +9,16 @@ export async function GET(request: Request) {
   const pageSize = searchParams.get("pageSize")
     ? parseInt(searchParams.get("pageSize")!)
     : undefined;
+  const clientName = searchParams.get("clientName") || undefined;
+  const isPaid = searchParams.get("isPaid") || undefined;
 
-  const invoices = await getAllInvoices(storeId!, page, pageSize);
+  const invoices = await getAllInvoices(
+    storeId!,
+    page,
+    pageSize,
+    clientName,
+    isPaid
+  );
 
   return Response.json(invoices);
 }

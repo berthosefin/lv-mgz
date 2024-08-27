@@ -21,7 +21,7 @@ const InvoiceTable = ({ invoices }: Props) => {
     return (
       <div className="text-muted-foreground flex items-center mb-6">
         <AlertCircle size={16} className="mr-2" />
-        Aucune commande enregistrée pour le moment
+        Aucune facture
       </div>
     );
   }

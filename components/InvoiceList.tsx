@@ -10,6 +10,15 @@ import InvoiceTable from "./InvoiceTable";
 import MyLoader from "./MyLoader";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { useDebounce } from "use-debounce";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type Props = {
   userStore: Store;
@@ -17,13 +26,21 @@ type Props = {
 
 const InvoiceList = ({ userStore }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [clientName, setClientName] = useState<string>("");
+  const [isPaidFilter, setIsPaidFilter] = useState<string>("all");
+
+  const [debouncedclientName] = useDebounce(clientName, 500);
 
   const {
     data: invoices,
     isLoading: invoicesLoading,
     error: invoicesError,
   } = useSWR(
-    `/api/invoices?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
+    `/api/invoices?storeId=${
+      userStore.id
+    }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&isPaid=${
+      isPaidFilter === "all" ? "" : isPaidFilter
+    }`,
     fetcher
   );
 
@@ -31,7 +48,14 @@ const InvoiceList = ({ userStore }: Props) => {
     data: invoicesCount,
     isLoading: invoicesCountLoading,
     error: invoicesCountError,
-  } = useSWR(`/api/invoices/count?storeId=${userStore.id}`, fetcher);
+  } = useSWR(
+    `/api/invoices/count?storeId=${
+      userStore.id
+    }&clientName=${debouncedclientName}&isPaid=${
+      isPaidFilter === "all" ? "" : isPaidFilter
+    }`,
+    fetcher
+  );
 
   const totalPages = Math.ceil(invoicesCount / (LIMIT || 1));
 
@@ -42,6 +66,24 @@ const InvoiceList = ({ userStore }: Props) => {
           {(invoicesError || invoicesCountError) && (
             <ErrorMessage errorMessage="Erreur lors du chargement des commandes." />
           )}
+          <div className="flex space-x-4">
+            <Input
+              placeholder="Rechercher par nom du client"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              className="w-full sm:max-w-xs"
+            />
+            <Select value={isPaidFilter} onValueChange={setIsPaidFilter}>
+              <SelectTrigger className="max-w-32">
+                <SelectValue placeholder="Filtrer par état de paiement" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                <SelectItem value="true">Payé</SelectItem>
+                <SelectItem value="false">Non payé</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           {invoicesLoading || invoicesCountLoading ? (
