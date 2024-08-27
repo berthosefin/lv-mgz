@@ -5,7 +5,7 @@ import { ToWords } from "to-words";
 
 export const generatePDF = (invoice: Invoice) => {
   const doc = new jsPDF();
-  const today = format(new Date(), "dd/MM/yyyy");
+  // const today = format(new Date(), "dd/MM/yyyy");
 
   // En-tête de la facture
   doc.setFontSize(12);
@@ -109,5 +109,5 @@ export const generatePDF = (invoice: Invoice) => {
   doc.text(`Le Gérant`, 150, endY + 30);
 
   // Sauvegarder le document
-  doc.save(`facture_${invoice.client.name}_${today}.pdf`);
+  doc.save(`facture_${invoice.client.name}_${invoice.updatedAt}.pdf`);
 };

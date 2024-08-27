@@ -5,14 +5,19 @@ const API_URL = process.env.API_URL;
 export const getAllClients = async (
   storeId: string,
   page?: number,
-  pageSize?: number
+  pageSize?: number,
+  search?: string
 ) => {
   const access_token = cookies().get("access_token");
 
   let apiUrl = `${API_URL}/clients?storeId=${storeId}`;
 
   if (page && pageSize) {
-    apiUrl = `${API_URL}/clients?storeId=${storeId}&page=${page}&pageSize=${pageSize}`;
+    apiUrl += `&page=${page}&pageSize=${pageSize}`;
+  }
+
+  if (search) {
+    apiUrl += `&search=${search}`;
   }
 
   const res = await fetch(apiUrl, {
@@ -27,11 +32,17 @@ export const getAllClients = async (
   return res.json();
 };
 
-export const getClientCount = async (storeId: string) => {
+export const getClientCount = async (storeId: string, search?: string) => {
   const access_token = cookies().get("access_token");
 
+  let apiUrl = `${API_URL}/clients/count?storeId=${storeId}`;
+
+  if (search) {
+    apiUrl += `&search=${search}`;
+  }
+
   try {
-    const res = await fetch(`${API_URL}/clients/count?storeId=${storeId}`, {
+    const res = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${access_token?.value}`,

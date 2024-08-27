@@ -34,7 +34,7 @@ const ClientTable = ({ clients }: Props) => {
     return (
       <div className="text-muted-foreground flex items-center mb-6">
         <AlertCircle size={16} className="mr-2" />
-        Aucun client enregistré pour le moment
+        Aucun client
       </div>
     );
   }

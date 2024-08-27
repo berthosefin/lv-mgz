@@ -10,6 +10,8 @@ import ErrorMessage from "./ErrorMessage";
 import MyLoader from "./MyLoader";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { useDebounce } from "use-debounce";
+import { Input } from "./ui/input";
 
 type Props = {
   userStore: Store;
@@ -17,13 +19,17 @@ type Props = {
 
 const ClientList = ({ userStore }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  // Appliquez le debounce au terme de recherche
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500 ms de délai
 
   const {
     data: clients,
     isLoading: clientsLoading,
     error: clientsError,
   } = useSWR(
-    `/api/clients?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
+    `/api/clients?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`,
     fetcher
   );
 
@@ -31,7 +37,10 @@ const ClientList = ({ userStore }: Props) => {
     data: clientsCount,
     isLoading: clientsCountLoading,
     error: clientsCountError,
-  } = useSWR(`/api/clients/count?storeId=${userStore.id}`, fetcher);
+  } = useSWR(
+    `/api/clients/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`,
+    fetcher
+  );
 
   const totalPages = Math.ceil(clientsCount / (LIMIT || 1));
 
@@ -42,6 +51,13 @@ const ClientList = ({ userStore }: Props) => {
           {(clientsError || clientsCountError) && (
             <ErrorMessage errorMessage="Erreur lors du chargement des clients." />
           )}
+          <Input
+            type="text"
+            placeholder="Rechercher un client..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:max-w-xs"
+          />
         </CardHeader>
         <CardContent>
           {clientsLoading || clientsCountLoading ? (
