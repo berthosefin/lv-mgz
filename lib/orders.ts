@@ -5,14 +5,24 @@ const API_URL = process.env.API_URL;
 export const getAllOrders = async (
   storeId: string,
   page?: number,
-  pageSize?: number
+  pageSize?: number,
+  clientName?: string,
+  status?: string
 ) => {
   const access_token = cookies().get("access_token");
 
   let apiUrl = `${API_URL}/orders?storeId=${storeId}`;
 
   if (page && pageSize) {
-    apiUrl = `${API_URL}/orders?storeId=${storeId}&page=${page}&pageSize=${pageSize}`;
+    apiUrl += `&page=${page}&pageSize=${pageSize}`;
+  }
+
+  if (clientName) {
+    apiUrl += `&clientName=${clientName}`;
+  }
+
+  if (status) {
+    apiUrl += `&status=${status}`;
   }
 
   const res = await fetch(apiUrl, {
@@ -27,11 +37,25 @@ export const getAllOrders = async (
   return res.json();
 };
 
-export const getOrderCount = async (storeId: string) => {
+export const getOrderCount = async (
+  storeId: string,
+  clientName?: string,
+  status?: string
+) => {
   const access_token = cookies().get("access_token");
 
+  let apiUrl = `${API_URL}/orders?storeId=${storeId}`;
+
+  if (clientName) {
+    apiUrl += `&clientName=${clientName}`;
+  }
+
+  if (status) {
+    apiUrl += `&status=${status}`;
+  }
+
   try {
-    const res = await fetch(`${API_URL}/orders/count?storeId=${storeId}`, {
+    const res = await fetch(apiUrl, {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${access_token?.value}`,

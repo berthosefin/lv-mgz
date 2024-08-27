@@ -10,6 +10,15 @@ import MyLoader from "./MyLoader";
 import OrderTable from "./OrderTable";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
+import { useDebounce } from "use-debounce";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type Props = {
   userStore: Store;
@@ -17,13 +26,21 @@ type Props = {
 
 const OrderList = ({ userStore }: Props) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [clientName, setClientName] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const [debouncedclientName] = useDebounce(clientName, 500);
 
   const {
     data: orders,
     isLoading: ordersLoading,
     error: ordersError,
   } = useSWR(
-    `/api/orders?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}`,
+    `/api/orders?storeId=${
+      userStore.id
+    }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&status=${
+      statusFilter === "all" ? "" : statusFilter
+    }`,
     fetcher
   );
 
@@ -31,7 +48,14 @@ const OrderList = ({ userStore }: Props) => {
     data: ordersCount,
     isLoading: ordersCountLoading,
     error: ordersCountError,
-  } = useSWR(`/api/orders/count?storeId=${userStore.id}`, fetcher);
+  } = useSWR(
+    `/api/orders/count?storeId=${
+      userStore.id
+    }&clientName=${debouncedclientName}&status=${
+      statusFilter === "all" ? "" : statusFilter
+    }`,
+    fetcher
+  );
 
   const totalPages = Math.ceil(ordersCount / (LIMIT || 1));
 
@@ -42,6 +66,24 @@ const OrderList = ({ userStore }: Props) => {
           {(ordersError || ordersCountError) && (
             <ErrorMessage errorMessage="Erreur lors du chargement des commandes." />
           )}
+          <div className="flex space-x-4">
+            <Input
+              placeholder="Rechercher par nom du client"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              className="w-full sm:max-w-xs"
+            />
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="max-w-24">
+                <SelectValue placeholder="Filtrer par statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous</SelectItem>
+                <SelectItem value="isPaid">Payé</SelectItem>
+                <SelectItem value="isDelivered">Livré</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           {ordersLoading || ordersCountLoading ? (
