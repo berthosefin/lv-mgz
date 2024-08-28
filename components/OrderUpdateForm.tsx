@@ -74,7 +74,7 @@ const OrderUpdateForm = ({ orderId }: Props) => {
       form.reset();
       router.push("/orders");
     } catch (error) {
-      setErrorMessage("Erreur lors de la mise à jour de la facture.");
+      setErrorMessage("Erreur lors de la mise à jour de la commande.");
     } finally {
       setBtnLoading(false);
     }

@@ -208,7 +208,13 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
             <Label className="flex items-center text-primary">
               <Checkbox
                 checked={isPaid}
-                onCheckedChange={(checked) => setIsPaid(checked === true)}
+                onCheckedChange={(checked) => {
+                  if (!checked && !isDelivered) {
+                    // Si isPaid est décoché alors que isDelivered est déjà décoché, on ne fait rien
+                    return;
+                  }
+                  setIsPaid(checked === true);
+                }}
                 className="mr-2"
               />
               Payé
@@ -216,7 +222,13 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
             <Label className="flex items-center text-primary">
               <Checkbox
                 checked={isDelivered}
-                onCheckedChange={(checked) => setIsDelivered(checked === true)}
+                onCheckedChange={(checked) => {
+                  if (!checked && !isPaid) {
+                    // Si isDelivered est décoché alors que isPaid est déjà décoché, on ne fait rien
+                    return;
+                  }
+                  setIsDelivered(checked === true);
+                }}
                 className="mr-2"
               />
               Livré
