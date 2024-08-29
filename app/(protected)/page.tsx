@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { SelectSeparator } from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -176,31 +178,25 @@ export default async function Home() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Article</TableHead>
-                  <TableHead className="text-end">Stock</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {lowStockArticles.length > 0 ? (
-                  lowStockArticles.map((article: Article) => (
-                    <TableRow key={article.id}>
-                      <TableCell>{article.name}</TableCell>
-                      <TableCell className="text-end">
-                        {article.stock}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <div className="text-muted-foreground py-4">
-                    Pas encore d&apos;articles en cours d&apos;épuisement de
-                    stock.
-                  </div>
-                )}
-              </TableBody>
-            </Table>
+            {lowStockArticles.length > 0 ? (
+              <ScrollArea className="h-80 w-full rounded-md border mb-4">
+                <div className="p-4">
+                  {lowStockArticles.map((item: Article) => (
+                    <div key={item.id} className="text-sm">
+                      <div className="flex justify-between">
+                        <div>{item.name}</div>
+                        <div>{item.stock}</div>
+                      </div>
+                      <SelectSeparator className="my-2" />
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : (
+              <div className="text-muted-foreground py-4">
+                Pas encore d&apos;articles en cours d&apos;épuisement de stock.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
