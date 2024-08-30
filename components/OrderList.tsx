@@ -74,13 +74,13 @@ const OrderList = ({ userStore }: Props) => {
               className="w-full sm:max-w-xs"
             />
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="max-w-24">
+              <SelectTrigger className="max-w-32">
                 <SelectValue placeholder="Filtrer par statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous</SelectItem>
-                <SelectItem value="isPaid">Payé</SelectItem>
-                <SelectItem value="isDelivered">Livré</SelectItem>
+                <SelectItem value="notPaid">Non payé</SelectItem>
+                <SelectItem value="notDelivered">Non livré</SelectItem>
               </SelectContent>
             </Select>
           </div>

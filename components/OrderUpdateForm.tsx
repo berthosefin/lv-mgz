@@ -84,6 +84,20 @@ const OrderUpdateForm = ({ orderId }: Props) => {
     return order ? order[fieldName] : true;
   };
 
+  const calculateTotalAmount = () => {
+    if (order && order.orderItems) {
+      const total = order.orderItems.reduce(
+        (total: number, item: OrderItem) => {
+          return total + item.article.sellingPrice * item.quantity;
+        },
+        0
+      );
+
+      return total.toLocaleString();
+    }
+    return "0";
+  };
+
   if (orderError) {
     return (
       <div className="mt-4">
@@ -122,6 +136,15 @@ const OrderUpdateForm = ({ orderId }: Props) => {
           className="space-y-4 mx-auto max-w-md"
         >
           {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+
+          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <FormLabel>MONTANT</FormLabel>
+            </div>
+            <div className="space-y-0.5">
+              <FormLabel>{calculateTotalAmount()} MGA</FormLabel>
+            </div>
+          </div>
 
           <FormField
             control={form.control}
