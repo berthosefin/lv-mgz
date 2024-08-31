@@ -40,17 +40,19 @@ const ClientTable = ({ clients }: Props) => {
   }
 
   const handleRemoveClient = async (id: string) => {
-    try {
-      await removeClient(id);
-      toast({
-        description: `Le client a été supprimé avec succès.`,
-      });
-    } catch (error: any) {
+    const result = await removeClient(id);
+
+    if (!result.success) {
       toast({
         variant: "destructive",
         description: `Le client ne peut pas être supprimé car il a des commandes non payées ou non livrées, ou des factures non payées.`,
       });
+      return;
     }
+
+    toast({
+      description: `Le client a été supprimé avec succès.`,
+    });
   };
 
   return (

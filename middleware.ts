@@ -1,4 +1,3 @@
-import { jwtDecode } from "jwt-decode";
 import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -14,7 +13,8 @@ async function refreshAccessToken(refreshToken: string) {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to refresh access token");
+      // console.warn("Failed to refresh access token");
+      return null;
     }
 
     const { access_token } = await response.json();
@@ -25,8 +25,30 @@ async function refreshAccessToken(refreshToken: string) {
   }
 }
 
+async function validateAccessToken(accessToken: string) {
+  try {
+    const response = await fetch(`${API_URL}/auth/validate`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      // console.warn("Invalid access token");
+      return false;
+    }
+
+    const { valid } = await response.json();
+    return valid;
+  } catch (error) {
+    console.error("Error validating access token:", error);
+    return false;
+  }
+}
+
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
   const accessToken = req.cookies.get("access_token")?.value;
   const refreshToken = req.cookies.get("refresh_token")?.value;
 
@@ -34,47 +56,42 @@ export async function middleware(req: NextRequest) {
   const isProtectedRoute = !isAuthPage;
 
   if (!accessToken) {
-    // Si l'utilisateur n'est pas connecté
-    if (isProtectedRoute) {
-      // Rediriger vers /login si l'utilisateur essaie d'accéder à une page protégée
-      return NextResponse.redirect(new URL("/login", req.url));
+    if (isProtectedRoute && !searchParams.get("redirected")) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("redirected", "true");
+      return NextResponse.redirect(url);
     }
-  } else {
-    // Si l'utilisateur est connecté, vérifier la validité du token
-    try {
-      const decodedToken = jwtDecode<any>(accessToken);
-      const now = Math.floor(Date.now() / 1000);
+    return NextResponse.next();
+  }
 
-      if (decodedToken.exp < now && !isAuthPage) {
-        // Token expiré, essayer de rafraîchir le token
-        if (refreshToken) {
-          const tokens = await refreshAccessToken(refreshToken);
+  // Vérifier la validité du token
+  const isTokenValid = await validateAccessToken(accessToken);
 
-          if (tokens) {
-            // Mettre à jour les cookies avec les nouveaux tokens
-            const response = NextResponse.next();
-            response.cookies.set("access_token", tokens.accessToken, {
-              path: "/",
-            });
-            return response;
-          }
-        }
+  if (!isTokenValid) {
+    if (refreshToken) {
+      const tokens = await refreshAccessToken(refreshToken);
 
-        // Si le rafraîchissement du token échoue ou si aucun refresh token n'est trouvé, rediriger vers /login
-        return NextResponse.redirect(new URL("/login", req.url));
+      if (tokens) {
+        const response = NextResponse.next();
+        response.cookies.set("access_token", tokens.accessToken, {
+          path: "/",
+        });
+        return response;
       }
+    }
 
-      // Rediriger l'utilisateur connecté loin de /login ou /signup
-      if (decodedToken.exp > now && isAuthPage) {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-    } catch (error) {
-      // Si le token est invalide (mal formé, etc.), rediriger vers /login
-      return NextResponse.redirect(new URL("/login", req.url));
+    // Eviter la redirection infinie
+    if (!isAuthPage && !searchParams.get("redirected")) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("redirected", "true");
+      return NextResponse.redirect(url);
     }
   }
 
-  // Continuer vers la page demandée
+  if (isTokenValid && isAuthPage) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
   return NextResponse.next();
 }
 

@@ -75,7 +75,7 @@ export const logout = async () => {
   const access_token = cookies().get("access_token");
 
   try {
-    if (access_token) {
+    if (access_token?.value) {
       // Appel à l'API NestJS pour invalider le token côté serveur
       await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
@@ -83,12 +83,19 @@ export const logout = async () => {
           Authorization: `Bearer ${access_token.value}`,
         },
       });
-    }
 
-    cookies().set("access_token", "", {
-      path: "/",
-      expires: new Date(0),
-    });
+      cookies().set("access_token", "", {
+        path: "/",
+        expires: new Date(0),
+      });
+
+      cookies().set("refresh_token", "", {
+        path: "/",
+        expires: new Date(0),
+      });
+    } else {
+      return { success: true };
+    }
 
     return { success: true };
   } catch (error) {

@@ -40,17 +40,19 @@ const ArticleTable = ({ articles }: Props) => {
   }
 
   const handleRemoveArticle = async (id: string) => {
-    try {
-      await removeArticle(id);
-      toast({
-        description: `L'article a été supprimé avec succès.`,
-      });
-    } catch (error: any) {
+    const result = await removeArticle(id);
+
+    if (!result.success) {
       toast({
         variant: "destructive",
         description: `L'article ne peut pas être supprimé car il y a des commandes liés à cet article.`,
       });
+      return;
     }
+
+    toast({
+      description: `L'article a été supprimé avec succès.`,
+    });
   };
 
   return (

@@ -66,8 +66,8 @@ export const removeClient = async (id: string) => {
     },
   });
 
-  if (!res.ok) throw new Error("failed to remove client");
+  if (!res.ok) return { success: false, message: "failed to remove client" };
 
   revalidatePath("/clients");
-  return res.json();
+  return { success: true, data: await res.json() };
 };

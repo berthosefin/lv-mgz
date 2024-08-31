@@ -41,17 +41,19 @@ const OrderTable = ({ orders }: Props) => {
   }
 
   const handleRemoveClient = async (id: string) => {
-    try {
-      await removeOrder(id);
-      toast({
-        description: `La commande a été supprimé avec succès.`,
-      });
-    } catch (error: any) {
+    const result = await removeOrder(id);
+
+    if (!result.success) {
       toast({
         variant: "destructive",
         description: `La commande ne peut pas être supprimé car il a des commandes non payées ou non livrées.`,
       });
+      return;
     }
+
+    toast({
+      description: `La commande a été supprimé avec succès.`,
+    });
   };
 
   return (

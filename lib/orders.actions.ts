@@ -71,8 +71,8 @@ export const removeOrder = async (id: string) => {
     },
   });
 
-  if (!res.ok) throw new Error("failed to remove order");
+  if (!res.ok) return { success: false, message: "failed to remove order" };
 
   revalidatePath("/orders");
-  return res.json();
+  return { success: true, data: await res.json() };
 };

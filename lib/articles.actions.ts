@@ -68,8 +68,8 @@ export const removeArticle = async (id: string) => {
     },
   });
 
-  if (!res.ok) throw new Error("failed to remove article");
+  if (!res.ok) return { success: false, message: "failed to remove article" };
 
   revalidatePath("/articles");
-  return res.json();
+  return { success: true, data: await res.json() };
 };
