@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "./ui/select";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 type Props = {
   userStore: Store;
 };
@@ -36,7 +38,7 @@ const OrderList = ({ userStore }: Props) => {
     isLoading: ordersLoading,
     error: ordersError,
   } = useSWR(
-    `/api/orders?storeId=${
+    `${API_URL}/orders?storeId=${
       userStore.id
     }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&status=${
       statusFilter === "all" ? "" : statusFilter
@@ -49,7 +51,7 @@ const OrderList = ({ userStore }: Props) => {
     isLoading: ordersCountLoading,
     error: ordersCountError,
   } = useSWR(
-    `/api/orders/count?storeId=${
+    `${API_URL}/orders/count?storeId=${
       userStore.id
     }&clientName=${debouncedclientName}&status=${
       statusFilter === "all" ? "" : statusFilter

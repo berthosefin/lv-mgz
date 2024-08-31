@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_URL = process.env.API_URL;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const getAllTransactions = async (
   cashDeskId: string,
@@ -39,31 +39,6 @@ export const getAllTransactions = async (
   });
 
   if (!res.ok) throw new Error("failed to fetch all transactions");
-
-  return res.json();
-};
-
-export const getTransactionsCount = async (
-  cashDeskId: string,
-  startDate?: string,
-  endDate?: string
-) => {
-  const access_token = cookies().get("access_token");
-
-  let apiUrl = `${API_URL}/transactions/count?cashDeskId=${cashDeskId}`;
-
-  if (startDate && endDate) {
-    apiUrl += `&startDate=${startDate}&endDate=${endDate}`;
-  }
-
-  const res = await fetch(apiUrl, {
-    cache: "no-store",
-    headers: {
-      Authorization: `Bearer ${access_token?.value}`,
-    },
-  });
-
-  if (!res.ok) throw new Error("failed to fetch the count of transactions");
 
   return res.json();
 };

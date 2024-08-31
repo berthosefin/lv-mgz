@@ -13,6 +13,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { useDebounce } from "use-debounce";
 import { Input } from "./ui/input";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 type Props = {
   userStore: Store;
 };
@@ -29,7 +31,7 @@ const ClientList = ({ userStore }: Props) => {
     isLoading: clientsLoading,
     error: clientsError,
   } = useSWR(
-    `/api/clients?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`,
+    `${API_URL}/clients?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`,
     fetcher
   );
 
@@ -38,7 +40,7 @@ const ClientList = ({ userStore }: Props) => {
     isLoading: clientsCountLoading,
     error: clientsCountError,
   } = useSWR(
-    `/api/clients/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`,
+    `${API_URL}/clients/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`,
     fetcher
   );
 

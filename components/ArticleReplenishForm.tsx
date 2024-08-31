@@ -23,6 +23,8 @@ import { useForm } from "react-hook-form";
 import useSWR from "swr";
 import { z } from "zod";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const formSchema = z.object({
   replenishQuantity: z.coerce
     .number()
@@ -48,7 +50,7 @@ const ArticleReplenishForm = ({ articleId }: Props) => {
     data: article,
     isLoading,
     error: articleError,
-  } = useSWR(`/api/articles/${articleId}`, fetcher);
+  } = useSWR(`${API_URL}/articles/${articleId}`, fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

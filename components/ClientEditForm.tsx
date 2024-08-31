@@ -23,6 +23,8 @@ import MyButton from "./MyButton";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const formSchema = z.object({
   name: z.string(),
   email: z.string().email().optional(),
@@ -45,7 +47,7 @@ const ClientEditForm = ({ clientId }: Props) => {
     data: client,
     isLoading,
     error: clientError,
-  } = useSWR(`/api/clients/${clientId}`, fetcher);
+  } = useSWR(`${API_URL}/clients/${clientId}`, fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

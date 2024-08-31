@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "./ui/select";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 type Props = {
   userStore: Store;
 };
@@ -36,7 +38,7 @@ const InvoiceList = ({ userStore }: Props) => {
     isLoading: invoicesLoading,
     error: invoicesError,
   } = useSWR(
-    `/api/invoices?storeId=${
+    `${API_URL}/invoices?storeId=${
       userStore.id
     }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&isPaid=${
       isPaidFilter === "all" ? "" : isPaidFilter
@@ -49,7 +51,7 @@ const InvoiceList = ({ userStore }: Props) => {
     isLoading: invoicesCountLoading,
     error: invoicesCountError,
   } = useSWR(
-    `/api/invoices/count?storeId=${
+    `${API_URL}/invoices/count?storeId=${
       userStore.id
     }&clientName=${debouncedclientName}&isPaid=${
       isPaidFilter === "all" ? "" : isPaidFilter

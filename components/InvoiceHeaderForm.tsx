@@ -23,6 +23,8 @@ import MyButton from "./MyButton";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const formSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -49,7 +51,7 @@ const InvoiceHeaderForm = ({ userData }: Props) => {
     data: invoice,
     isLoading,
     error: invoiceError,
-  } = useSWR(`/api/store/${userData.store.id}`, fetcher);
+  } = useSWR(`${API_URL}/store/${userData.store.id}`, fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

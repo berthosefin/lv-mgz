@@ -21,6 +21,8 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { addArticle } from "@/lib/articles.actions";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const formSchema = z.object({
   name: z.string(),
   purchasePrice: z.coerce.number(),
@@ -46,7 +48,7 @@ const ArticleAddForm = ({ userData }: { userData: User }) => {
   // const userCashDesk = userData.store.cashDesk;
 
   const { data: articles, error: articlesError } = useSWR(
-    `/api/articles?storeId=${userStore.id}`,
+    `${API_URL}/articles?storeId=${userStore.id}`,
     fetcher
   );
 

@@ -22,6 +22,8 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 type Props = {
   userCashDesk: CashDesk;
 };
@@ -37,12 +39,12 @@ const TransactionList = ({ userCashDesk }: Props) => {
     isLoading: transactionsLoading,
     error: transactionsError,
   } = useSWR(
-    `/api/transactions?cashDeskId=${userCashDesk.id}&page=${currentPage}&pageSize=${LIMIT}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions?cashDeskId=${userCashDesk.id}&page=${currentPage}&pageSize=${LIMIT}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 
   const { data: allTransactions } = useSWR(
-    `/api/transactions?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 
@@ -51,7 +53,7 @@ const TransactionList = ({ userCashDesk }: Props) => {
     isLoading: transactionsCountLoading,
     error: transactionsCountError,
   } = useSWR(
-    `/api/transactions/count?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions/count?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 

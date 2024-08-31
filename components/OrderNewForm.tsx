@@ -27,6 +27,8 @@ import { createOrder } from "@/lib/orders.actions";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 type OrderItem = {
   articleId: string;
   quantity: number;
@@ -52,7 +54,7 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
     data: articles,
     isLoading,
     error: articlesError,
-  } = useSWR(`/api/articles?storeId=${userStore.id}`, fetcher);
+  } = useSWR(`${API_URL}/articles?storeId=${userStore.id}`, fetcher);
 
   if (articlesError) {
     setErrorMessage("Erreur lors du chargement des articles");

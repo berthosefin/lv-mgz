@@ -11,14 +11,6 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectSeparator } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { getArticlesCount, getLowStockArticles } from "@/lib/articles";
 import { calculateMonthlyData } from "@/lib/calculate";
 import {

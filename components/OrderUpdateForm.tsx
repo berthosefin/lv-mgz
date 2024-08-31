@@ -24,6 +24,8 @@ import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
 import { Separator } from "./ui/separator";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const formSchema = z.object({
   isPaid: z.boolean(),
   isDelivered: z.boolean(),
@@ -43,7 +45,7 @@ const OrderUpdateForm = ({ orderId }: Props) => {
     data: order,
     isLoading,
     error: orderError,
-  } = useSWR(`/api/orders/${orderId}`, fetcher);
+  } = useSWR(`${API_URL}/orders/${orderId}`, fetcher);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
