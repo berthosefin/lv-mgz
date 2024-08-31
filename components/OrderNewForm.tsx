@@ -110,7 +110,17 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
   };
 
   const handleRemoveItem = (indexToRemove: number) => {
-    setOrderItems(orderItems.filter((_, index) => index !== indexToRemove));
+    const itemToRemove = orderItems[indexToRemove];
+    const newOrderItems = orderItems.filter(
+      (_, index) => index !== indexToRemove
+    );
+
+    // Mettre à jour le montant total en soustrayant le montant de l'article supprimé
+    setTotalAmount(
+      totalAmount - itemToRemove.quantity * itemToRemove.sellingPrice
+    );
+
+    setOrderItems(newOrderItems);
   };
 
   const handleExportToPDF = () => {
