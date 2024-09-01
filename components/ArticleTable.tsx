@@ -22,13 +22,45 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "./ui/use-toast";
+import { mutate } from "swr";
 
 type Props = {
   articles: Article[];
+  apiUrl: string;
 };
 
-const ArticleTable = ({ articles }: Props) => {
+const ArticleTable = ({ articles, apiUrl }: Props) => {
   const { toast } = useToast();
+
+  const handleRemoveArticle = async (id: string) => {
+    // Optimistic update
+    mutate(
+      apiUrl,
+      (currentArticles: Article[] | undefined) => {
+        if (!currentArticles) return [];
+        return currentArticles.filter((article: Article) => article.id !== id);
+      },
+      false // Ne pas revalider immédiatement
+    );
+
+    const result = await removeArticle(id);
+
+    if (!result.success) {
+      // Rétablir l'état initial en cas d'erreur
+      mutate(apiUrl);
+      toast({
+        variant: "destructive",
+        description: `L'article ne peut pas être supprimé car il y a des commandes liés à cet article.`,
+      });
+      return;
+    }
+
+    // Rafraîchir les données après une suppression réussie
+    mutate(apiUrl);
+    toast({
+      description: `L'article a été supprimé avec succès.`,
+    });
+  };
 
   if (!articles || !articles.length) {
     return (
@@ -38,22 +70,6 @@ const ArticleTable = ({ articles }: Props) => {
       </div>
     );
   }
-
-  const handleRemoveArticle = async (id: string) => {
-    const result = await removeArticle(id);
-
-    if (!result.success) {
-      toast({
-        variant: "destructive",
-        description: `L'article ne peut pas être supprimé car il y a des commandes liés à cet article.`,
-      });
-      return;
-    }
-
-    toast({
-      description: `L'article a été supprimé avec succès.`,
-    });
-  };
 
   return (
     <Table>

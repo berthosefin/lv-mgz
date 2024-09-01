@@ -23,13 +23,45 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "./ui/use-toast";
+import { mutate } from "swr";
 
 type Props = {
   orders: Order[];
+  apiUrl: string;
 };
 
-const OrderTable = ({ orders }: Props) => {
+const OrderTable = ({ orders, apiUrl }: Props) => {
   const { toast } = useToast();
+
+  const handleRemoveOrder = async (id: string) => {
+    // Optimistic update
+    mutate(
+      apiUrl,
+      (currentOrders: Order[] | undefined) => {
+        if (!currentOrders) return [];
+        return currentOrders.filter((order: Order) => order.id !== id);
+      },
+      false // Ne pas revalider immédiatement
+    );
+
+    const result = await removeOrder(id);
+
+    if (!result.success) {
+      // Rétablir l'état initial en cas d'erreur
+      mutate(apiUrl);
+      toast({
+        variant: "destructive",
+        description: `La commande ne peut pas être supprimé car il a des commandes non payées ou non livrées.`,
+      });
+      return;
+    }
+
+    // Rafraîchir les données après une suppression réussie
+    mutate(apiUrl);
+    toast({
+      description: `La commande a été supprimé avec succès.`,
+    });
+  };
 
   if (!orders || !orders.length) {
     return (
@@ -39,22 +71,6 @@ const OrderTable = ({ orders }: Props) => {
       </div>
     );
   }
-
-  const handleRemoveClient = async (id: string) => {
-    const result = await removeOrder(id);
-
-    if (!result.success) {
-      toast({
-        variant: "destructive",
-        description: `La commande ne peut pas être supprimé car il a des commandes non payées ou non livrées.`,
-      });
-      return;
-    }
-
-    toast({
-      description: `La commande a été supprimé avec succès.`,
-    });
-  };
 
   return (
     <Table>
@@ -127,7 +143,7 @@ const OrderTable = ({ orders }: Props) => {
                     <AlertDialogFooter>
                       <AlertDialogCancel>Annuler</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleRemoveClient(order.id)}
+                        onClick={() => handleRemoveOrder(order.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         Supprimer

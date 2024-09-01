@@ -26,23 +26,20 @@ const ArticleList = ({ userStore }: Props) => {
   // Appliquez le debounce au terme de recherche
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500); // 500 ms de délai
 
+  const articleApiUrl = `${API_URL}/articles?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`;
+  const articleCountApiUrl = `${API_URL}/articles/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`;
+
   const {
     data: articles,
     isLoading: articlesLoading,
     error: articlesError,
-  } = useSWR(
-    `${API_URL}/articles?storeId=${userStore.id}&page=${currentPage}&pageSize=${LIMIT}&search=${debouncedSearchTerm}`,
-    fetcher
-  );
+  } = useSWR(articleApiUrl, fetcher);
 
   const {
     data: articlesCount,
     isLoading: articlesCountLoading,
     error: articlesCountError,
-  } = useSWR(
-    `${API_URL}/articles/count?storeId=${userStore.id}&search=${debouncedSearchTerm}`,
-    fetcher
-  );
+  } = useSWR(articleCountApiUrl, fetcher);
 
   const totalPages = Math.ceil(articlesCount / (LIMIT || 1));
 
@@ -65,7 +62,7 @@ const ArticleList = ({ userStore }: Props) => {
           {articlesLoading || articlesCountLoading ? (
             <MyLoader />
           ) : (
-            <ArticleTable articles={articles} />
+            <ArticleTable articles={articles} apiUrl={articleApiUrl} />
           )}
         </CardContent>
         {articles && articlesCount > LIMIT && (

@@ -33,31 +33,28 @@ const OrderList = ({ userStore }: Props) => {
 
   const [debouncedclientName] = useDebounce(clientName, 500);
 
+  const orderApiUrl = `${API_URL}/orders?storeId=${
+    userStore.id
+  }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&status=${
+    statusFilter === "all" ? "" : statusFilter
+  }`;
+  const ordersCountApiUrl = `${API_URL}/orders/count?storeId=${
+    userStore.id
+  }&clientName=${debouncedclientName}&status=${
+    statusFilter === "all" ? "" : statusFilter
+  }`;
+
   const {
     data: orders,
     isLoading: ordersLoading,
     error: ordersError,
-  } = useSWR(
-    `${API_URL}/orders?storeId=${
-      userStore.id
-    }&page=${currentPage}&pageSize=${LIMIT}&clientName=${debouncedclientName}&status=${
-      statusFilter === "all" ? "" : statusFilter
-    }`,
-    fetcher
-  );
+  } = useSWR(orderApiUrl, fetcher);
 
   const {
     data: ordersCount,
     isLoading: ordersCountLoading,
     error: ordersCountError,
-  } = useSWR(
-    `${API_URL}/orders/count?storeId=${
-      userStore.id
-    }&clientName=${debouncedclientName}&status=${
-      statusFilter === "all" ? "" : statusFilter
-    }`,
-    fetcher
-  );
+  } = useSWR(ordersCountApiUrl, fetcher);
 
   const totalPages = Math.ceil(ordersCount / (LIMIT || 1));
 
@@ -91,7 +88,7 @@ const OrderList = ({ userStore }: Props) => {
           {ordersLoading || ordersCountLoading ? (
             <MyLoader />
           ) : (
-            <OrderTable orders={orders} />
+            <OrderTable orders={orders} apiUrl={orderApiUrl} />
           )}
         </CardContent>
         {orders && ordersCount > LIMIT && (
