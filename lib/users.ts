@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const getUser = async () => {
   const access_token = cookies().get("access_token");
 
-  if (!access_token) {
+  if (!access_token || !access_token.value.trim()) {
     redirect("/login");
   }
 
