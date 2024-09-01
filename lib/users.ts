@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -7,7 +8,7 @@ export const getUser = async () => {
   const access_token = cookies().get("access_token");
 
   if (!access_token) {
-    throw new Error("Access token is missing");
+    redirect("/login");
   }
 
   const decodedToken: any = jwtDecode(access_token.value);
@@ -19,7 +20,7 @@ export const getUser = async () => {
     },
   });
 
-  if (!res.ok) throw new Error("failed to fetch user");
+  if (!res.ok) redirect("/login");
 
   return res.json();
 };
