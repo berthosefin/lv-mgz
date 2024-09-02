@@ -4,6 +4,7 @@ import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
+  Card,
   CardContent,
   CardDescription,
   CardFooter,
@@ -17,6 +18,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { calculateMonthlyData } from "@/lib/calculate";
+import { fetcher } from "@/lib/fetcher";
+import useSWR from "swr";
+import ErrorMessage from "./ErrorMessage";
+import { Skeleton } from "./ui/skeleton";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Configuration du graphique
 const chartConfig = {
@@ -31,15 +38,38 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 type Props = {
-  transactionsMonthlySummary: {
-    month: string;
-    sales: number;
-    purchases: number;
-  }[];
+  storeId: string;
 };
 
-export function SalesChart({ transactionsMonthlySummary }: Props) {
+export function SalesChart({ storeId }: Props) {
   const currentYear = new Date().getFullYear();
+  const {
+    data: transactionsMonthlySummary,
+    isLoading,
+    error,
+  } = useSWR(
+    `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${currentYear}`,
+    fetcher
+  );
+
+  if (isLoading)
+    return (
+      <Card className="w-full lg:w-1/2">
+        <CardHeader>
+          <Skeleton className="h-4 w-[350px]" />
+          <Skeleton className="h-4 w-[250px]" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-64 w-full rounded-lg" />
+        </CardContent>
+        <CardFooter className="flex-col items-start gap-2 text-sm">
+          <Skeleton className="h-4 w-[350px]" />
+          <Skeleton className="h-4 w-[350px]" />
+        </CardFooter>
+      </Card>
+    );
+
+  if (error) return <ErrorMessage errorMessage="Erreur lors du chargement" />;
 
   const { revenueDifference } = calculateMonthlyData(
     transactionsMonthlySummary
@@ -60,7 +90,7 @@ export function SalesChart({ transactionsMonthlySummary }: Props) {
   const isNeutral = revenueDifference === 0;
 
   return (
-    <>
+    <Card className="w-full lg:w-1/2">
       <CardHeader>
         <CardTitle>Graphiques des Ventes et Approvisionnements</CardTitle>
         <CardDescription>Janvier - Décembre {currentYear}</CardDescription>
@@ -108,6 +138,6 @@ export function SalesChart({ transactionsMonthlySummary }: Props) {
           Affichage des ventes par rapport aux approvisionnements
         </div>
       </CardFooter>
-    </>
+    </Card>
   );
 }

@@ -89,6 +89,7 @@ export const logout = async () => {
       };
       cookies().set("access_token", "", cookieOptions);
       cookies().set("refresh_token", "", cookieOptions);
+      return { success: true };
     }
 
     return { success: true };

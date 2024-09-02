@@ -40,20 +40,23 @@ const Navbar = () => {
   async function onSubmit() {
     setBtnLoading(true);
 
-    const result = await logout();
+    try {
+      const result = await logout();
 
-    setBtnLoading(false);
-
-    if (result.success) {
-      router.push("/login");
-      toast({
-        description: `Compte déconnecté avec succès !`,
-      });
-    } else {
-      toast({
-        description: `Erreur lors de la déconnexion.`,
-        variant: "destructive",
-      });
+      if (result.success) {
+        router.push("/login");
+        toast({
+          description: `Compte déconnecté avec succès !`,
+        });
+      } else {
+        toast({
+          description: `Erreur lors de la déconnexion.`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+    } finally {
+      setBtnLoading(false);
     }
   }
 

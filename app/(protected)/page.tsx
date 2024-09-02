@@ -1,60 +1,18 @@
-import MyCard from "@/components/MyCard";
+import { ArticlesCountCard } from "@/components/ArticlesCountCard";
+import { ArticlesLowStockCard } from "@/components/ArticlesLowStockCard";
+import { CurrentMonthPurchasesCard } from "@/components/CurrentMonthPurchasesCard";
+import { CurrentMonthRevenueCard } from "@/components/CurrentMonthRevenueCard";
+import { CurrentMonthSalesCard } from "@/components/CurrentMonthSalesCard";
+import { LastTransactionsCard } from "@/components/LastTransactionsCard";
 import { SalesChart } from "@/components/SalesChart";
-import TransactionTable from "@/components/TransactionTable";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { SelectSeparator } from "@/components/ui/select";
-import { getArticlesCount, getLowStockArticles } from "@/lib/articles";
-import { calculateMonthlyData } from "@/lib/calculate";
-import {
-  getAllTransactions,
-  getTransactionsMonthlySummary,
-} from "@/lib/transactions";
-import { getUser } from "@/lib/users";
-import { Article } from "@prisma/client";
-import {
-  Activity,
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Plus,
-  Store,
-} from "lucide-react";
-import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserSession } from "@/lib/getSession";
+import { Store } from "lucide-react";
+import { Suspense } from "react";
 
 export default async function Home() {
-  const userData: User = await getUser();
-  const userStore: Store = userData.store;
-  const userCashDesk: CashDesk = userData.store.cashDesk;
-
-  const [
-    articlesCount,
-    transactions,
-    transactionsMonthlySummary,
-    lowStockArticles,
-  ] = await Promise.all([
-    getArticlesCount(userStore.id),
-    getAllTransactions(userCashDesk.id, 1, 5),
-    getTransactionsMonthlySummary(userStore.id, new Date().getFullYear()),
-    getLowStockArticles(userStore.id),
-  ]);
-
-  // Utilisez la fonction pour obtenir les données calculées
-  const {
-    currentMonthRevenue,
-    revenueDifference,
-    currentMonthSales,
-    salesDifference,
-    currentMonthPurchases,
-    purchasesDifference,
-  } = calculateMonthlyData(transactionsMonthlySummary);
+  const userData = await getUserSession();
 
   return (
     <>
@@ -62,135 +20,63 @@ export default async function Home() {
         <h1 className="text-3xl font-bold mb-4">Tableau de bord</h1>
         <h1 className="text-3xl font-bold mb-4 capitalize flex items-center">
           <Store size={20} className="mr-2" />
-          {userStore.name}
+          {userData.username}
         </h1>
       </div>
 
-      {/* Cards */}
       <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
         <div className="w-full lg:w-1/4">
-          <MyCard
-            title={`Total Revenue`}
-            value={`${currentMonthRevenue.toLocaleString("fr-FR")} MGA`}
-            description={`${
-              revenueDifference > 0
-                ? `+${revenueDifference.toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-                : `-${Math.abs(revenueDifference).toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-            }`}
-            icon={<DollarSign />}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <CurrentMonthRevenueCard storeId={userData.storeId} />
+          </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
-          <MyCard
-            title={`Résumé des Ventes`}
-            value={`${currentMonthSales.toLocaleString("fr-FR")} MGA`}
-            description={`${
-              salesDifference > 0
-                ? `+${salesDifference.toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-                : `-${Math.abs(salesDifference).toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-            }`}
-            icon={<CreditCard />}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <CurrentMonthSalesCard storeId={userData.storeId} />
+          </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
-          <MyCard
-            title={`Résumé des Approvisionnements`}
-            value={`${currentMonthPurchases.toLocaleString("fr-FR")} MGA`}
-            description={`${
-              purchasesDifference > 0
-                ? `+${purchasesDifference.toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-                : `-${Math.abs(purchasesDifference).toLocaleString(
-                    "fr-FR"
-                  )} MGA depuis le mois dernier`
-            }`}
-            icon={<Plus />}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <CurrentMonthPurchasesCard storeId={userData.storeId} />
+          </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
-          <MyCard
-            title={`Résumé des Stocks`}
-            value={`${articlesCount}`}
-            description={`Produits en Stock`}
-            icon={<Activity />}
-          />
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <ArticlesCountCard storeId={userData.storeId} />
+          </Suspense>
         </div>
       </div>
 
       <div className="flex flex-col space-y-4 mt-4 lg:flex-row lg:space-y-0 lg:space-x-4">
-        {/* SalesChart */}
-        <Card className="w-full lg:w-1/2">
-          <SalesChart transactionsMonthlySummary={transactionsMonthlySummary} />
-        </Card>
+        <SalesChart storeId={userData.storeId} />
 
-        {/* Lasts transactions */}
-        <Card className="w-full lg:w-2/3">
-          <CardHeader>
-            <div className="flex">
-              <div className="flex flex-col gap-2">
-                <CardTitle>Transactions</CardTitle>
-                <CardDescription>Historique des Transactions.</CardDescription>
-              </div>
-              <Button asChild size="sm" className="ml-auto gap-1">
-                <Link href="/cashdesks">
-                  Voir tout
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <TransactionTable transactions={transactions} />
-          </CardContent>
-        </Card>
+        <Suspense
+          fallback={
+            <Card className="w-full lg:w-2/3">
+              <Skeleton className="h-full w-full rounded-lg" />
+            </Card>
+          }
+        >
+          <LastTransactionsCard CashDeskId={userData.cashDeskId} />
+        </Suspense>
 
-        {/* Alert */}
-        <Card className="w-full lg:w-1/3">
-          <CardHeader>
-            <div className="flex">
-              <div className="flex flex-col gap-2">
-                <CardTitle>Alertes</CardTitle>
-                <CardDescription>Epuisement de stock.</CardDescription>
-              </div>
-              <Button asChild size="sm" className="ml-auto gap-1">
-                <Link href="/articles">
-                  Voir page des articles
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {lowStockArticles.length > 0 ? (
-              <ScrollArea className="h-80 w-full rounded-md border mb-4">
-                <div className="p-4">
-                  {lowStockArticles.map((item: Article) => (
-                    <div key={item.id} className="text-sm">
-                      <div className="flex justify-between">
-                        <div>{item.name}</div>
-                        <div>{item.stock}</div>
-                      </div>
-                      <SelectSeparator className="my-2" />
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            ) : (
-              <div className="text-muted-foreground py-4">
-                Pas encore d&apos;articles en cours d&apos;épuisement de stock.
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <Suspense
+          fallback={
+            <Card className="w-full lg:w-1/3">
+              <Skeleton className="h-full w-full rounded-lg" />
+            </Card>
+          }
+        >
+          <ArticlesLowStockCard storeId={userData.storeId} />
+        </Suspense>
       </div>
     </>
   );
