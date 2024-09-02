@@ -36,6 +36,7 @@ const Navbar = () => {
   };
 
   const user = useUserStore((state) => state.user);
+  const unSetUser = useUserStore((state) => state.unSetUser);
 
   async function onSubmit() {
     setBtnLoading(true);
@@ -44,10 +45,11 @@ const Navbar = () => {
       const result = await logout();
 
       if (result.success) {
-        router.push("/login");
+        // router.push("/login");
         toast({
           description: `Compte déconnecté avec succès !`,
         });
+        unSetUser();
       } else {
         toast({
           description: `Erreur lors de la déconnexion.`,
