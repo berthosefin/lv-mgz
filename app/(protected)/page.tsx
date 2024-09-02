@@ -7,7 +7,7 @@ import { LastTransactionsCard } from "@/components/LastTransactionsCard";
 import { SalesChart } from "@/components/SalesChart";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getUserSession } from "@/lib/getSession";
+import { getUserSession } from "@/lib/getUserSession";
 import { Store } from "lucide-react";
 import { Suspense } from "react";
 

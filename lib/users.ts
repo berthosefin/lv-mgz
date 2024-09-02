@@ -1,4 +1,4 @@
-import { jwtDecode } from "jwt-decode";
+import * as jose from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -11,7 +11,7 @@ export const getUser = async () => {
     redirect("/login");
   }
 
-  const decodedToken: any = jwtDecode(access_token.value);
+  const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token.value);
 
   const res = await fetch(`${API_URL}/users/${decodedToken.username}`, {
     cache: "no-store",

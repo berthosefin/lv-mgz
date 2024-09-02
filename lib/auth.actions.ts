@@ -1,6 +1,6 @@
 "use server";
 
-import { jwtDecode } from "jwt-decode";
+import * as jose from "jose";
 import { cookies } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -60,7 +60,7 @@ export const login = async (data: { username: string; password: string }) => {
     const { access_token, refresh_token } = await response.json();
     cookies().set("access_token", access_token, { path: "/" });
     cookies().set("refresh_token", refresh_token, { path: "/" });
-    const decodedToken: any = jwtDecode(access_token);
+    const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token);
     const userId = decodedToken.sub;
 
     // Retourner les détails de l'utilisateur
