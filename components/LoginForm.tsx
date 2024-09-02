@@ -51,19 +51,22 @@ const LoginForm = () => {
     try {
       const res = await login(values);
 
-      if (res.error) {
-        setErrorMessage(res.error);
-      } else if (res.user) {
-        setErrorMessage("");
-        setUser(res.user.id, res.user.username);
-        form.reset();
+      if (res.user) {
         router.push("/");
         toast({
           description: `Bienvenue ${res.user.username} !`,
         });
+        setUser(
+          res.user.id,
+          res.user.username,
+          res.user.storeId,
+          res.user.cashDEskId
+        );
+        form.reset();
+      } else {
+        setErrorMessage(res.error);
       }
     } catch (error) {
-      setErrorMessage("Une erreur inattendue s'est produite.");
     } finally {
       setBtnLoading(false);
     }

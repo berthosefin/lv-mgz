@@ -61,10 +61,14 @@ export const login = async (data: { username: string; password: string }) => {
     cookies().set("access_token", access_token, { path: "/" });
     cookies().set("refresh_token", refresh_token, { path: "/" });
     const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token);
-    const userId = decodedToken.sub;
 
     // Retourner les détails de l'utilisateur
-    const user = { id: userId, username };
+    const user = {
+      id: decodedToken.sub as string,
+      username,
+      storeId: decodedToken.storeId as string,
+      cashDEskId: decodedToken.cashDeskId as string,
+    };
     return { user };
   } catch (error) {
     return { error: "An unexpected error occurred during login." };
