@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { generatePDF } from "@/lib/invoice2pdf";
+import { exportInvoiceToPdf } from "@/lib/export-invoice-to-pdf";
 import { AlertCircle, Edit3, FileDown } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "./ui/badge";
@@ -76,7 +76,7 @@ const InvoiceTable = ({ invoices }: Props) => {
                   size={"icon"}
                   variant={"outline"}
                   onClick={() => {
-                    generatePDF(invoice);
+                    exportInvoiceToPdf(invoice);
                   }}
                 >
                   <FileDown className="w-4 h-4" />

@@ -8,8 +8,9 @@ import {
 import { getTransactions } from "@/lib/get-transactions";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import TransactionTable from "./TransactionTable";
+import { transactioncolumns } from "./TransactionColumn";
 import { Button } from "./ui/button";
+import { DataTable } from "./ui/data-table";
 
 export const TransactionCard = async ({
   cashDeskId,
@@ -35,7 +36,7 @@ export const TransactionCard = async ({
         </div>
       </CardHeader>
       <CardContent>
-        <TransactionTable transactions={transactions} />
+        <DataTable columns={transactioncolumns} data={transactions} />
       </CardContent>
     </Card>
   );

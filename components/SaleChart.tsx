@@ -17,7 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { calculateMonthlyData } from "@/lib/calculate";
+import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
 import { API_URL } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
@@ -52,17 +52,7 @@ export function SaleChart() {
   if (isLoading)
     return (
       <Card className="w-full lg:w-1/2">
-        <CardHeader>
-          <Skeleton className="h-4 w-[350px]" />
-          <Skeleton className="h-4 w-[250px]" />
-        </CardHeader>
-        <CardContent>
-          <Skeleton className="h-64 w-full rounded-lg" />
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <Skeleton className="h-4 w-[350px]" />
-          <Skeleton className="h-4 w-[350px]" />
-        </CardFooter>
+        <Skeleton className="h-full w-full rounded-lg" />
       </Card>
     );
 

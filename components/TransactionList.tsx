@@ -1,107 +1,28 @@
 "use client";
 
-import { API_URL, LIMIT } from "@/lib/constants";
+import { API_URL } from "@/lib/constants";
+import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
 import { fetcher } from "@/lib/fetcher";
-import { format } from "date-fns";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { ChevronLeft, ChevronRight, FileDown } from "lucide-react";
+import { useUserStore } from "@/lib/store";
+import { FileDown } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
-import ErrorMessage from "./ErrorMessage";
-import MyLoader from "./MyLoader";
-import TransactionTable from "./TransactionTable";
+import { transactioncolumns } from "./TransactionColumn";
+import { DataTable } from "./DataTable";
 import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
-import { useUserStore } from "@/lib/store";
+import { Skeleton } from "./ui/skeleton";
 
-const TransactionList = () => {
+export const TransactionList = () => {
   const { user } = useUserStore.getState();
-  console.log(user);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  const {
-    data: transactions,
-    isLoading: transactionsLoading,
-    error: transactionsError,
-  } = useSWR(
-    `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&page=${currentPage}&pageSize=${LIMIT}&startDate=${startDate}&endDate=${endDate}`,
-    fetcher
-  );
-
-  const { data: allTransactions } = useSWR(
+  const { data: transactions, isLoading } = useSWR(
     `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
-
-  const {
-    data: transactionsCount,
-    isLoading: transactionsCountLoading,
-    error: transactionsCountError,
-  } = useSWR(
-    `${API_URL}/transactions/count?cashDeskId=${user?.cashDeskId}&startDate=${startDate}&endDate=${endDate}`,
-    fetcher
-  );
-
-  const handleExportToPDF = async (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  ) => {
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text(
-      `Liste des transactions du ${format(
-        new Date(startDate),
-        "dd/MM/yyyy"
-      )} au ${format(new Date(endDate), "dd/MM/yyyy")}`,
-      15,
-      15
-    );
-
-    const tableData = allTransactions.map(
-      (transaction: Transaction, index: number) => {
-        const { createdAt, label, articles, amount } = transaction;
-
-        // Format date
-        const formattedDate = format(new Date(createdAt), "dd/MM/yyyy");
-
-        // Transform label
-        let formattedLabel = label;
-        if (label === "STOCK IN") {
-          formattedLabel = "ACHAT";
-        } else if (label === "STOCK OUT") {
-          formattedLabel = "VENTE";
-        }
-
-        // Get articles names
-        const articleNames = articles.map((article) => article.name).join(", ");
-
-        return [index + 1, formattedDate, formattedLabel, articleNames, amount];
-      }
-    );
-
-    autoTable(doc, {
-      head: [["#", "Date", "Libellé", "Article(s)", "Montant (MGA)"]],
-      body: tableData,
-      startY: 20,
-      columnStyles: {
-        4: { halign: "right" },
-      },
-    });
-
-    doc.save(`liste_des_transactions_du_${startDate}_au_${endDate}.pdf`);
-  };
-
-  const totalPages = Math.ceil(transactionsCount / (LIMIT || 1));
 
   return (
     <div className="overflow-x-auto mt-4">
@@ -124,48 +45,26 @@ const TransactionList = () => {
                   onChange={(e) => setEndDate(e.target.value)}
                 />
                 {startDate && endDate && (
-                  <Button onClick={handleExportToPDF}>
+                  <Button
+                    onClick={() => {
+                      exportTransactionsToPdf(transactions, startDate, endDate);
+                    }}
+                  >
                     <FileDown size={16} />
                   </Button>
                 )}
               </div>
             </div>
           </div>
-          {(transactionsError || transactionsCountError) && (
-            <ErrorMessage errorMessage="Erreur lors du chargement des transactions." />
-          )}
         </CardHeader>
         <CardContent>
-          {transactionsLoading || transactionsCountLoading ? (
-            <MyLoader />
+          {isLoading ? (
+            <Skeleton className="h-full w-full rounded-lg" />
           ) : (
-            <TransactionTable transactions={transactions} />
+            <DataTable columns={transactioncolumns} data={transactions} />
           )}
         </CardContent>
-        {transactions && transactionsCount > LIMIT && (
-          <CardFooter className="flex justify-center space-x-4">
-            <Button
-              variant={"outline"}
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage == 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button variant={"outline"} disabled>
-              Page {currentPage} / {totalPages}
-            </Button>
-            <Button
-              variant={"outline"}
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage == totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </CardFooter>
-        )}
       </Card>
     </div>
   );
 };
-
-export default TransactionList;

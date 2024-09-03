@@ -1,7 +1,7 @@
 import { CashDeskCurrentAmountCard } from "@/components/CashDeskCurrentAmountCard";
 import { CashDeskTotalInCard } from "@/components/CashDeskTotalInCard";
 import { CashDeskTotalOutCard } from "@/components/CashDeskTotalOutCard";
-import TransactionList from "@/components/TransactionList";
+import { TransactionList } from "@/components/TransactionList";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserData } from "@/lib/get-user-data";
 import { Wallet } from "lucide-react";

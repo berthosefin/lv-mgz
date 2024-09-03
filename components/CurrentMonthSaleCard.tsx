@@ -1,4 +1,4 @@
-import { calculateMonthlyData } from "@/lib/calculate";
+import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
 import { getTransactionsMonthlySummary } from "@/lib/get-transactions-monthly-summary";
 import { CreditCard } from "lucide-react";
 import MyCard from "./MyCard";

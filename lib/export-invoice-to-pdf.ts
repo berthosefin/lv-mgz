@@ -1,11 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { format } from "date-fns";
 import { ToWords } from "to-words";
 
-export const generatePDF = (invoice: Invoice) => {
+export const exportInvoiceToPdf = (invoice: Invoice) => {
   const doc = new jsPDF();
-  // const today = format(new Date(), "dd/MM/yyyy");
 
   // En-tête de la facture
   doc.setFontSize(12);
