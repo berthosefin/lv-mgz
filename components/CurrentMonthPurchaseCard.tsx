@@ -1,30 +1,9 @@
 import { calculateMonthlyData } from "@/lib/calculate";
+import { getTransactionsMonthlySummary } from "@/lib/get-transactions-monthly-summary";
 import { Plus } from "lucide-react";
 import MyCard from "./MyCard";
-import { cookies } from "next/headers";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const getTransactionsMonthlySummary = async (storeId: string) => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  const url = `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${new Date().getFullYear()}`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
-
-  return res
-    .json()
-    .then((json) => json)
-    .catch((e) => undefined);
-};
-
-export const CurrentMonthPurchasesCard = async ({
+export const CurrentMonthPurchaseCard = async ({
   storeId,
 }: {
   storeId: string;

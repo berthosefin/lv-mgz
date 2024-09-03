@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, TrendingDown, TrendingUp } from "lucide-react";
+import { Activity, AlertCircle, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -18,12 +18,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { calculateMonthlyData } from "@/lib/calculate";
+import { API_URL } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
+import { useUserStore } from "@/lib/store";
 import useSWR from "swr";
-import ErrorMessage from "./ErrorMessage";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Configuration du graphique
 const chartConfig = {
@@ -37,18 +37,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-type Props = {
-  storeId: string;
-};
-
-export function SalesChart({ storeId }: Props) {
+export function SaleChart() {
+  const { user } = useUserStore.getState();
   const currentYear = new Date().getFullYear();
   const {
     data: transactionsMonthlySummary,
     isLoading,
     error,
   } = useSWR(
-    `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${currentYear}`,
+    `${API_URL}/transactions/monthly-summary?storeId=${user?.storeId}&year=${currentYear}`,
     fetcher
   );
 
@@ -69,7 +66,16 @@ export function SalesChart({ storeId }: Props) {
       </Card>
     );
 
-  if (error) return <ErrorMessage errorMessage="Erreur lors du chargement" />;
+  if (error)
+    return (
+      <Card>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      </Card>
+    );
 
   const { revenueDifference } = calculateMonthlyData(
     transactionsMonthlySummary

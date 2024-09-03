@@ -10,7 +10,7 @@ import {
 import { LogIn } from "lucide-react";
 import Link from "next/link";
 
-export default async function Page() {
+export default async function SignupPage() {
   return (
     <Card className="w-[350px] mx-auto">
       <CardHeader>

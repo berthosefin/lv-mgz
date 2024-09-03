@@ -5,39 +5,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getTransactions } from "@/lib/get-transactions";
 import { ArrowUpRight } from "lucide-react";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import TransactionTable from "./TransactionTable";
 import { Button } from "./ui/button";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const getLastTransactions = async (CashDeskId: string) => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  const url = `${API_URL}/transactions/?CashDeskId=${CashDeskId}&page=1&pageSize=5`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
-
-  return res
-    .json()
-    .then((json) => json)
-    .catch((e) => undefined);
-};
-
-export const LastTransactionsCard = async ({
-  CashDeskId,
+export const TransactionCard = async ({
+  cashDeskId,
 }: {
-  CashDeskId: string;
+  cashDeskId: string;
 }) => {
-  const transactions = await getLastTransactions(CashDeskId);
+  const transactions = await getTransactions(cashDeskId, 1, 5);
 
   return (
     <Card className="w-full lg:w-2/3">

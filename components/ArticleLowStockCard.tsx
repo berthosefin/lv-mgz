@@ -7,37 +7,12 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectSeparator } from "@/components/ui/select";
+import { getArticlesLowStock } from "@/lib/get-articles-low-stock";
 import { ArrowUpRight } from "lucide-react";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-const getArticlesLowStock = async (storeId: string) => {
-  const cookieStore = cookies();
-  const accessToken = cookieStore.get("access_token")?.value;
-
-  const url = `${API_URL}/articles/low?storeId=${storeId}`;
-  const res = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    cache: "no-store",
-  });
-
-  return res
-    .json()
-    .then((json) => json)
-    .catch((e) => undefined);
-};
-
-export const ArticlesLowStockCard = async ({
-  storeId,
-}: {
-  storeId: string;
-}) => {
+export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
   const lowStockArticles = await getArticlesLowStock(storeId);
 
   return (
