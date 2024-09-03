@@ -19,9 +19,8 @@ async function refreshAccessToken(refreshToken: string) {
 
     const { access_token } = await response.json();
     return { accessToken: access_token };
-  } catch (error) {
-    console.error("Error refreshing access token:", error);
-    return null;
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 
@@ -41,9 +40,8 @@ async function validateAccessToken(accessToken: string) {
 
     const { valid } = await response.json();
     return valid;
-  } catch (error) {
-    console.error("Error validating access token:", error);
-    return false;
+  } catch (error: any) {
+    throw new Error(error);
   }
 }
 

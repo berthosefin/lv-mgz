@@ -1,5 +1,5 @@
 import LoginForm from "@/components/LoginForm";
-import MyButtonBack from "@/components/MyButtonBack";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { UserPlus } from "lucide-react";
+import Link from "next/link";
 
 export default async function Page() {
   return (
@@ -19,11 +20,12 @@ export default async function Page() {
         <LoginForm />
       </CardContent>
       <CardFooter className="flex justify-center">
-        <MyButtonBack
-          path="/signup"
-          name="Créer un compte"
-          icon={<UserPlus size={10} className="mr-2" />}
-        />
+        <Button variant={"link"} asChild>
+          <Link href={"/signup"} className="flex">
+            <UserPlus size={10} className="mr-2" />
+            Créer un compte
+          </Link>
+        </Button>
       </CardFooter>
     </Card>
   );

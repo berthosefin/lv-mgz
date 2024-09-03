@@ -1,6 +1,6 @@
 "use client";
 
-import { LIMIT } from "@/lib/constant";
+import { LIMIT } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { format } from "date-fns";
 import jsPDF from "jspdf";

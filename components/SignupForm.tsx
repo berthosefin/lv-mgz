@@ -8,19 +8,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signup } from "@/lib/auth.actions";
+import { signupAction } from "@/lib/actions/signup";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserPlus } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import ErrorMessage from "./ErrorMessage";
-import MyButton from "./MyButton";
+import { useServerAction } from "zsa-react";
+import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useToast } from "./ui/use-toast";
 
-const formSchema = z
+export const formSchema = z
   .object({
     username: z
       .string()
@@ -40,44 +39,37 @@ const formSchema = z
   });
 
 const SignupForm = () => {
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [btnLoading, setBtnLoading] = useState(false);
+  const { isPending, execute } = useServerAction(signupAction);
   const router = useRouter();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
-      storeName: "",
-    },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setBtnLoading(true);
-
-    const { username, confirmPassword, storeName } = values;
-
-    const res = await signup({
-      username,
-      password: confirmPassword,
-      storeName,
+    const [data, err] = await execute({
+      username: values.username,
+      password: values.password,
+      storeName: values.storeName,
     });
 
-    if (res.error) {
-      setErrorMessage(res.error);
-    } else {
-      setErrorMessage("");
+    if (err) {
       toast({
-        description: `Compte utilisateur "${res.username}" crée avec succès !`,
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
       });
-      form.reset();
-      router.push("/login");
     }
 
-    setBtnLoading(false);
+    if (data) {
+      router.push("/login");
+      toast({
+        title: `Compte utilisateur crée avec succès !`,
+        description: `Nom d'utilisateur: ${data.username}`,
+      });
+      form.reset();
+    }
   }
 
   return (
@@ -86,8 +78,6 @@ const SignupForm = () => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-4 mx-auto max-w-md"
       >
-        {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
-
         <div className="flex space-x-4">
           <div className="w-full">
             <FormField
@@ -97,13 +87,7 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Nom d&apos;utilisateur</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Nom d'utilisateur"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setErrorMessage("");
-                        field.onChange(e);
-                      }}
-                    />
+                    <Input placeholder="Nom d'utilisateur" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -119,13 +103,7 @@ const SignupForm = () => {
                 <FormItem>
                   <FormLabel>Nom du magasin</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Nom du magasin"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setErrorMessage("");
-                        field.onChange(e);
-                      }}
-                    />
+                    <Input placeholder="Nom du magasin" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,14 +119,7 @@ const SignupForm = () => {
             <FormItem>
               <FormLabel>Mot de passe</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Mot de passe"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setErrorMessage("");
-                    field.onChange(e);
-                  }}
-                />
+                <Input type="password" placeholder="Mot de passe" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -165,10 +136,7 @@ const SignupForm = () => {
                 <Input
                   type="password"
                   placeholder="Confirmer le mot de passe"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setErrorMessage("");
-                    field.onChange(e);
-                  }}
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -176,12 +144,19 @@ const SignupForm = () => {
           )}
         />
 
-        <MyButton
-          label="Créer"
-          loading={btnLoading}
-          errorMessage={errorMessage}
-          icon={<UserPlus size={16} className="mr-2 h-4 w-4" />}
-        />
+        <Button type="submit" disabled={isPending} className="w-full mt-4">
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Chargement
+            </>
+          ) : (
+            <>
+              <UserPlus size={16} className="mr-2 h-4 w-4" />
+              Créer
+            </>
+          )}
+        </Button>
       </form>
     </Form>
   );
