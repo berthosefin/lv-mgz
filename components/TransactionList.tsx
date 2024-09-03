@@ -1,12 +1,11 @@
 "use client";
 
-import { LIMIT } from "@/lib/constants";
+import { API_URL, LIMIT } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { ChevronLeft, ChevronRight, FileDown } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import ErrorMessage from "./ErrorMessage";
@@ -21,30 +20,26 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Input } from "./ui/input";
+import { useUserStore } from "@/lib/store";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-type Props = {
-  userCashDesk: CashDesk;
-};
-
-const TransactionList = ({ userCashDesk }: Props) => {
+const TransactionList = () => {
+  const { user } = useUserStore.getState();
+  console.log(user);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
-  const router = useRouter();
 
   const {
     data: transactions,
     isLoading: transactionsLoading,
     error: transactionsError,
   } = useSWR(
-    `${API_URL}/transactions?cashDeskId=${userCashDesk.id}&page=${currentPage}&pageSize=${LIMIT}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&page=${currentPage}&pageSize=${LIMIT}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 
   const { data: allTransactions } = useSWR(
-    `${API_URL}/transactions?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 
@@ -53,7 +48,7 @@ const TransactionList = ({ userCashDesk }: Props) => {
     isLoading: transactionsCountLoading,
     error: transactionsCountError,
   } = useSWR(
-    `${API_URL}/transactions/count?cashDeskId=${userCashDesk.id}&startDate=${startDate}&endDate=${endDate}`,
+    `${API_URL}/transactions/count?cashDeskId=${user?.cashDeskId}&startDate=${startDate}&endDate=${endDate}`,
     fetcher
   );
 

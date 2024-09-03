@@ -60,7 +60,7 @@ const LoginForm = () => {
         data.sub as string,
         data.username as string,
         data.storeId as string,
-        data.cashDEskId as string
+        data.cashDeskId as string
       );
       form.reset();
     }

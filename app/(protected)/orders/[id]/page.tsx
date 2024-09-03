@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUser } from "@/lib/users";
+import { getUserData } from "@/lib/get-user-data";
 
 type Props = {
   params: {
@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default async function UpdateOrder({ params }: Props) {
-  const userData: User = await getUser();
+  const userData: User = await getUserData();
 
   return (
     <Card className="w-[350px] mx-auto">

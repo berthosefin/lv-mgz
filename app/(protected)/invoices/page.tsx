@@ -1,11 +1,11 @@
 import InvoiceList from "@/components/InvoiceList";
 import { Button } from "@/components/ui/button";
-import { getUser } from "@/lib/users";
+import { getUserData } from "@/lib/get-user-data";
 import { FileText } from "lucide-react";
 import Link from "next/link";
 
 export default async function Invoices() {
-  const userData: User = await getUser();
+  const userData: User = await getUserData();
   const userStore: Store = userData.store;
 
   return (

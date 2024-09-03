@@ -1,12 +1,12 @@
 import ClientList from "@/components/ClientList";
 import { Button } from "@/components/ui/button";
-import { getUser } from "@/lib/users";
+import { getUserData } from "@/lib/get-user-data";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 export default async function Client() {
-  const userData: User = await getUser();
+  const userData: User = await getUserData();
 
   return (
     <>

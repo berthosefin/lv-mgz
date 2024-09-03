@@ -7,10 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getUser } from "@/lib/users";
+import { getUserData } from "@/lib/get-user-data";
 
 export default async function AddClient() {
-  const userData: User = await getUser();
+  const userData: User = await getUserData();
 
   return (
     <Card className="w-[350px] mx-auto">

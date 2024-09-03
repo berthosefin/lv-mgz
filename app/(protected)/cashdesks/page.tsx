@@ -1,29 +1,46 @@
-import CashDesk from "@/components/CashDesk";
+import { CashDeskCurrentAmountCard } from "@/components/CashDeskCurrentAmountCard";
+import { CashDeskTotalInCard } from "@/components/CashDeskTotalInCard";
+import { CashDeskTotalOutCard } from "@/components/CashDeskTotalOutCard";
 import TransactionList from "@/components/TransactionList";
-import { getUser } from "@/lib/users";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserData } from "@/lib/get-user-data";
 import { Wallet } from "lucide-react";
+import { Suspense } from "react";
 
 export default async function CashDeskPage() {
-  const userData: User = await getUser();
-  const userCashDesk: CashDesk = userData.store.cashDesk;
+  const userData = await getUserData();
 
   return (
     <>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Caisse</h1>
-        {/* <Button asChild>
-          <Link href={"/cashdesks/operation"} className="btn">
-            <ArrowLeftRight size={16} className="mr-2 h-4 w-4" />
-            Dépot / Rétrait
-          </Link>
-        </Button> */}
         <span className="flex gap-2">
           <Wallet size={20} className="mr-2" />
-          {userData.store.name}
+          {userData.username}
         </span>
       </div>
-      <CashDesk userCashDesk={userCashDesk} />
-      <TransactionList userCashDesk={userCashDesk} />
+      <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
+        <div className="w-full lg:w-1/3">
+          <CashDeskCurrentAmountCard
+            currentAmount={userData.store.cashDesk.currentAmount}
+          />
+        </div>
+        <div className="w-full lg:w-1/3">
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <CashDeskTotalInCard cashDeskId={userData.store.cashDesk.id} />
+          </Suspense>
+        </div>
+        <div className="w-full lg:w-1/3">
+          <Suspense
+            fallback={<Skeleton className="h-full w-full rounded-lg" />}
+          >
+            <CashDeskTotalOutCard cashDeskId={userData.store.cashDesk.id} />
+          </Suspense>
+        </div>
+      </div>
+      <TransactionList />
     </>
   );
 }
