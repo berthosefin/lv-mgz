@@ -1,7 +1,8 @@
 import { CashDeskCurrentAmountCard } from "@/components/CashDeskCurrentAmountCard";
 import { CashDeskTotalInCard } from "@/components/CashDeskTotalInCard";
 import { CashDeskTotalOutCard } from "@/components/CashDeskTotalOutCard";
-import { TransactionList } from "@/components/TransactionList";
+import { transactionColumns } from "@/components/TransactionColumn";
+import { TransactionDataTable } from "@/components/TransactionDataTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserData } from "@/lib/get-user-data";
 import { Wallet } from "lucide-react";
@@ -16,7 +17,7 @@ export default async function CashDeskPage() {
         <h1 className="text-3xl font-bold">Caisse</h1>
         <span className="flex gap-2">
           <Wallet size={20} className="mr-2" />
-          {userData.username}
+          {userData.store.name}
         </span>
       </div>
       <div className="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
@@ -40,7 +41,7 @@ export default async function CashDeskPage() {
           </Suspense>
         </div>
       </div>
-      <TransactionList />
+      <TransactionDataTable columns={transactionColumns} />
     </>
   );
 }

@@ -1,13 +1,10 @@
-import InvoiceList from "@/components/InvoiceList";
+import { invoiceColumns } from "@/components/InvoiceColumn";
+import { InvoiceDataTable } from "@/components/InvoiceDataTable";
 import { Button } from "@/components/ui/button";
-import { getUserData } from "@/lib/get-user-data";
 import { FileText } from "lucide-react";
 import Link from "next/link";
 
 export default async function Invoices() {
-  const userData: User = await getUserData();
-  const userStore: Store = userData.store;
-
   return (
     <>
       <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
@@ -21,7 +18,7 @@ export default async function Invoices() {
           </Button>
         </div>
       </div>
-      <InvoiceList userStore={userStore} />
+      <InvoiceDataTable columns={invoiceColumns} />
     </>
   );
 }

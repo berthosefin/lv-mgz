@@ -1,13 +1,10 @@
-import ClientList from "@/components/ClientList";
+import { clientColumns } from "@/components/ClientColumn";
+import { ClientDataTable } from "@/components/ClientDataTable";
 import { Button } from "@/components/ui/button";
-import { getUserData } from "@/lib/get-user-data";
 import { UserPlus } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 
 export default async function Client() {
-  const userData: User = await getUserData();
-
   return (
     <>
       <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
@@ -21,7 +18,7 @@ export default async function Client() {
           </Button>
         </div>
       </div>
-      <ClientList userStore={userData.store} />
+      <ClientDataTable columns={clientColumns} />
     </>
   );
 }

@@ -7,12 +7,12 @@ import { SaleChart } from "@/components/SaleChart";
 import { TransactionCard } from "@/components/TransactionCard";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getUserSession } from "@/lib/get-user-session";
+import { getUserData } from "@/lib/get-user-data";
 import { Store } from "lucide-react";
 import { Suspense } from "react";
 
 export default async function HomePage() {
-  const user = await getUserSession();
+  const userData = await getUserData();
 
   return (
     <>
@@ -20,7 +20,7 @@ export default async function HomePage() {
         <h1 className="text-3xl font-bold mb-4">Tableau de bord</h1>
         <h1 className="text-3xl font-bold mb-4 capitalize flex items-center">
           <Store size={20} className="mr-2" />
-          {user.username}
+          {userData.store.name}
         </h1>
       </div>
 
@@ -29,28 +29,28 @@ export default async function HomePage() {
           <Suspense
             fallback={<Skeleton className="h-full w-full rounded-lg" />}
           >
-            <CurrentMonthRevenueCard storeId={user.storeId} />
+            <CurrentMonthRevenueCard storeId={userData.store.id} />
           </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
           <Suspense
             fallback={<Skeleton className="h-full w-full rounded-lg" />}
           >
-            <CurrentMonthSaleCard storeId={user.storeId} />
+            <CurrentMonthSaleCard storeId={userData.store.id} />
           </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
           <Suspense
             fallback={<Skeleton className="h-full w-full rounded-lg" />}
           >
-            <CurrentMonthPurchaseCard storeId={user.storeId} />
+            <CurrentMonthPurchaseCard storeId={userData.store.id} />
           </Suspense>
         </div>
         <div className="w-full lg:w-1/4">
           <Suspense
             fallback={<Skeleton className="h-full w-full rounded-lg" />}
           >
-            <ArticleCountCard storeId={user.storeId} />
+            <ArticleCountCard storeId={userData.store.id} />
           </Suspense>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default async function HomePage() {
             </Card>
           }
         >
-          <TransactionCard cashDeskId={user.cashDeskId} />
+          <TransactionCard cashDeskId={userData.store.cashDesk.id} />
         </Suspense>
 
         <Suspense
@@ -75,7 +75,7 @@ export default async function HomePage() {
             </Card>
           }
         >
-          <ArticleLowStockCard storeId={user.storeId} />
+          <ArticleLowStockCard storeId={userData.store.id} />
         </Suspense>
       </div>
     </>

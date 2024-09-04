@@ -12,20 +12,17 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { fetcher } from "@/lib/fetcher";
+import { createOrder } from "@/lib/orders.actions";
 import clsx from "clsx";
-import { format } from "date-fns";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { Check, FileDown, RotateCw, ShoppingCart, X } from "lucide-react";
+import { Check, RotateCw, ShoppingCart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Select from "react-select";
 import useSWR from "swr";
 import ErrorMessage from "./ErrorMessage";
 import Loader from "./MyLoader";
-import { createOrder } from "@/lib/orders.actions";
-import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -121,48 +118,6 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
     );
 
     setOrderItems(newOrderItems);
-  };
-
-  const handleExportToPDF = () => {
-    const doc = new jsPDF();
-    const today = format(new Date(), "dd/MM/yyyy");
-
-    doc.setFontSize(16);
-    doc.text(`Nom: ${clientName}`, 15, 15);
-    doc.text(`Date: ${today}`, 15, 22);
-    doc.text(`FACTURE`, 90, 45);
-
-    const tableData = orderItems.map((item: OrderItem, index: number) => {
-      const articleName = articles.find(
-        (article: Article) => article.id === item.articleId
-      )?.name;
-      const amount = item.quantity * item.sellingPrice;
-      return [index + 1, articleName, item.quantity, item.sellingPrice, amount];
-    });
-
-    const totalAmountRow = ["", "", "", "TOTAL", totalAmount];
-    tableData.push(totalAmountRow);
-
-    autoTable(doc, {
-      head: [
-        [
-          "#",
-          "Designation",
-          "Quantité",
-          "Prix Unitaire (MGA)",
-          "Montant (MGA)",
-        ],
-      ],
-      body: tableData,
-      startY: 50,
-      columnStyles: {
-        2: { halign: "right" },
-        3: { halign: "right" },
-        4: { halign: "right" },
-      },
-    });
-
-    doc.save(`facture_de_${clientName}_du_${today}.pdf`);
   };
 
   const handleSubmitOrder = async () => {
@@ -385,14 +340,6 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
               <TableCell></TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end items-center space-x-4">
-                  {/* <Button
-                    disabled={errorMessage || clientName == "" ? true : false}
-                    onClick={handleExportToPDF}
-                    variant="ghost"
-                  >
-                    <FileDown size={16} />
-                  </Button> */}
-
                   <div className="font-bold">
                     <span>TOTAL:</span>
                     <span className="ml-2">{totalAmount.toLocaleString()}</span>

@@ -2,7 +2,17 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-export const transactioncolumns: ColumnDef<Transaction>[] = [
+export const transactionColumns: ColumnDef<Transaction>[] = [
+  {
+    accessorKey: "createdAt",
+    header: "Date",
+    cell: ({ row }) => {
+      const date: Date = row.getValue("createdAt");
+      const formatted = new Date(date).toLocaleDateString("fr-FR");
+
+      return formatted;
+    },
+  },
   {
     accessorKey: "label",
     header: "Libellé",
@@ -38,16 +48,6 @@ export const transactioncolumns: ColumnDef<Transaction>[] = [
       const formatted = amount.toLocaleString();
 
       return <div className={`text-right`}>{formatted} MGA</div>;
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: () => <div className="text-right">Date</div>,
-    cell: ({ row }) => {
-      const date: Date = row.getValue("createdAt");
-      const formatted = new Date(date).toLocaleDateString("fr-FR");
-
-      return <div className={`text-right`}>{formatted}</div>;
     },
   },
 ];

@@ -8,7 +8,7 @@ import {
 import { getTransactions } from "@/lib/get-transactions";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { transactioncolumns } from "./TransactionColumn";
+import { transactionColumns } from "./TransactionColumn";
 import { Button } from "./ui/button";
 import { DataTable } from "./ui/data-table";
 
@@ -17,7 +17,7 @@ export const TransactionCard = async ({
 }: {
   cashDeskId: string;
 }) => {
-  const transactions = await getTransactions(cashDeskId, 1, 5);
+  const data = await getTransactions(cashDeskId, 1, 5);
 
   return (
     <Card className="w-full lg:w-2/3">
@@ -36,7 +36,7 @@ export const TransactionCard = async ({
         </div>
       </CardHeader>
       <CardContent>
-        <DataTable columns={transactioncolumns} data={transactions} />
+        <DataTable columns={transactionColumns} data={data.transactions} />
       </CardContent>
     </Card>
   );

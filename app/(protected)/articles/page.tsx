@@ -1,13 +1,10 @@
-import ArticleList from "@/components/ArticleList";
+import { articleColumns } from "@/components/ArticleColumn";
+import { ArticleDataTable } from "@/components/ArticleDataTable";
 import { Button } from "@/components/ui/button";
-import { getUserData } from "@/lib/get-user-data";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export default async function Article() {
-  const userData: User = await getUserData();
-  const userStore: Store = userData.store;
-
   return (
     <>
       <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
@@ -21,7 +18,7 @@ export default async function Article() {
           </Button>
         </div>
       </div>
-      <ArticleList userStore={userStore} />
+      <ArticleDataTable columns={articleColumns} />
     </>
   );
 }
