@@ -24,6 +24,13 @@ import useSWR from "swr";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 
 interface TransactionDataTableProps<Transaction, TValue> {
   columns: ColumnDef<Transaction, TValue>[];
@@ -58,28 +65,36 @@ export function TransactionDataTable<TValue>({
   });
 
   return (
-    <div className="overflow-x-auto p-4">
-      <div className="flex flex-row space-x-2 my-4">
-        <Input
-          type="date"
-          id="startDate"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="w-full sm:max-w-36"
-        />
-        <Input
-          type="date"
-          id="endDate"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="w-full sm:max-w-36"
-        />
-      </div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <>
-          <div className="rounded-md border">
+    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-4">
+      <CardHeader className="flex flex-row items-center">
+        <div className="grid gap-2">
+          <CardTitle>Transactions</CardTitle>
+          <CardDescription>
+            Liste des transactions de votre boutique.
+          </CardDescription>
+        </div>
+        <div className="ml-auto flex flex-col gap-2 lg:flex-row">
+          <Input
+            type="date"
+            id="startDate"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="w-full sm:max-w-48"
+          />
+          <Input
+            type="date"
+            id="endDate"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="w-full sm:max-w-48"
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -128,34 +143,34 @@ export function TransactionDataTable<TValue>({
                 )}
               </TableBody>
             </Table>
-          </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {table.getPageCount() === 0
-                ? "Page 1 sur 1"
-                : `Page ${
-                    table.getState().pagination.pageIndex + 1
-                  } sur ${table.getPageCount()}`}
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                {table.getPageCount() === 0
+                  ? "Page 1 sur 1"
+                  : `Page ${
+                      table.getState().pagination.pageIndex + 1
+                    } sur ${table.getPageCount()}`}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }
