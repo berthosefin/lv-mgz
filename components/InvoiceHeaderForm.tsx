@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/MyLoader";
+import { Loader } from "@/components/Loader";
 import {
   Form,
   FormControl,

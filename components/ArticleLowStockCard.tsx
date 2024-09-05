@@ -16,20 +16,20 @@ export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
   const lowStockArticles = await getArticlesLowStock(storeId);
 
   return (
-    <Card className="w-full lg:w-1/3">
-      <CardHeader>
-        <div className="flex">
-          <div className="flex flex-col gap-2">
-            <CardTitle>Alertes</CardTitle>
-            <CardDescription>Epuisement de stock.</CardDescription>
-          </div>
-          <Button asChild size="sm" className="ml-auto gap-1">
-            <Link href="/articles">
-              Voir tout
-              <ArrowUpRight className="h-4 w-4" />
-            </Link>
-          </Button>
+    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-4">
+      <CardHeader className="flex flex-row items-center">
+        <div className="grid gap-2">
+          <CardTitle>Alertes</CardTitle>
+          <CardDescription>
+            Articles en cours d&apos;épuisement de stock de votre boutique.
+          </CardDescription>
         </div>
+        <Button asChild size="sm" className="ml-auto gap-1">
+          <Link href="/articles">
+            Voir tout
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </Button>
       </CardHeader>
       <CardContent>
         {lowStockArticles.length > 0 ? (

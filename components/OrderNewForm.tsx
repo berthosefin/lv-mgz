@@ -20,7 +20,7 @@ import React, { useState } from "react";
 import Select from "react-select";
 import useSWR from "swr";
 import ErrorMessage from "./ErrorMessage";
-import Loader from "./MyLoader";
+import { Loader } from "./Loader";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 

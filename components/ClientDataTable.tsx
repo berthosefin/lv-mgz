@@ -36,7 +36,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { useServerAction } from "zsa-react";
-import MyLoader from "./MyLoader";
+import { Loader } from "./Loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
@@ -104,7 +104,7 @@ export function ClientDataTable<TValue>({
         />
       </div>
       {isLoading ? (
-        <MyLoader />
+        <Loader />
       ) : (
         <>
           <div className="rounded-md border">

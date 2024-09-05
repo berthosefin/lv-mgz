@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, AlertCircle, TrendingDown, TrendingUp } from "lucide-react";
+import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import {
@@ -22,7 +22,6 @@ import { API_URL } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import useSWR from "swr";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { Skeleton } from "./ui/skeleton";
 
 // Configuration du graphique
@@ -40,30 +39,15 @@ const chartConfig = {
 export function SaleChart() {
   const { user } = useUserStore.getState();
   const currentYear = new Date().getFullYear();
-  const {
-    data: transactionsMonthlySummary,
-    isLoading,
-    error,
-  } = useSWR(
+  const { data: transactionsMonthlySummary, isLoading } = useSWR(
     `${API_URL}/transactions/monthly-summary?storeId=${user?.storeId}&year=${currentYear}`,
     fetcher
   );
 
   if (isLoading)
     return (
-      <Card className="w-full lg:w-1/2">
+      <Card x-chunk="dashboard-01-chunk-5">
         <Skeleton className="h-full w-full rounded-lg" />
-      </Card>
-    );
-
-  if (error)
-    return (
-      <Card>
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       </Card>
     );
 
@@ -86,7 +70,7 @@ export function SaleChart() {
   const isNeutral = revenueDifference === 0;
 
   return (
-    <Card className="w-full lg:w-1/2">
+    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-5">
       <CardHeader>
         <CardTitle>Graphiques des Ventes et Approvisionnements</CardTitle>
         <CardDescription>Janvier - Décembre {currentYear}</CardDescription>
@@ -131,7 +115,7 @@ export function SaleChart() {
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Affichage des ventes par rapport aux approvisionnements
+          Comparaison des ventes par rapport aux approvisionnements
         </div>
       </CardFooter>
     </Card>

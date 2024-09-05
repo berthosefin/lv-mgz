@@ -2,7 +2,6 @@
 
 import ErrorMessage from "@/components/ErrorMessage";
 import MyButton from "@/components/MyButton";
-import Loader from "@/components/MyLoader";
 import {
   Form,
   FormControl,
@@ -22,6 +21,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useSWR from "swr";
 import { z } from "zod";
+import { Loader } from "./Loader";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

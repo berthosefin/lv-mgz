@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  PaginationState,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
   Table,
   TableBody,
   TableCell,
@@ -19,13 +11,19 @@ import {
 import { API_URL, LIMIT } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
-import useSWR from "swr";
-import { Skeleton } from "./ui/skeleton";
-import { Button } from "./ui/button";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  PaginationState,
+  useReactTable,
+} from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Input } from "./ui/input";
 import { useState } from "react";
-import MyLoader from "./MyLoader";
+import useSWR from "swr";
+import { Loader } from "./Loader";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 interface TransactionDataTableProps<Transaction, TValue> {
   columns: ColumnDef<Transaction, TValue>[];
@@ -78,7 +76,7 @@ export function TransactionDataTable<TValue>({
         />
       </div>
       {isLoading ? (
-        <MyLoader />
+        <Loader />
       ) : (
         <>
           <div className="rounded-md border">

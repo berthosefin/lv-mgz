@@ -24,7 +24,7 @@ import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
-import MyLoader from "./MyLoader";
+import { Loader } from "./Loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -95,7 +95,7 @@ export function InvoiceDataTable<TValue>({
         </Select>
       </div>
       {isLoading ? (
-        <MyLoader />
+        <Loader />
       ) : (
         <>
           <div className="rounded-md border">

@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/MyLoader";
+import { Loader } from "@/components/Loader";
 import {
   Form,
   FormControl,
@@ -20,9 +20,9 @@ import { z } from "zod";
 import ErrorMessage from "./ErrorMessage";
 import MyButton from "./MyButton";
 import { ScrollArea } from "./ui/scroll-area";
+import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
 import { useToast } from "./ui/use-toast";
-import { Separator } from "./ui/separator";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
