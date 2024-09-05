@@ -78,8 +78,8 @@ export const LoginForm = () => {
       <CardHeader>
         <CardTitle className="text-2xl">Se connecter</CardTitle>
         <CardDescription>
-          Entrez votre nom d'utilisateur ci-dessous pour vous connecter à votre
-          compte
+          Entrez votre nom d&apos;utilisateur ci-dessous pour vous connecter à
+          votre compte
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -136,9 +136,9 @@ export const LoginForm = () => {
             <div className="grid gap-2"></div>
           </form>
           <div className="mt-4 text-center text-sm">
-            Vous n'avez pas de compte ?{" "}
+            Vous n&apos;avez pas de compte ?{" "}
             <Link href="/signup" className="underline">
-              S'inscrire
+              S&apos;inscrire
             </Link>
           </div>
         </Form>

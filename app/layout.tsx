@@ -12,8 +12,11 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "LV MGZ",
-  description: "Powered by Berthose Fin",
+  title: {
+    default: `LV MGZ`,
+    template: `%s | LV MGZ`,
+  },
+  description: "Store management system created by Berthose Fin",
 };
 
 export default function RootLayout({

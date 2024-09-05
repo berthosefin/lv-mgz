@@ -9,7 +9,12 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserData } from "@/lib/get-user-data";
 import { Store } from "lucide-react";
+import { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: `Accueil`,
+};
 
 export default async function HomePage() {
   const userData = await getUserData();

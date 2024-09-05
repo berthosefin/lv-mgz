@@ -82,7 +82,7 @@ export const SignupForm = () => {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-xl">S'inscrire</CardTitle>
+        <CardTitle className="text-xl">S&apos;inscrire</CardTitle>
         <CardDescription>
           Entrez vos informations pour créer un compte
         </CardDescription>

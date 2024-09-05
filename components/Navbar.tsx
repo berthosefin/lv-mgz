@@ -20,7 +20,7 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 
 const NavLinks = [
-  { name: "Home", path: "/" },
+  { name: "Accueil", path: "/" },
   { name: "Articles", path: "/articles" },
   { name: "Commandes", path: "/orders" },
   { name: "Clients", path: "/clients" },
@@ -73,7 +73,7 @@ export const Navbar = () => {
           className="flex items-center gap-2 text-lg font-semibold md:text-base"
         >
           <Store className="h-6 w-6" />
-          <span className="sr-only">Accueil</span>
+          <span className="sr-only">Home</span>
         </Link>
         {NavLinks.map((link) => (
           <Link
@@ -103,7 +103,7 @@ export const Navbar = () => {
               className="flex items-center gap-2 text-lg font-semibold"
             >
               <Store className="h-6 w-6" />
-              <span className="sr-only">Accueil</span>
+              <span className="sr-only">Home</span>
             </Link>
             {NavLinks.map((link) => (
               <Link
