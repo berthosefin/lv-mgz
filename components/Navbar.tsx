@@ -1,14 +1,22 @@
 "use client";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { logoutAction } from "@/lib/actions/logout";
+import { useUserStore } from "@/lib/store";
+import { CircleUser, Menu, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useServerAction } from "zsa-react";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
-
-import { logout } from "@/lib/auth.actions";
-import { useUserStore } from "@/lib/store";
-import { Loader2, LogOut, Store } from "lucide-react";
-import { useState } from "react";
 import { useToast } from "./ui/use-toast";
 
 const NavLinks = [
@@ -20,90 +28,129 @@ const NavLinks = [
   { name: "Caisse", path: "/cashdesks" },
 ];
 
-const Navbar = () => {
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
-  const { toast } = useToast();
+export const Navbar = () => {
   const pathname = usePathname();
+  const { execute } = useServerAction(logoutAction);
   const router = useRouter();
-  const isProtected = pathname !== "/login" && pathname !== "/signup";
+  const { toast } = useToast();
 
   const isNavLinkActive = (path: string) => {
     if (path === "/") {
       return pathname === "/";
     }
-
     return pathname.startsWith(path);
   };
 
   const user = useUserStore((state) => state.user);
   const unSetUser = useUserStore((state) => state.unSetUser);
 
-  async function onSubmit() {
-    setBtnLoading(true);
+  const handleLogout = async () => {
+    const [data, err] = await execute();
 
-    try {
-      const result = await logout();
-
-      if (result.success) {
-        // router.push("/login");
-        toast({
-          description: `Compte déconnecté avec succès !`,
-        });
-        unSetUser();
-      } else {
-        toast({
-          description: `Erreur lors de la déconnexion.`,
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-    } finally {
-      setBtnLoading(false);
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
     }
-  }
+
+    if (data) {
+      router.push("/login");
+      toast({
+        title: `Déconnexion`,
+        description: `Utilisateur déconnectée avec succès !`,
+      });
+      unSetUser();
+    }
+  };
 
   return (
-    <nav className="bg-background w-full border-b fixed z-10">
-      <div className="flex justify-between items-center h-14">
-        <div className="flex items-center space-x-4 ml-4">
-          <Store size={16} />
-          {isProtected &&
-            NavLinks.map((link) => (
+    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-10">
+      <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
+        <Link
+          href="#"
+          className="flex items-center gap-2 text-lg font-semibold md:text-base"
+        >
+          <Store className="h-6 w-6" />
+          <span className="sr-only">Accueil</span>
+        </Link>
+        {NavLinks.map((link) => (
+          <Link
+            href={link.path}
+            key={link.name}
+            className={`${
+              isNavLinkActive(link.path)
+                ? "font-semibold text-foreground transition-colors hover:text-foreground"
+                : "text-muted-foreground transition-colors hover:text-foreground"
+            }`}
+          >
+            {link.name}
+          </Link>
+        ))}
+      </nav>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left">
+          <nav className="grid gap-6 text-lg font-medium">
+            <Link
+              href="#"
+              className="flex items-center gap-2 text-lg font-semibold"
+            >
+              <Store className="h-6 w-6" />
+              <span className="sr-only">Accueil</span>
+            </Link>
+            {NavLinks.map((link) => (
               <Link
                 href={link.path}
                 key={link.name}
                 className={`${
                   isNavLinkActive(link.path)
-                    ? "font-bold text-sm"
-                    : "text-muted-foreground text-sm"
+                    ? "font-semibold hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-        </div>
-        <div className="flex items-center mr-2">
-          {isProtected && (
-            <>
-              <span className="text-sm text-muted-foreground capitalize mr-2">
-                {user?.username}
-              </span>
-              {btnLoading ? (
-                <Button disabled variant="ghost" size="icon">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </Button>
-              ) : (
-                <Button onClick={onSubmit} variant="ghost" size="icon">
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              )}
-            </>
-          )}
-          <ModeToggle />
-        </div>
+          </nav>
+        </SheetContent>
+      </Sheet>
+      <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        <form className="ml-auto flex-1 sm:flex-initial">
+          {/* <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Recherche..."
+              className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
+            />
+          </div> */}
+        </form>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="rounded-full">
+              <CircleUser className="h-5 w-5" />
+              <span className="sr-only">Menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel className="capitalize">
+              {user?.username}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleLogout()}>
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <ModeToggle />
       </div>
-    </nav>
+    </header>
   );
 };
-
-export default Navbar;

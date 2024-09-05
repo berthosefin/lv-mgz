@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -10,7 +17,7 @@ import {
 } from "@/components/ui/form";
 import { signupAction } from "@/lib/actions/signup";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, UserPlus } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,7 +45,7 @@ export const formSchema = z
     path: ["confirmPassword"],
   });
 
-const SignupForm = () => {
+export const SignupForm = () => {
   const { isPending, execute } = useServerAction(signupAction);
   const router = useRouter();
   const { toast } = useToast();
@@ -65,101 +72,109 @@ const SignupForm = () => {
     if (data) {
       router.push("/login");
       toast({
-        title: `Compte utilisateur crée avec succès !`,
-        description: `Nom d'utilisateur: ${data.username}`,
+        title: `Création de compte`,
+        description: `Compte utilisateur crée avec succès !`,
       });
       form.reset();
     }
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 mx-auto max-w-md"
-      >
-        <div className="flex space-x-4">
-          <div className="w-full">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom d&apos;utilisateur</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nom d'utilisateur" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="w-full">
-            <FormField
-              control={form.control}
-              name="storeName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom du magasin</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nom du magasin" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mot de passe</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Mot de passe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirmer le mot de passe</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Confirmer le mot de passe"
-                  {...field}
+    <Card className="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-xl">S'inscrire</CardTitle>
+        <CardDescription>
+          Entrez vos informations pour créer un compte
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom d&apos;utilisateur</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nom d'utilisateur" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit" disabled={isPending} className="w-full mt-4">
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Chargement
-            </>
-          ) : (
-            <>
-              <UserPlus size={16} className="mr-2 h-4 w-4" />
-              Créer
-            </>
-          )}
-        </Button>
-      </form>
-    </Form>
+              </div>
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="storeName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom du magasin</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nom du magasin" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mot de passe</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Mot de passe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirmer le mot de passe</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirmer le mot de passe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button type="submit" disabled={isPending} className="w-full">
+              {isPending ? `Chargement...` : `Créer un compte`}
+            </Button>
+            <Button variant="outline" className="w-full" disabled>
+              Inscrivez-vous avec Google
+            </Button>
+          </form>
+        </Form>
+        <div className="mt-4 text-center text-sm">
+          Vous avez déjà un compte ?{" "}
+          <Link href="/login" className="underline">
+            Se connecter
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
-
-export default SignupForm;

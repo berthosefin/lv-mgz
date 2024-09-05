@@ -33,7 +33,7 @@ export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
       </CardHeader>
       <CardContent>
         {lowStockArticles.length > 0 ? (
-          <ScrollArea className="h-80 w-full rounded-md border mb-4">
+          <ScrollArea className="h-80 w-full rounded-md mb-4">
             <div className="p-4">
               {lowStockArticles.map((item: Article) => (
                 <div key={item.id} className="text-sm">

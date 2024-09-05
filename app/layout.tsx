@@ -1,13 +1,15 @@
 import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { clsx } from "clsx";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "LV MGZ",
@@ -22,9 +24,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body
-        className={clsx(
-          inter.className,
-          "flex flex-col h-screen justify-between"
+        className={cn(
+          "min-h-screen flex flex-col bg-background font-sans antialiased",
+          fontSans.variable
         )}
       >
         <ThemeProvider
@@ -33,10 +35,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
-          <main className="mt-16">
-            <div className="container mx-auto p-4">{children}</div>
-          </main>
+          <main className="flex-grow">{children}</main>
           <Toaster />
           <Footer />
         </ThemeProvider>

@@ -1,8 +1,9 @@
 "use client"; // Error components must be Client Components
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-
 export default function Error({
   error,
   reset,
@@ -16,8 +17,12 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="text-center space-y-4">
-      <h2 className="text-destructive">Something went wrong!</h2>
+    <div className="container flex flex-col gap-2 p-24 max-w-lg">
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Une erreur s'est produite !</AlertDescription>
+      </Alert>
       <Button
         variant={"outline"}
         onClick={
@@ -25,7 +30,7 @@ export default function Error({
           () => reset()
         }
       >
-        Try again
+        Essayer à nouveau
       </Button>
     </div>
   );

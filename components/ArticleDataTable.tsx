@@ -30,7 +30,13 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight, RefreshCw, Trash } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  RefreshCw,
+  Trash,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
@@ -57,7 +63,7 @@ export function ArticleDataTable<TValue>({
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
   const { data, isLoading, mutate } = useSWR(
-    `${API_URL}/articles?storeId=${user?.storeId}&page=${pagination.pageIndex}&${pagination.pageSize}&search=${debouncedSearchTerm}`,
+    `${API_URL}/articles?storeId=${user?.storeId}&page=${pagination.pageIndex}&pageSize=${pagination.pageSize}&search=${debouncedSearchTerm}`,
     fetcher
   );
 

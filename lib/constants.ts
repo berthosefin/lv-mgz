@@ -1,2 +1,2 @@
-export const LIMIT = 8;
+export const LIMIT = 10;
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;

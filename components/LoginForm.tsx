@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Form,
   FormControl,
   FormField,
@@ -12,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { loginAction } from "@/lib/actions/login";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, LogInIcon } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,7 +32,7 @@ const formSchema = z.object({
   password: z.string(),
 });
 
-const LoginForm = () => {
+export const LoginForm = () => {
   const { isPending, execute } = useServerAction(loginAction);
   const router = useRouter();
   const { toast } = useToast();
@@ -52,8 +59,8 @@ const LoginForm = () => {
     if (data) {
       router.push("/");
       toast({
-        title: `Bienvenue !`,
-        description: `${data.username}`,
+        title: `Connexion`,
+        description: `Utilisateur connectée avec succès !`,
       });
 
       setUser(
@@ -67,55 +74,75 @@ const LoginForm = () => {
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 mx-auto max-w-md"
-      >
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom d&apos;utilisateur</FormLabel>
-              <FormControl>
-                <Input placeholder="Nom d'utilisateur" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Mot de passe</FormLabel>
-              <FormControl>
-                <Input type="password" placeholder="Mot de passe" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit" disabled={isPending} className="w-full mt-4">
-          {isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Chargement
-            </>
-          ) : (
-            <>
-              <LogInIcon size={16} className="mr-2 h-4 w-4" />
-              Se connecter
-            </>
-          )}
-        </Button>
-      </form>
-    </Form>
+    <Card className="mx-auto max-w-sm">
+      <CardHeader>
+        <CardTitle className="text-2xl">Se connecter</CardTitle>
+        <CardDescription>
+          Entrez votre nom d'utilisateur ci-dessous pour vous connecter à votre
+          compte
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nom d&apos;utilisateur</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nom d'utilisateur" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <FormLabel>Mot de passe</FormLabel>
+                <Link
+                  href="#"
+                  className="ml-auto inline-block text-sm underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Mot de passe"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Button type="submit" disabled={isPending} className="w-full">
+              {isPending ? `Chargement...` : `Se connecter`}
+            </Button>
+            <Button variant="outline" className="w-full" disabled>
+              Se connecter avec Google
+            </Button>
+            <div className="grid gap-2"></div>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            Vous n'avez pas de compte ?{" "}
+            <Link href="/signup" className="underline">
+              S'inscrire
+            </Link>
+          </div>
+        </Form>
+      </CardContent>
+    </Card>
   );
 };
-
-export default LoginForm;
