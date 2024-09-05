@@ -20,7 +20,7 @@ export const TransactionCard = async ({
   const data = await getTransactions(cashDeskId, 1, 5);
 
   return (
-    <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
+    <Card className="lg:col-span-2" x-chunk="dashboard-01-chunk-4">
       <CardHeader className="flex flex-row items-center">
         <div className="grid gap-2">
           <CardTitle>Transactions</CardTitle>

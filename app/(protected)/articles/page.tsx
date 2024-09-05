@@ -1,24 +1,17 @@
 import { articleColumns } from "@/components/ArticleColumn";
 import { ArticleDataTable } from "@/components/ArticleDataTable";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import Link from "next/link";
+import { Metadata } from "next";
 
-export default async function Article() {
+export const metadata: Metadata = {
+  title: `Liste des articles`,
+};
+
+export default async function ArticlesPage() {
   return (
-    <>
-      <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
-        <h1 className="text-3xl font-bold">Liste des articles</h1>
-        <div className="flex flex-col space-y-4 lg:flex-row lg:justify-end lg:space-y-0 lg:space-x-4">
-          <Button asChild>
-            <Link href={"/articles/add"} className="btn">
-              <Plus size={16} className="mr-2 h-4 w-4" />
-              Nouvel article
-            </Link>
-          </Button>
-        </div>
+    <main className="flex flex-1 flex-col gap-4 md:gap-8 md:p-4">
+      <div className="gap-4 md:gap-8">
+        <ArticleDataTable columns={articleColumns} />
       </div>
-      <ArticleDataTable columns={articleColumns} />
-    </>
+    </main>
   );
 }

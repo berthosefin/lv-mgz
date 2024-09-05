@@ -30,7 +30,14 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight, RefreshCw, Trash } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Edit3,
+  PlusCircle,
+  Search,
+  Trash,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
@@ -38,6 +45,13 @@ import { useDebounce } from "use-debounce";
 import { useServerAction } from "zsa-react";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
 
@@ -94,20 +108,35 @@ export function ArticleDataTable<TValue>({
   });
 
   return (
-    <div className="overflow-x-auto p-4">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Recherche..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:max-w-xs"
-        />
-      </div>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <>
-          <div className="rounded-md border">
+    <Card x-chunk="dashboard-01-chunk-4">
+      <CardHeader className="flex md:flex-row md:items-center">
+        <div className="grid gap-2">
+          <CardTitle>Articles</CardTitle>
+          <CardDescription>Gérez et visualisez vos articles.</CardDescription>
+        </div>
+        <div className="flex flex-col gap-2 pt-2 md:ml-auto md:flex-row md:pt-0">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Recherche..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 w-full sm:w-[300px]"
+            />
+          </div>
+          <Button asChild>
+            <Link href={"/articles/add"} className="btn">
+              <PlusCircle size={16} className="mr-2 h-4 w-4" />
+              Ajouter un article
+            </Link>
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <>
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -147,7 +176,7 @@ export function ArticleDataTable<TValue>({
                         <span className="flex justify-end gap-2">
                           <Button asChild size={"icon"} variant={"outline"}>
                             <Link href={`/articles/${row.original.id}`}>
-                              <RefreshCw className="w-4 h-4" />
+                              <Edit3 className="w-4 h-4" />
                             </Link>
                           </Button>
                           <AlertDialog>
@@ -196,34 +225,34 @@ export function ArticleDataTable<TValue>({
                 )}
               </TableBody>
             </Table>
-          </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {table.getPageCount() === 0
-                ? "Page 1 sur 1"
-                : `Page ${
-                    table.getState().pagination.pageIndex + 1
-                  } sur ${table.getPageCount()}`}
+            <div className="flex items-center justify-end space-x-2 py-4">
+              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                {table.getPageCount() === 0
+                  ? "Page 1 sur 1"
+                  : `Page ${
+                      table.getState().pagination.pageIndex + 1
+                    } sur ${table.getPageCount()}`}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

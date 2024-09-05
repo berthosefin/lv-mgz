@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { API_URL, LIMIT } from "@/lib/constants";
+import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import {
@@ -23,7 +24,6 @@ import { useState } from "react";
 import useSWR from "swr";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import {
   Card,
   CardContent,
@@ -31,7 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
+import { Input } from "./ui/input";
 
 interface TransactionDataTableProps<Transaction, TValue> {
   columns: ColumnDef<Transaction, TValue>[];
@@ -66,28 +66,28 @@ export function TransactionDataTable<TValue>({
   });
 
   return (
-    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-4">
-      <CardHeader className="flex flex-row items-center">
+    <Card x-chunk="dashboard-01-chunk-4">
+      <CardHeader className="flex md:flex-row md:items-center">
         <div className="grid gap-2">
           <CardTitle>Transactions</CardTitle>
           <CardDescription>
             Liste des transactions de votre boutique.
           </CardDescription>
         </div>
-        <div className="ml-auto flex flex-col gap-2 lg:flex-row">
+        <div className="flex gap-2 pt-2 md:ml-auto md:py-0">
           <Input
             type="date"
             id="startDate"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full sm:max-w-48"
+            className="w-full sm:max-w-xs"
           />
           <Input
             type="date"
             id="endDate"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full sm:max-w-48"
+            className="w-full sm:max-w-xs"
           />
           {startDate && endDate && (
             <Button
@@ -95,7 +95,8 @@ export function TransactionDataTable<TValue>({
                 exportTransactionsToPdf(data?.transactions, startDate, endDate);
               }}
             >
-              <FileDown className="h-4 w-4" />
+              <FileDown className="mr-2 h-4 w-4" />
+              Exporter
             </Button>
           )}
         </div>

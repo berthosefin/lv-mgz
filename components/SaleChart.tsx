@@ -46,7 +46,7 @@ export function SaleChart() {
 
   if (isLoading)
     return (
-      <Card x-chunk="dashboard-01-chunk-5">
+      <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-5">
         <Skeleton className="h-full w-full rounded-lg" />
       </Card>
     );

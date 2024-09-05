@@ -6,7 +6,7 @@ export const Footer = () => {
   return (
     <footer className="text-center p-4 mt-auto">
       <aside>
-        <p>Copyright © {currentYear} - Berthose Fin</p>
+        <p>© {currentYear} Berthose Fin &#8226; All Rights Reserved</p>
       </aside>
     </footer>
   );

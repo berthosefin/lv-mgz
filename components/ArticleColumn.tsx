@@ -44,12 +44,12 @@ export const articleColumns: ColumnDef<Article>[] = [
   },
   {
     accessorKey: "purchasePrice",
-    header: () => <div className="text-right">Prix d'achat</div>,
+    header: () => <div className="text-right">Prix d&apos;achat</div>,
     cell: ({ row }) => {
       const purchasePrice: number = row.getValue("purchasePrice");
       const formatted = purchasePrice.toLocaleString();
 
-      return <div className={`text-right`}>{formatted}</div>;
+      return <div className={`text-right`}>{formatted} MGA</div>;
     },
   },
   {
@@ -59,7 +59,7 @@ export const articleColumns: ColumnDef<Article>[] = [
       const sellingPrice: number = row.getValue("sellingPrice");
       const formatted = sellingPrice.toLocaleString();
 
-      return <div className={`text-right`}>{formatted}</div>;
+      return <div className={`text-right`}>{formatted} MGA</div>;
     },
   },
 ];
