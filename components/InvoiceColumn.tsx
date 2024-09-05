@@ -46,7 +46,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
   },
   {
     accessorKey: "amount",
-    header: () => <div className="text-right">Montant (MGA)</div>,
+    header: () => <div className="text-right">Montant</div>,
     cell: ({ row }) => {
       const amount: number = row.getValue("amount");
       const formatted = amount.toLocaleString();

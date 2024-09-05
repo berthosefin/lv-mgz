@@ -109,30 +109,28 @@ export function ArticleDataTable<TValue>({
 
   return (
     <Card x-chunk="dashboard-01-chunk-4">
-      <CardHeader className="flex md:flex-row md:items-center">
-        <div className="grid gap-2">
-          <CardTitle>Articles</CardTitle>
-          <CardDescription>Gérez et visualisez vos articles.</CardDescription>
-        </div>
-        <div className="flex flex-col gap-2 pt-2 md:ml-auto md:flex-row md:pt-0">
-          <div className="relative">
+      <CardHeader>
+        <CardTitle>Articles</CardTitle>
+        <CardDescription>Gérez et visualisez vos articles.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-2">
+          <div className="relative w-full sm:w-[300px]">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Recherche..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 w-full sm:w-[300px]"
+              className="pl-8"
             />
           </div>
-          <Button asChild>
+          <Button className="sm:ml-auto" asChild>
             <Link href={"/articles/add"} className="btn">
               <PlusCircle size={16} className="mr-2 h-4 w-4" />
-              Ajouter un article
+              Ajouter
             </Link>
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
         {isLoading ? (
           <Loader />
         ) : (

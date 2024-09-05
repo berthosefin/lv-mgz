@@ -67,27 +67,27 @@ export function TransactionDataTable<TValue>({
 
   return (
     <Card x-chunk="dashboard-01-chunk-4">
-      <CardHeader className="flex md:flex-row md:items-center">
-        <div className="grid gap-2">
-          <CardTitle>Transactions</CardTitle>
-          <CardDescription>
-            Liste des transactions de votre boutique.
-          </CardDescription>
-        </div>
-        <div className="flex gap-2 pt-2 md:ml-auto md:py-0">
+      <CardHeader>
+        <CardTitle>Transactions</CardTitle>
+        <CardDescription>
+          Liste des transactions de votre boutique.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-2">
           <Input
             type="date"
             id="startDate"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full sm:max-w-xs"
+            className="w-full sm:max-w-40"
           />
           <Input
             type="date"
             id="endDate"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full sm:max-w-xs"
+            className="w-full sm:max-w-40"
           />
           {startDate && endDate && (
             <Button
@@ -100,8 +100,6 @@ export function TransactionDataTable<TValue>({
             </Button>
           )}
         </div>
-      </CardHeader>
-      <CardContent>
         {isLoading ? (
           <Loader />
         ) : (
