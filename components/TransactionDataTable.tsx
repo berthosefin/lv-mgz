@@ -18,7 +18,7 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { useState } from "react";
 import useSWR from "swr";
 import { Loader } from "./Loader";
@@ -31,6 +31,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
 
 interface TransactionDataTableProps<Transaction, TValue> {
   columns: ColumnDef<Transaction, TValue>[];
@@ -88,6 +89,15 @@ export function TransactionDataTable<TValue>({
             onChange={(e) => setEndDate(e.target.value)}
             className="w-full sm:max-w-48"
           />
+          {startDate && endDate && (
+            <Button
+              onClick={() => {
+                exportTransactionsToPdf(data?.transactions, startDate, endDate);
+              }}
+            >
+              <FileDown className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
