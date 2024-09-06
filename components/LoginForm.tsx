@@ -74,7 +74,7 @@ export const LoginForm = () => {
   }
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <Card className="mx-auto max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl">Se connecter</CardTitle>
         <CardDescription>
