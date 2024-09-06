@@ -100,9 +100,7 @@ export function TransactionDataTable() {
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="rounded-md border">
-            <Loader />
-          </div>
+          <Loader />
         ) : (
           <>
             <Table>

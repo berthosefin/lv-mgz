@@ -17,13 +17,15 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { DataTablePagination } from "./DataTablePagination";
 import { invoiceColumns } from "./InvoiceColumn";
 import { Loader } from "./Loader";
+import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -90,6 +92,12 @@ export function InvoiceDataTable() {
             <SelectItem value="false">Non payé</SelectItem>
           </SelectContent>
         </Select>
+        <Button className="ml-auto" asChild>
+          <Link href={"/invoices/headers"} className="btn">
+            <FileText size={16} className="sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:block">En-têtes</span>
+          </Link>
+        </Button>
       </div>
       {isLoading ? (
         <div className="rounded-md border">
