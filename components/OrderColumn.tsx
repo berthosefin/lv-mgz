@@ -2,16 +2,29 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "./ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Edit3, Trash } from "lucide-react";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
-export const orderColumns: ColumnDef<Order>[] = [
+export const orderColumns = (
+  handleDelete: (id: string) => void
+): ColumnDef<Order>[] => [
   {
     accessorKey: "updatedAt",
     header: "Date",
     cell: ({ row }) => {
-      const date: Date = row.getValue("updatedAt");
-      const formatted = new Date(date).toLocaleDateString("fr-FR");
-
-      return formatted;
+      return new Date(row.getValue("updatedAt")).toLocaleDateString("fr-FR");
     },
   },
   {
@@ -19,9 +32,7 @@ export const orderColumns: ColumnDef<Order>[] = [
     header: "Client",
     cell: ({ row }) => {
       const client: Client = row.getValue("client");
-      const formatted = client.name;
-
-      return <div>{formatted}</div>;
+      return <div className="capitalize">{client.name}</div>;
     },
   },
   {
@@ -29,7 +40,7 @@ export const orderColumns: ColumnDef<Order>[] = [
     header: "Article(s)",
     cell: ({ row }) => {
       const orderItems: OrderItem[] = row.getValue("orderItems");
-      const formatted = (
+      return (
         <>
           {orderItems.slice(0, 3).map((item, index) => (
             <span key={index}>
@@ -40,8 +51,6 @@ export const orderColumns: ColumnDef<Order>[] = [
           {orderItems.length > 3 && " ..."}
         </>
       );
-
-      return <div>{formatted}</div>;
     },
   },
   {
@@ -77,6 +86,47 @@ export const orderColumns: ColumnDef<Order>[] = [
             </Badge>
           )}
         </>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const order = row.original;
+      return (
+        <span className="flex justify-end gap-2">
+          <Button asChild size="icon" variant="outline">
+            <Link href={`/orders/${order.id}`}>
+              <Edit3 className="w-4 h-4" />
+            </Link>
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="icon" variant="outline">
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action ne peut pas être annulée. Cela supprimera
+                  définitivement la commande et ses données de nos serveurs.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDelete(order.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </span>
       );
     },
   },

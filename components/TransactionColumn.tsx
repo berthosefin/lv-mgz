@@ -6,11 +6,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "createdAt",
     header: "Date",
-    cell: ({ row }) => (
-      <div className="capitalize">
-        {new Date(row.getValue("createdAt")).toLocaleDateString("fr-FR")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      return new Date(row.getValue("createdAt")).toLocaleDateString("fr-FR");
+    },
   },
   {
     accessorKey: "label",

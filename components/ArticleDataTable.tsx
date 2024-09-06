@@ -97,7 +97,7 @@ export function ArticleDataTable<TValue>() {
             className="pl-8"
           />
         </div>
-        <Button className="sm:ml-auto" asChild>
+        <Button className="ml-auto" asChild>
           <Link href={"/articles/add"} className="btn">
             <PlusCircle size={16} className="sm:mr-2 h-4 w-4" />
             <span className="hidden sm:block">Ajouter article</span>

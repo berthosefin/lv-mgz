@@ -1,24 +1,22 @@
-import { orderColumns } from "@/components/OrderColumn";
 import { OrderDataTable } from "@/components/OrderDataTable";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
-import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: `Commandes`,
+};
 
 export default async function Orders() {
   return (
-    <>
-      <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">
-        <h1 className="text-3xl font-bold">Liste des commandes</h1>
-        <div className="flex flex-col space-y-4 lg:flex-row lg:justify-end lg:space-y-0 lg:space-x-4">
-          <Button asChild>
-            <Link href={"/orders/new"} className="btn">
-              <ShoppingCart size={16} className="mr-2 h-4 w-4" />
-              Nouvelle commande
-            </Link>
-          </Button>
-        </div>
+    <main className="flex flex-1 flex-col gap-4 md:gap-8 md:p-4">
+      <div className="space-y-2 px-2">
+        <h1 className="text-2xl font-semibold leading-none tracking-tight">
+          Commandes
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Gérez et visualisez vos commandes.
+        </p>
       </div>
-      <OrderDataTable columns={orderColumns} />
-    </>
+      <OrderDataTable />
+    </main>
   );
 }
