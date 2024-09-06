@@ -2,6 +2,10 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
+import { Edit3, FileDown } from "lucide-react";
+import { exportInvoiceToPdf } from "@/lib/export-invoice-to-pdf";
+import Link from "next/link";
 
 export const invoiceColumns: ColumnDef<Invoice>[] = [
   {
@@ -9,9 +13,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
     header: "Date",
     cell: ({ row }) => {
       const date: Date = row.getValue("updatedAt");
-      const formatted = new Date(date).toLocaleDateString("fr-FR");
-
-      return formatted;
+      return new Date(date).toLocaleDateString("fr-FR");
     },
   },
   {
@@ -19,9 +21,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
     header: "Client",
     cell: ({ row }) => {
       const client: Client = row.getValue("client");
-      const formatted = client.name;
-
-      return <div>{formatted}</div>;
+      return <div className="capitalize">{client.name}</div>;
     },
   },
   {
@@ -29,7 +29,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
     header: "Article(s)",
     cell: ({ row }) => {
       const invoiceItems: InvoiceItem[] = row.getValue("invoiceItems");
-      const formatted = (
+      return (
         <>
           {invoiceItems.slice(0, 3).map((item, index) => (
             <span key={index}>
@@ -40,8 +40,6 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
           {invoiceItems.length > 3 && " ..."}
         </>
       );
-
-      return <div>{formatted}</div>;
     },
   },
   {
@@ -49,9 +47,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
     header: () => <div className="text-right">Montant</div>,
     cell: ({ row }) => {
       const amount: number = row.getValue("amount");
-      const formatted = amount.toLocaleString();
-
-      return <div className={`text-right`}>{formatted} MGA</div>;
+      return <div className={`text-right`}>{amount.toLocaleString()} MGA</div>;
     },
   },
   {
@@ -69,6 +65,31 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
             </Badge>
           )}
         </>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const invoice = row.original;
+      return (
+        <span className="flex justify-end gap-2">
+          <Button asChild size={"icon"} variant={"outline"}>
+            <Link href={`/invoices/${invoice.id}`}>
+              <Edit3 className="w-4 h-4" />
+            </Link>
+          </Button>
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            onClick={() => {
+              exportInvoiceToPdf(invoice);
+            }}
+          >
+            <FileDown className="w-4 h-4" />
+          </Button>
+        </span>
       );
     },
   },

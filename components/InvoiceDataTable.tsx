@@ -9,29 +9,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { API_URL, LIMIT } from "@/lib/constants";
-import { exportInvoiceToPdf } from "@/lib/export-invoice-to-pdf";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit3,
-  FileDown,
-  Search,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
+import { DataTablePagination } from "./DataTablePagination";
+import { invoiceColumns } from "./InvoiceColumn";
 import { Loader } from "./Loader";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -40,21 +32,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
 
-interface InvoiceDataTableProps<Invoice, TValue> {
-  columns: ColumnDef<Invoice, TValue>[];
-}
-
-export function InvoiceDataTable<TValue>({
-  columns,
-}: InvoiceDataTableProps<Invoice, TValue>) {
+export function InvoiceDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -75,6 +54,8 @@ export function InvoiceDataTable<TValue>({
     fetcher
   );
 
+  const columns = useMemo(() => invoiceColumns, []);
+
   const table = useReactTable({
     data: data?.invoices,
     columns,
@@ -88,37 +69,35 @@ export function InvoiceDataTable<TValue>({
   });
 
   return (
-    <Card x-chunk="dashboard-01-chunk-4">
-      <CardHeader>
-        <CardTitle>Factures</CardTitle>
-        <CardDescription>Gérez et visualisez vos factures.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-2">
-          <div className="relative w-full sm:w-[300px]">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Recherche..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Select value={isPaidFilter} onValueChange={setIsPaidFilter}>
-            <SelectTrigger className="max-w-32">
-              <SelectValue placeholder="Filtrer par état de paiement" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous</SelectItem>
-              <SelectItem value="true">Payé</SelectItem>
-              <SelectItem value="false">Non payé</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="overflow-x-auto px-2">
+      <div className="flex items-center py-2 gap-2">
+        <div className="relative w-full sm:w-[300px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Recherche..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
         </div>
-        {isLoading ? (
+        <Select value={isPaidFilter} onValueChange={setIsPaidFilter}>
+          <SelectTrigger className="max-w-32">
+            <SelectValue placeholder="Filtrer par état de paiement" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous</SelectItem>
+            <SelectItem value="true">Payé</SelectItem>
+            <SelectItem value="false">Non payé</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      {isLoading ? (
+        <div className="rounded-md border">
           <Loader />
-        ) : (
-          <>
+        </div>
+      ) : (
+        <>
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -135,7 +114,6 @@ export function InvoiceDataTable<TValue>({
                         </TableHead>
                       );
                     })}
-                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 ))}
               </TableHeader>
@@ -154,24 +132,6 @@ export function InvoiceDataTable<TValue>({
                           )}
                         </TableCell>
                       ))}
-                      <TableCell>
-                        <span className="flex justify-end gap-2">
-                          <Button asChild size={"icon"} variant={"outline"}>
-                            <Link href={`/invoices/${row.original.id}`}>
-                              <Edit3 className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                          <Button
-                            size={"icon"}
-                            variant={"outline"}
-                            onClick={() => {
-                              exportInvoiceToPdf(row.original);
-                            }}
-                          >
-                            <FileDown className="w-4 h-4" />
-                          </Button>
-                        </span>
-                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -186,34 +146,10 @@ export function InvoiceDataTable<TValue>({
                 )}
               </TableBody>
             </Table>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                {table.getPageCount() === 0
-                  ? "Page 1 sur 1"
-                  : `Page ${
-                      table.getState().pagination.pageIndex + 1
-                    } sur ${table.getPageCount()}`}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+          </div>
+          <DataTablePagination table={table} />
+        </>
+      )}
+    </div>
   );
 }
