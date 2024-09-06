@@ -31,7 +31,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
 
-export function ArticleDataTable<TValue>() {
+export function ArticleDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,

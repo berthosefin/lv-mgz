@@ -11,8 +11,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ColumnDef } from "@tanstack/react-table";
-import { Edit3, Trash } from "lucide-react";
-import Link from "next/link";
+import { Trash } from "lucide-react";
+import { ArticleEditForm } from "./ArticleEditForm";
 import { Button } from "./ui/button";
 
 export const articleColumns = (
@@ -80,11 +80,7 @@ export const articleColumns = (
       const article = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={`/articles/${article.id}`}>
-              <Edit3 className="w-4 h-4" />
-            </Link>
-          </Button>
+          <ArticleEditForm article={article} />
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button size={"icon"} variant={"outline"}>
