@@ -1,11 +1,27 @@
 "use client";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ColumnDef } from "@tanstack/react-table";
+import { Edit3, Trash } from "lucide-react";
+import Link from "next/link";
+import { Button } from "./ui/button";
 
-export const articleColumns: ColumnDef<Article>[] = [
+export const articleColumns = (
+  handleDelete: (id: string) => void
+): ColumnDef<Article>[] => [
   {
     accessorKey: "name",
     header: "Nom",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
     id: "virtualStock",
@@ -13,9 +29,7 @@ export const articleColumns: ColumnDef<Article>[] = [
     cell: ({ row }) => {
       const stock: number = row.getValue("stock");
       const notDelivered: number = row.getValue("notDelivered");
-      const formatted = stock + notDelivered;
-
-      return <div className={`text-right`}>{formatted}</div>;
+      return <div className={`text-right`}>{stock + notDelivered}</div>;
     },
   },
   {
@@ -23,9 +37,7 @@ export const articleColumns: ColumnDef<Article>[] = [
     header: () => <div className="text-right">Non livré</div>,
     cell: ({ row }) => {
       const notDelivered: number = row.getValue("notDelivered");
-      const formatted = notDelivered;
-
-      return <div className={`text-right`}>{formatted}</div>;
+      return <div className={`text-right`}>{notDelivered}</div>;
     },
   },
   {
@@ -33,23 +45,22 @@ export const articleColumns: ColumnDef<Article>[] = [
     header: () => <div className="text-right">Stock réel</div>,
     cell: ({ row }) => {
       const stock: number = row.getValue("stock");
-      const formatted = stock;
-
-      return <div className={`text-right`}>{formatted}</div>;
+      return <div className={`text-right`}>{stock}</div>;
     },
   },
   {
     accessorKey: "unit",
     header: "Unité",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("unit")}</div>,
   },
   {
     accessorKey: "purchasePrice",
     header: () => <div className="text-right">Prix d&apos;achat</div>,
     cell: ({ row }) => {
       const purchasePrice: number = row.getValue("purchasePrice");
-      const formatted = purchasePrice.toLocaleString();
-
-      return <div className={`text-right`}>{formatted} MGA</div>;
+      return (
+        <div className={`text-right`}>{purchasePrice.toLocaleString()} MGA</div>
+      );
     },
   },
   {
@@ -57,9 +68,50 @@ export const articleColumns: ColumnDef<Article>[] = [
     header: () => <div className="text-right">Prix de vente</div>,
     cell: ({ row }) => {
       const sellingPrice: number = row.getValue("sellingPrice");
-      const formatted = sellingPrice.toLocaleString();
-
-      return <div className={`text-right`}>{formatted} MGA</div>;
+      return (
+        <div className={`text-right`}>{sellingPrice.toLocaleString()} MGA</div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const article = row.original;
+      return (
+        <span className="flex justify-end gap-2">
+          <Button asChild size={"icon"} variant={"outline"}>
+            <Link href={`/articles/${article.id}`}>
+              <Edit3 className="w-4 h-4" />
+            </Link>
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size={"icon"} variant={"outline"}>
+                <Trash className="w-4 h-4 text-destructive" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action ne peut pas être annulée. Cela supprimera
+                  définitivement l&apos;article et ses données de nos serveurs.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDelete(article.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Supprimer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </span>
+      );
     },
   },
 ];

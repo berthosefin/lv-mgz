@@ -1,17 +1,6 @@
 "use client";
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -24,44 +13,25 @@ import { API_URL, LIMIT } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Edit3,
-  PlusCircle,
-  Search,
-  Trash,
-} from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { useServerAction } from "zsa-react";
+import { articleColumns } from "./ArticleColumn";
+import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
 
-interface ArticleDataTableProps<Article, TValue> {
-  columns: ColumnDef<Article, TValue>[];
-}
-
-export function ArticleDataTable<TValue>({
-  columns,
-}: ArticleDataTableProps<Article, TValue>) {
+export function ArticleDataTable<TValue>() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -77,23 +47,31 @@ export function ArticleDataTable<TValue>({
 
   const { execute } = useServerAction(removeArticleAction);
 
-  const handleRemoveArticle = async (id: string) => {
-    const [data, err] = await execute({ id });
+  const handleRemoveArticle = useCallback(
+    async (id: string) => {
+      const [data, err] = await execute({ id });
 
-    if (err) {
-      toast({
-        title: `${err.code}`,
-        description: `${err.message}`,
-        variant: `destructive`,
-      });
-    } else if (data) {
-      toast({
-        title: `Suppression d'article`,
-        description: `L'article a été supprimé avec succès !`,
-      });
-      mutate();
-    }
-  };
+      if (err) {
+        toast({
+          title: `${err.code}`,
+          description: `${err.message}`,
+          variant: `destructive`,
+        });
+      } else if (data) {
+        toast({
+          title: `Suppression d'article`,
+          description: `L'article a été supprimé avec succès !`,
+        });
+        mutate();
+      }
+    },
+    [execute, mutate]
+  );
+
+  const columns = useMemo(
+    () => articleColumns(handleRemoveArticle),
+    [handleRemoveArticle]
+  );
 
   const table = useReactTable({
     data: data?.articles,
@@ -108,33 +86,31 @@ export function ArticleDataTable<TValue>({
   });
 
   return (
-    <Card x-chunk="dashboard-01-chunk-4">
-      <CardHeader>
-        <CardTitle>Articles</CardTitle>
-        <CardDescription>Gérez et visualisez vos articles.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-2">
-          <div className="relative w-full sm:w-[300px]">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Recherche..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
-          </div>
-          <Button className="sm:ml-auto" asChild>
-            <Link href={"/articles/add"} className="btn">
-              <PlusCircle size={16} className="mr-2 h-4 w-4" />
-              Ajouter
-            </Link>
-          </Button>
+    <div className="overflow-x-auto px-2">
+      <div className="flex items-center py-2 gap-2">
+        <div className="relative w-full sm:w-[300px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Recherche..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
         </div>
-        {isLoading ? (
+        <Button className="sm:ml-auto" asChild>
+          <Link href={"/articles/add"} className="btn">
+            <PlusCircle size={16} className="sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:block">Ajouter article</span>
+          </Link>
+        </Button>
+      </div>
+      {isLoading ? (
+        <div className="rounded-md border">
           <Loader />
-        ) : (
-          <>
+        </div>
+      ) : (
+        <>
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -151,7 +127,6 @@ export function ArticleDataTable<TValue>({
                         </TableHead>
                       );
                     })}
-                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 ))}
               </TableHeader>
@@ -170,45 +145,6 @@ export function ArticleDataTable<TValue>({
                           )}
                         </TableCell>
                       ))}
-                      <TableCell>
-                        <span className="flex justify-end gap-2">
-                          <Button asChild size={"icon"} variant={"outline"}>
-                            <Link href={`/articles/${row.original.id}`}>
-                              <Edit3 className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size={"icon"} variant={"outline"}>
-                                <Trash className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Êtes-vous absolument sûr ?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Cette action ne peut pas être annulée. Cela
-                                  supprimera définitivement l&apos;article et
-                                  ses données de nos serveurs.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() =>
-                                    handleRemoveArticle(row.original.id)
-                                  }
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Supprimer
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </span>
-                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -223,34 +159,10 @@ export function ArticleDataTable<TValue>({
                 )}
               </TableBody>
             </Table>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                {table.getPageCount() === 0
-                  ? "Page 1 sur 1"
-                  : `Page ${
-                      table.getState().pagination.pageIndex + 1
-                    } sur ${table.getPageCount()}`}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+          </div>
+          <DataTablePagination table={table} />
+        </>
+      )}
+    </div>
   );
 }

@@ -95,7 +95,7 @@ export function InvoiceDataTable() {
         <Button className="ml-auto" asChild>
           <Link href={"/invoices/headers"} className="btn">
             <FileText size={16} className="sm:mr-2 h-4 w-4" />
-            <span className="hidden sm:block">En-têtes</span>
+            <span className="hidden sm:block">En-têtes facture</span>
           </Link>
         </Button>
       </div>
