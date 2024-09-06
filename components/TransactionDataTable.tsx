@@ -13,16 +13,17 @@ import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight, FileDown } from "lucide-react";
-import { useState } from "react";
+import { FileDown } from "lucide-react";
+import { useMemo, useState } from "react";
 import useSWR from "swr";
+import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
+import { transactionColumns } from "./TransactionColumn";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -33,13 +34,7 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 
-interface TransactionDataTableProps<Transaction, TValue> {
-  columns: ColumnDef<Transaction, TValue>[];
-}
-
-export function TransactionDataTable<TValue>({
-  columns,
-}: TransactionDataTableProps<Transaction, TValue>) {
+export function TransactionDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -47,6 +42,8 @@ export function TransactionDataTable<TValue>({
   });
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+
+  const columns = useMemo(() => transactionColumns, []);
 
   const { data, isLoading } = useSWR(
     `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&page=${pagination.pageIndex}&pageSize=${pagination.pageSize}&startDate=${startDate}&endDate=${endDate}`,
@@ -67,14 +64,14 @@ export function TransactionDataTable<TValue>({
 
   return (
     <Card x-chunk="dashboard-01-chunk-4">
-      <CardHeader>
-        <CardTitle>Transactions</CardTitle>
-        <CardDescription>
-          Liste des transactions de votre boutique.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="flex gap-2">
+      <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center">
+        <div className="grid gap-2">
+          <CardTitle>Transactions</CardTitle>
+          <CardDescription>
+            Liste des transactions de votre boutique.
+          </CardDescription>
+        </div>
+        <div className="flex flex-col gap-2 md:flex-row md:ml-auto">
           <Input
             type="date"
             id="startDate"
@@ -100,8 +97,12 @@ export function TransactionDataTable<TValue>({
             </Button>
           )}
         </div>
+      </CardHeader>
+      <CardContent>
         {isLoading ? (
-          <Loader />
+          <div className="rounded-md border">
+            <Loader />
+          </div>
         ) : (
           <>
             <Table>
@@ -152,31 +153,7 @@ export function TransactionDataTable<TValue>({
                 )}
               </TableBody>
             </Table>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                {table.getPageCount() === 0
-                  ? "Page 1 sur 1"
-                  : `Page ${
-                      table.getState().pagination.pageIndex + 1
-                    } sur ${table.getPageCount()}`}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            <DataTablePagination table={table} />
           </>
         )}
       </CardContent>

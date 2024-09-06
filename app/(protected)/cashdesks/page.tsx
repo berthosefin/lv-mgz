@@ -1,7 +1,6 @@
 import { CashDeskCurrentAmountCard } from "@/components/CashDeskCurrentAmountCard";
 import { CashDeskTotalInCard } from "@/components/CashDeskTotalInCard";
 import { CashDeskTotalOutCard } from "@/components/CashDeskTotalOutCard";
-import { transactionColumns } from "@/components/TransactionColumn";
 import { TransactionDataTable } from "@/components/TransactionDataTable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserData } from "@/lib/get-user-data";
@@ -29,7 +28,7 @@ export default async function CashDeskPage() {
         </Suspense>
       </div>
       <div className="gap-4 md:gap-8">
-        <TransactionDataTable columns={transactionColumns} />
+        <TransactionDataTable />
       </div>
     </main>
   );

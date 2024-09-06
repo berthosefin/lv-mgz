@@ -6,12 +6,11 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
   {
     accessorKey: "createdAt",
     header: "Date",
-    cell: ({ row }) => {
-      const date: Date = row.getValue("createdAt");
-      const formatted = new Date(date).toLocaleDateString("fr-FR");
-
-      return formatted;
-    },
+    cell: ({ row }) => (
+      <div className="capitalize">
+        {new Date(row.getValue("createdAt")).toLocaleDateString("fr-FR")}
+      </div>
+    ),
   },
   {
     accessorKey: "label",
@@ -22,22 +21,19 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     header: "Article(s)",
     cell: ({ row }) => {
       const articles: Article[] = row.getValue("articles");
-      const formatted =
-        articles.length > 0 ? (
-          <>
-            {articles.slice(0, 3).map((article, index) => (
-              <span key={index}>
-                {article.name}
-                {index !== articles.slice(0, 3).length - 1 && ", "}
-              </span>
-            ))}
-            {articles.length > 3 && " ..."}
-          </>
-        ) : (
-          <span className="line-through">Article</span>
-        );
-
-      return <div>{formatted}</div>;
+      return articles.length > 0 ? (
+        <>
+          {articles.slice(0, 3).map((article, index) => (
+            <span key={index}>
+              {article.name}
+              {index !== articles.slice(0, 3).length - 1 && ", "}
+            </span>
+          ))}
+          {articles.length > 3 && " ..."}
+        </>
+      ) : (
+        <span className="line-through">Article</span>
+      );
     },
   },
   {
@@ -45,9 +41,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     header: () => <div className="text-right">Montant</div>,
     cell: ({ row }) => {
       const amount: number = row.getValue("amount");
-      const formatted = amount.toLocaleString();
-
-      return <div className={`text-right`}>{formatted} MGA</div>;
+      return <div className={`text-right`}>{amount.toLocaleString()} MGA</div>;
     },
   },
 ];

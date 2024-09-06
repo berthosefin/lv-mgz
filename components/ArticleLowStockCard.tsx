@@ -16,7 +16,7 @@ export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
   const lowStockArticles = await getArticlesLowStock(storeId);
 
   return (
-    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-4">
+    <Card x-chunk="dashboard-01-chunk-4">
       <CardHeader className="flex flex-row items-center">
         <div className="grid gap-2">
           <CardTitle>Alertes</CardTitle>

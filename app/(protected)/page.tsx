@@ -35,10 +35,10 @@ export default async function HomePage() {
         </Suspense>
       </div>
 
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:gap-8 xl:grid-cols-4">
         <Suspense
           fallback={
-            <Card className="lg:col-span-2" x-chunk="dashboard-01-chunk-4">
+            <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
               <Skeleton className="h-full w-full rounded-lg" />
             </Card>
           }
@@ -50,7 +50,7 @@ export default async function HomePage() {
 
         <Suspense
           fallback={
-            <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-4">
+            <Card x-chunk="dashboard-01-chunk-4">
               <Skeleton className="h-full w-full rounded-lg" />
             </Card>
           }

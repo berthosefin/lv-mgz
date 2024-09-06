@@ -46,7 +46,7 @@ export function SaleChart() {
 
   if (isLoading)
     return (
-      <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-5">
+      <Card x-chunk="dashboard-01-chunk-5">
         <Skeleton className="h-full w-full rounded-lg" />
       </Card>
     );
@@ -70,7 +70,7 @@ export function SaleChart() {
   const isNeutral = revenueDifference === 0;
 
   return (
-    <Card className="xl:col-span-1" x-chunk="dashboard-01-chunk-5">
+    <Card x-chunk="dashboard-01-chunk-5">
       <CardHeader>
         <CardTitle>Graphiques des Ventes et Approvisionnements</CardTitle>
         <CardDescription>Janvier - Décembre {currentYear}</CardDescription>

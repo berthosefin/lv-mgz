@@ -1,17 +1,6 @@
 "use client";
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -24,30 +13,25 @@ import { API_URL, LIMIT } from "@/lib/constants";
 import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
 import {
-  ColumnDef,
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronLeft, ChevronRight, RefreshCw, Trash } from "lucide-react";
+import { Search, UserPlus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { useServerAction } from "zsa-react";
+import { clientColumns } from "./ClientColumn";
+import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
 
-interface ClientDataTableProps<Client, TValue> {
-  columns: ColumnDef<Client, TValue>[];
-}
-
-export function ClientDataTable<TValue>({
-  columns,
-}: ClientDataTableProps<Client, TValue>) {
+export function ClientDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -63,23 +47,31 @@ export function ClientDataTable<TValue>({
 
   const { execute } = useServerAction(removeClientAction);
 
-  const handleRemoveClient = async (id: string) => {
-    const [data, err] = await execute({ id });
+  const handleRemoveClient = useCallback(
+    async (id: string) => {
+      const [data, err] = await execute({ id });
 
-    if (err) {
-      toast({
-        title: `${err.code}`,
-        description: `${err.message}`,
-        variant: `destructive`,
-      });
-    } else if (data) {
-      toast({
-        title: `Suppression de client`,
-        description: `Le client a été supprimé avec succès !`,
-      });
-      mutate();
-    }
-  };
+      if (err) {
+        toast({
+          title: `${err.code}`,
+          description: `${err.message}`,
+          variant: `destructive`,
+        });
+      } else if (data) {
+        toast({
+          title: `Suppression de client`,
+          description: `Le client a été supprimé avec succès !`,
+        });
+        mutate();
+      }
+    },
+    [execute, mutate]
+  );
+
+  const columns = useMemo(
+    () => clientColumns(handleRemoveClient),
+    [handleRemoveClient]
+  );
 
   const table = useReactTable({
     data: data?.clients,
@@ -94,17 +86,28 @@ export function ClientDataTable<TValue>({
   });
 
   return (
-    <div className="overflow-x-auto p-4">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Recherche client..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:max-w-xs"
-        />
+    <div className="overflow-x-auto px-2">
+      <div className="flex items-center py-2 gap-2">
+        <div className="relative w-full sm:w-[300px]">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Recherche..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Button className="ml-auto" asChild>
+          <Link href={"/clients/add"} className="btn">
+            <UserPlus size={16} className="sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:block">Ajouter client</span>
+          </Link>
+        </Button>
       </div>
       {isLoading ? (
-        <Loader />
+        <div className="rounded-md border">
+          <Loader />
+        </div>
       ) : (
         <>
           <div className="rounded-md border">
@@ -124,7 +127,6 @@ export function ClientDataTable<TValue>({
                         </TableHead>
                       );
                     })}
-                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 ))}
               </TableHeader>
@@ -143,45 +145,6 @@ export function ClientDataTable<TValue>({
                           )}
                         </TableCell>
                       ))}
-                      <TableCell>
-                        <span className="flex justify-end gap-2">
-                          <Button asChild size={"icon"} variant={"outline"}>
-                            <Link href={`/clients/${row.original.id}`}>
-                              <RefreshCw className="w-4 h-4" />
-                            </Link>
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size={"icon"} variant={"outline"}>
-                                <Trash className="w-4 h-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  Êtes-vous absolument sûr ?
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Cette action ne peut pas être annulée. Cela
-                                  supprimera définitivement l&apos;article et
-                                  ses données de nos serveurs.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() =>
-                                    handleRemoveClient(row.original.id)
-                                  }
-                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                >
-                                  Supprimer
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </span>
-                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
@@ -197,31 +160,7 @@ export function ClientDataTable<TValue>({
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              {table.getPageCount() === 0
-                ? "Page 1 sur 1"
-                : `Page ${
-                    table.getState().pagination.pageIndex + 1
-                  } sur ${table.getPageCount()}`}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
+          <DataTablePagination table={table} />
         </>
       )}
     </div>
