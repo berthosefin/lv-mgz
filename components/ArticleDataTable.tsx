@@ -38,7 +38,7 @@ export function ArticleDataTable() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
   const { data, isPending } = useQuery({
-    queryKey: ["articles"],
+    queryKey: ["articles", debouncedSearchTerm, pagination.pageIndex],
     queryFn: () =>
       getArtciles(
         user?.storeId as string,
