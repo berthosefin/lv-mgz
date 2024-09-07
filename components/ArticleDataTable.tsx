@@ -18,14 +18,13 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { PlusCircle, Search } from "lucide-react";
-import Link from "next/link";
+import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { ArticleAddForm } from "./ArticleAddForm";
 import { articleColumns } from "./ArticleColumn";
 import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
 export function ArticleDataTable() {
@@ -74,12 +73,7 @@ export function ArticleDataTable() {
             className="pl-8"
           />
         </div>
-        <Button className="ml-auto" asChild>
-          <Link href={"/articles/add"} className="btn">
-            <PlusCircle size={16} className="sm:mr-2 h-4 w-4" />
-            <span className="hidden sm:block">Ajouter article</span>
-          </Link>
-        </Button>
+        <ArticleAddForm />
       </div>
       {isPending ? (
         <div className="rounded-md border">

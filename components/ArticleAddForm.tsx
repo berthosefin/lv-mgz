@@ -1,6 +1,22 @@
 "use client";
 
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
   Form,
   FormControl,
   FormField,
@@ -8,238 +24,205 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { addArticleAction } from "@/lib/actions/add-article";
+import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useMediaQuery } from "react-responsive";
 import { z } from "zod";
-import ErrorMessage from "./ErrorMessage";
-import MyButton from "./MyButton";
+import { useServerAction } from "zsa-react";
+import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useToast } from "./ui/use-toast";
-import useSWR from "swr";
-import { fetcher } from "@/lib/fetcher";
-import { addArticle } from "@/lib/articles.actions";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
-  purchasePrice: z.coerce.number(),
-  sellingPrice: z.coerce.number(),
-  stock: z.coerce
-    .number()
-    .int()
-    .max(
-      2147483647,
-      "La valeur du stock doit être inférieure à 2,147,483,647."
-    ),
+  purchasePrice: z.coerce.number().gte(1),
+  sellingPrice: z.coerce.number().gte(1),
+  stock: z.coerce.number().gte(1),
   unit: z.string(),
-  storeId: z.optional(z.string()),
+  storeId: z.string().optional(),
 });
 
-const ArticleAddForm = ({ userData }: { userData: User }) => {
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
-  const { toast } = useToast();
-  const router = useRouter();
-
-  const userStore = userData.store;
-  // const userCashDesk = userData.store.cashDesk;
-
-  const { data: articles, error: articlesError } = useSWR(
-    `${API_URL}/articles?storeId=${userStore.id}`,
-    fetcher
-  );
-
-  if (articlesError) {
-    setErrorMessage("Erreur lors du chargement des articles");
-  }
+export const ArticleAddForm = () => {
+  const [open, setOpen] = useState(false);
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const { user } = useUserStore.getState();
+  const { execute } = useServerAction(addArticleAction);
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
   });
 
-  const { watch } = form;
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      values.storeId = user?.storeId;
+      const [data, err] = await execute(values);
 
-  const handleArticleNameChange = async (value: string) => {
-    if (!articles) return;
-
-    const articleExists = articles.some(
-      (article: Article) => article.name === value
-    );
-
-    if (articleExists) {
-      setErrorMessage("Nom d'article déjà prise");
-    } else {
-      setErrorMessage("");
-    }
-  };
-
-  // const handlePurchasePriceChange = async (value: string) => {
-  //   const purchasePrice = parseFloat(value);
-  //   const stockValue = watch("stock");
-  //   const totalCost = stockValue * purchasePrice;
-
-  //   if (totalCost > userCashDesk.currentAmount) {
-  //     setErrorMessage("Solde insuffisant dans la caisse.");
-  //   } else {
-  //     setErrorMessage("");
-  //   }
-  // };
-
-  // const handleStockChange = async (value: string) => {
-  //   const stockValue = parseInt(value);
-  //   const purchasePrice = watch("purchasePrice");
-  //   const totalCost = stockValue * purchasePrice;
-
-  //   if (totalCost > userCashDesk.currentAmount) {
-  //     setErrorMessage("Solde insuffisant dans la caisse.");
-  //   } else {
-  //     setErrorMessage("");
-  //   }
-  // };
+      if (err) {
+        toast({
+          title: `${err.code}`,
+          description: `${err.message}`,
+          variant: `destructive`,
+        });
+      } else if (data) {
+        queryClient.invalidateQueries({ queryKey: ["articles"] });
+        toast({
+          title: `Ajout article`,
+          description: `Article ajoutée avec succès !`,
+        });
+        setOpen(false);
+        form.reset();
+      }
+    },
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setBtnLoading(true);
-
-    values.storeId = userStore.id;
-
-    await addArticle(values);
-
-    toast({
-      title: `Ajout d'article: ${values.name}`,
-      description: `L'article a été ajouté avec succès !`,
-    });
-
-    form.reset();
-    setBtnLoading(false);
-    router.push("/articles");
+    values.storeId = user?.storeId;
+    mutate(values);
   }
 
-  return (
+  const Content = (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 mx-auto max-w-md"
-      >
-        {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <fieldset className="grid grid-cols-2 gap-6 rounded-lg border p-4">
+          <legend className="-ml-1 px-1 text-sm font-medium">Article</legend>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom de l&apos;article</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Nom de l'article"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="unit"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Unité</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="Unité" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
+        <fieldset className="grid grid-cols-2 gap-6 rounded-lg border p-4">
+          <legend className="-ml-1 px-1 text-sm font-medium">Prix</legend>
+          <FormField
+            control={form.control}
+            name="purchasePrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prix d&apos;achat</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Prix d'achat" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="sellingPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prix de vente</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Prix de vente" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
+        <fieldset className="grid grid-cols-1 gap-6 rounded-lg border p-4">
+          <legend className="-ml-1 px-1 text-sm font-medium">Stock</legend>
+          <FormField
+            control={form.control}
+            name="stock"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Stock initial</FormLabel>
+                <FormControl>
+                  <Input type="number" placeholder="Stock initial" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </fieldset>
 
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nom de l&apos;article</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Nom de l'article"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    handleArticleNameChange(e.target.value);
-                    field.onChange(e);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+        <Button type="submit" disabled={isPending} className="w-full">
+          {isPending ? (
+            <span className="flex">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Chargement..
+            </span>
+          ) : (
+            <span className="flex">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Ajouter
+            </span>
           )}
-        />
-
-        <FormField
-          control={form.control}
-          name="purchasePrice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Prix d&apos;achat (MGA)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Prix d'achat (MGA)"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    // handlePurchasePriceChange(e.target.value);
-                    field.onChange(e);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="sellingPrice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Prix de vente (MGA)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Prix de vente (MGA)"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    field.onChange(e);
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex space-x-4">
-          <div className="w-full">
-            <FormField
-              control={form.control}
-              name="stock"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Stock initial</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="Stock initial"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        // handleStockChange(e.target.value);
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="w-full">
-            <FormField
-              control={form.control}
-              name="unit"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Unité</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Unité"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <MyButton
-          label="Ajouter"
-          loading={btnLoading}
-          errorMessage={errorMessage}
-        />
+        </Button>
       </form>
     </Form>
   );
-};
 
-export default ArticleAddForm;
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <Button>
+            <PlusCircle className="w-4 h-4" />
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Ajouter</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4">{Content}</div>
+          <DrawerFooter className="pt-4">
+            <DrawerClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="ml-auto">
+          <PlusCircle className="mr-2 w-4 h-4" />
+          <span className="hidden sm:block">Ajouter article</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Ajouter</DialogTitle>
+        </DialogHeader>
+        {Content}
+      </DialogContent>
+    </Dialog>
+  );
+};

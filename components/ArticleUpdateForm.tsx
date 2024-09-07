@@ -89,9 +89,9 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     mutate(values);
-  };
+  }
 
   const Content = (
     <Form {...form}>
