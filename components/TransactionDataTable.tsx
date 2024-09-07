@@ -8,10 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { API_URL, LIMIT } from "@/lib/constants";
+import { LIMIT } from "@/lib/constants";
 import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
-import { fetcher } from "@/lib/fetcher";
+import { getTransactions } from "@/lib/get-transactions";
 import { useUserStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import {
   flexRender,
   getCoreRowModel,
@@ -20,7 +21,6 @@ import {
 } from "@tanstack/react-table";
 import { FileDown } from "lucide-react";
 import { useMemo, useState } from "react";
-import useSWR from "swr";
 import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
 import { transactionColumns } from "./TransactionColumn";
@@ -43,12 +43,19 @@ export function TransactionDataTable() {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  const columns = useMemo(() => transactionColumns, []);
+  const { data, isPending } = useQuery({
+    queryKey: ["transactions", pagination.pageIndex, endDate],
+    queryFn: () =>
+      getTransactions(
+        user?.cashDeskId as string,
+        pagination.pageIndex,
+        pagination.pageSize,
+        startDate,
+        endDate
+      ),
+  });
 
-  const { data, isLoading } = useSWR(
-    `${API_URL}/transactions?cashDeskId=${user?.cashDeskId}&page=${pagination.pageIndex}&pageSize=${pagination.pageSize}&startDate=${startDate}&endDate=${endDate}`,
-    fetcher
-  );
+  const columns = useMemo(() => transactionColumns, []);
 
   const table = useReactTable({
     data: data?.transactions,
@@ -99,7 +106,7 @@ export function TransactionDataTable() {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isPending ? (
           <Loader />
         ) : (
           <>

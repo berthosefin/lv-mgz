@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getTransactions } from "@/lib/get-transactions";
+import { getTransactionsRecents } from "@/lib/get-transactionsRecents";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { transactionColumns } from "./TransactionColumn";
@@ -17,7 +17,7 @@ export const TransactionCard = async ({
 }: {
   cashDeskId: string;
 }) => {
-  const data = await getTransactions(cashDeskId, 1, 5);
+  const data = await getTransactionsRecents(cashDeskId, 1, 5);
 
   return (
     <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
