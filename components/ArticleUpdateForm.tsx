@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { replenishArticleAction } from "@/lib/actions/replenish-article";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Ban, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
@@ -105,12 +105,7 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
               <FormItem>
                 <FormLabel>Nom de l&apos;article</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Nom de l'article"
-                    disabled
-                    {...field}
-                  />
+                  <Input placeholder="Nom de l'article" disabled {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -123,7 +118,7 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
               <FormItem>
                 <FormLabel>Unité</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Unité" disabled {...field} />
+                  <Input placeholder="Unité" disabled {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -208,7 +203,7 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
           {isPending ? (
             <span className="flex">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Chargement..
+              Chargement...
             </span>
           ) : (
             <span className="flex">
@@ -236,7 +231,10 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
           <div className="px-4">{Content}</div>
           <DrawerFooter className="pt-4">
             <DrawerClose asChild>
-              <Button variant="outline">Annuler</Button>
+              <Button variant="outline">
+                <Ban className="mr-2 h-4 w-4" />
+                Annuler
+              </Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>

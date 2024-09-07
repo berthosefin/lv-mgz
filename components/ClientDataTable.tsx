@@ -8,28 +8,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { removeClientAction } from "@/lib/actions/remove-client";
-import { API_URL, LIMIT } from "@/lib/constants";
-import { fetcher } from "@/lib/fetcher";
+import { LIMIT } from "@/lib/constants";
+import { getClients } from "@/lib/get-clients";
 import { useUserStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import {
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search, UserPlus } from "lucide-react";
-import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { Search } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { useServerAction } from "zsa-react";
+import { ClientAddForm } from "./ClientAddForm";
 import { clientColumns } from "./ClientColumn";
 import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { toast } from "./ui/use-toast";
 
 export function ClientDataTable() {
   const { user } = useUserStore.getState();
@@ -40,38 +36,18 @@ export function ClientDataTable() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
-  const { data, isLoading, mutate } = useSWR(
-    `${API_URL}/clients?storeId=${user?.storeId}&page=${pagination.pageIndex}&${pagination.pageSize}&search=${debouncedSearchTerm}`,
-    fetcher
-  );
+  const { data, isPending } = useQuery({
+    queryKey: ["clients", debouncedSearchTerm, pagination.pageIndex],
+    queryFn: () =>
+      getClients(
+        user?.storeId as string,
+        pagination.pageIndex,
+        pagination.pageSize,
+        debouncedSearchTerm
+      ),
+  });
 
-  const { execute } = useServerAction(removeClientAction);
-
-  const handleRemoveClient = useCallback(
-    async (id: string) => {
-      const [data, err] = await execute({ id });
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        toast({
-          title: `Suppression de client`,
-          description: `Le client a été supprimé avec succès !`,
-        });
-        mutate();
-      }
-    },
-    [execute, mutate]
-  );
-
-  const columns = useMemo(
-    () => clientColumns(handleRemoveClient),
-    [handleRemoveClient]
-  );
+  const columns = useMemo(() => clientColumns, []);
 
   const table = useReactTable({
     data: data?.clients,
@@ -97,14 +73,9 @@ export function ClientDataTable() {
             className="pl-8"
           />
         </div>
-        <Button className="ml-auto" asChild>
-          <Link href={"/clients/add"} className="btn">
-            <UserPlus size={16} className="sm:mr-2 h-4 w-4" />
-            <span className="hidden sm:block">Ajouter client</span>
-          </Link>
-        </Button>
+        <ClientAddForm />
       </div>
-      {isLoading ? (
+      {isPending ? (
         <div className="rounded-md border">
           <Loader />
         </div>

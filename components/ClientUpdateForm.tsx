@@ -1,5 +1,4 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -24,34 +23,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { addArticleAction } from "@/lib/actions/add-article";
-import { useUserStore } from "@/lib/store";
+import { Input } from "@/components/ui/input";
+import { updateClientAction } from "@/lib/actions/update-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Ban, Loader2, PlusCircle } from "lucide-react";
-import { useState } from "react";
+import { Ban, Loader2, RefreshCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
-  purchasePrice: z.coerce.number().gte(1),
-  sellingPrice: z.coerce.number().gte(1),
-  stock: z.coerce.number().gte(1),
-  unit: z.string(),
-  storeId: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
 });
 
-export const ArticleAddForm = () => {
+export const ClientUpdateForm = ({ client }: { client: Client }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
-  const { user } = useUserStore.getState();
-  const { execute } = useServerAction(addArticleAction);
+  const { execute } = useServerAction(updateClientAction);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,10 +54,18 @@ export const ArticleAddForm = () => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+    if (client) {
+      form.reset(client);
+    }
+  }, [client, form]);
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
-      values.storeId = user?.storeId;
-      const [data, err] = await execute(values);
+      const [data, err] = await execute({
+        id: client.id,
+        updateClientData: values,
+      });
 
       if (err) {
         toast({
@@ -71,10 +74,10 @@ export const ArticleAddForm = () => {
           variant: `destructive`,
         });
       } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["articles"] });
+        queryClient.invalidateQueries({ queryKey: ["clients"] });
         toast({
-          title: `Ajout article`,
-          description: `Article ajoutée avec succès !`,
+          title: `Mise à jours`,
+          description: `Informations du client mis à jour avec succès !`,
         });
         setOpen(false);
         form.reset();
@@ -83,7 +86,6 @@ export const ArticleAddForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    values.storeId = user?.storeId;
     mutate(values);
   }
 
@@ -91,19 +93,31 @@ export const ArticleAddForm = () => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
         <fieldset className="grid grid-cols-2 gap-6 rounded-lg border p-4">
-          <legend className="-ml-1 px-1 text-sm font-medium">Article</legend>
+          <legend className="-ml-1 px-1 text-sm font-medium">Client</legend>
+          <div className="col-span-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom du client</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nom du client" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="name"
+            name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nom de l&apos;article</FormLabel>
+                <FormLabel>Téléphone</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="Nom de l'article"
-                    {...field}
-                  />
+                  <Input placeholder="Téléphone" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -111,28 +125,26 @@ export const ArticleAddForm = () => {
           />
           <FormField
             control={form.control}
-            name="unit"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Unité</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Unité" {...field} />
+                  <Input type="email" placeholder="Email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </fieldset>
-        <fieldset className="grid grid-cols-2 gap-6 rounded-lg border p-4">
-          <legend className="-ml-1 px-1 text-sm font-medium">Prix</legend>
+
           <FormField
             control={form.control}
-            name="purchasePrice"
+            name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prix d&apos;achat</FormLabel>
+                <FormLabel>Adresse</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Prix d'achat" {...field} />
+                  <Input placeholder="Adresse" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,28 +152,12 @@ export const ArticleAddForm = () => {
           />
           <FormField
             control={form.control}
-            name="sellingPrice"
+            name="city"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Prix de vente</FormLabel>
+                <FormLabel>Ville</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="Prix de vente" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </fieldset>
-        <fieldset className="grid grid-cols-1 gap-6 rounded-lg border p-4">
-          <legend className="-ml-1 px-1 text-sm font-medium">Stock</legend>
-          <FormField
-            control={form.control}
-            name="stock"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Stock initial</FormLabel>
-                <FormControl>
-                  <Input type="number" placeholder="Stock initial" {...field} />
+                  <Input placeholder="Ville" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,12 +169,12 @@ export const ArticleAddForm = () => {
           {isPending ? (
             <span className="flex">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Chargement..
+              Chargement...
             </span>
           ) : (
             <span className="flex">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Ajouter
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Mettre à jour
             </span>
           )}
         </Button>
@@ -190,13 +186,13 @@ export const ArticleAddForm = () => {
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
-          <Button>
-            <PlusCircle className="w-4 h-4" />
+          <Button variant="outline" size={"icon"}>
+            <RefreshCw className="w-4 h-4" />
           </Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>Nouvel</DrawerTitle>
+            <DrawerTitle>Mise à jour</DrawerTitle>
           </DrawerHeader>
           <div className="px-4">{Content}</div>
           <DrawerFooter className="pt-4">
@@ -215,14 +211,13 @@ export const ArticleAddForm = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="ml-auto">
-          <PlusCircle className="mr-2 w-4 h-4" />
-          <span className="hidden sm:block">Ajouter article</span>
+        <Button variant="outline" size={"icon"}>
+          <RefreshCw className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nouvel</DialogTitle>
+          <DialogTitle>Mise à jour</DialogTitle>
         </DialogHeader>
         {Content}
       </DialogContent>
