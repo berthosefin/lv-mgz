@@ -1,4 +1,5 @@
 import { Footer } from "@/components/Footer";
+import { ReactQueryProvider } from "@/components/ReactQueryProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
@@ -32,16 +33,18 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <main className="flex-grow">{children}</main>
-          <Toaster />
-          <Footer />
-        </ThemeProvider>
+        <ReactQueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <main className="flex-grow">{children}</main>
+            <Toaster />
+            <Footer />
+          </ThemeProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

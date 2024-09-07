@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { removeArticleAction } from "@/lib/actions/remove-article";
-import { API_URL, LIMIT } from "@/lib/constants";
-import { fetcher } from "@/lib/fetcher";
+import { LIMIT } from "@/lib/constants";
+import { getArtciles } from "@/lib/get-articles";
 import { useUserStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import {
   flexRender,
   getCoreRowModel,
@@ -20,16 +20,13 @@ import {
 } from "@tanstack/react-table";
 import { PlusCircle, Search } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { useServerAction } from "zsa-react";
 import { articleColumns } from "./ArticleColumn";
 import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { toast } from "./ui/use-toast";
 
 export function ArticleDataTable() {
   const { user } = useUserStore.getState();
@@ -40,38 +37,18 @@ export function ArticleDataTable() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
-  const { data, isLoading, mutate } = useSWR(
-    `${API_URL}/articles?storeId=${user?.storeId}&page=${pagination.pageIndex}&pageSize=${pagination.pageSize}&search=${debouncedSearchTerm}`,
-    fetcher
-  );
+  const { data, isPending } = useQuery({
+    queryKey: ["articles"],
+    queryFn: () =>
+      getArtciles(
+        user?.storeId as string,
+        pagination.pageIndex,
+        pagination.pageSize,
+        debouncedSearchTerm
+      ),
+  });
 
-  const { execute } = useServerAction(removeArticleAction);
-
-  const handleRemoveArticle = useCallback(
-    async (id: string) => {
-      const [data, err] = await execute({ id });
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        toast({
-          title: `Suppression d'article`,
-          description: `L'article a été supprimé avec succès !`,
-        });
-        mutate();
-      }
-    },
-    [execute, mutate]
-  );
-
-  const columns = useMemo(
-    () => articleColumns(handleRemoveArticle),
-    [handleRemoveArticle]
-  );
+  const columns = useMemo(() => articleColumns, []);
 
   const table = useReactTable({
     data: data?.articles,
@@ -104,7 +81,7 @@ export function ArticleDataTable() {
           </Link>
         </Button>
       </div>
-      {isLoading ? (
+      {isPending ? (
         <div className="rounded-md border">
           <Loader />
         </div>

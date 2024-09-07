@@ -1,23 +1,10 @@
 "use client";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ColumnDef } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
-import { ArticleEditForm } from "./ArticleEditForm";
-import { Button } from "./ui/button";
 
-export const articleColumns = (
-  handleDelete: (id: string) => void
-): ColumnDef<Article>[] => [
+import { ColumnDef } from "@tanstack/react-table";
+import { ArticleRemoveAlertDialog } from "./ArticleRemoveAlertDialog";
+import { ArticleUpdateForm } from "./ArticleUpdateForm";
+
+export const articleColumns: ColumnDef<Article>[] = [
   {
     accessorKey: "name",
     header: "Nom",
@@ -80,32 +67,8 @@ export const articleColumns = (
       const article = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <ArticleEditForm article={article} />
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size={"icon"} variant={"outline"}>
-                <Trash className="w-4 h-4 text-destructive" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Cette action ne peut pas être annulée. Cela supprimera
-                  définitivement l&apos;article et ses données de nos serveurs.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleDelete(article.id)}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Supprimer
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <ArticleUpdateForm article={article} />
+          <ArticleRemoveAlertDialog article={article} />
         </span>
       );
     },
