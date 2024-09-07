@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
@@ -19,9 +20,8 @@ import {
 } from "@/components/ui/chart";
 import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
 import { API_URL } from "@/lib/constants";
-import { fetcher } from "@/lib/fetcher";
 import { useUserStore } from "@/lib/store";
-import useSWR from "swr";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "./ui/skeleton";
 
 // Configuration du graphique
@@ -39,12 +39,26 @@ const chartConfig = {
 export function SaleChart() {
   const { user } = useUserStore.getState();
   const currentYear = new Date().getFullYear();
-  const { data: transactionsMonthlySummary, isLoading } = useSWR(
-    `${API_URL}/transactions/monthly-summary?storeId=${user?.storeId}&year=${currentYear}`,
-    fetcher
-  );
+  const accessToken = Cookies.get("access_token");
 
-  if (isLoading)
+  const { data: transactionsMonthlySummary, isPending } = useQuery({
+    queryKey: ["monthly-summary"],
+    queryFn: async () => {
+      const res = await fetch(
+        `${API_URL}/transactions/monthly-summary?storeId=${user?.storeId}&year=${currentYear}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
+        }
+      );
+      return await res.json();
+    },
+  });
+
+  if (isPending)
     return (
       <Card x-chunk="dashboard-01-chunk-5">
         <Skeleton className="h-full w-full rounded-lg" />
