@@ -21,7 +21,7 @@ export default function Error({
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
-        <AlertDescription>Une erreur s'est produite !</AlertDescription>
+        <AlertDescription>Une erreur s&apos;est produite !</AlertDescription>
       </Alert>
       <Button
         variant={"outline"}
