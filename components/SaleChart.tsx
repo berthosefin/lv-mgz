@@ -1,9 +1,5 @@
 "use client";
 
-import Cookies from "js-cookie";
-import { Activity, TrendingDown, TrendingUp } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -22,6 +18,9 @@ import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
 import { API_URL } from "@/lib/constants";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
+import Cookies from "js-cookie";
+import { Activity, TrendingDown, TrendingUp } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { Skeleton } from "./ui/skeleton";
 
 // Configuration du graphique

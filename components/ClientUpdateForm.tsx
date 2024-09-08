@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { updateClientAction } from "@/lib/actions/update-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Ban, Loader2, RefreshCw } from "lucide-react";
+import { Ban, Edit3, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
@@ -77,7 +77,7 @@ export const ClientUpdateForm = ({ client }: { client: Client }) => {
         queryClient.invalidateQueries({ queryKey: ["clients"] });
         toast({
           title: `Mise à jours`,
-          description: `Informations du client mis à jour avec succès !`,
+          description: `Informations du client mise à jour avec succès !`,
         });
         setOpen(false);
         form.reset();
@@ -187,7 +187,7 @@ export const ClientUpdateForm = ({ client }: { client: Client }) => {
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>
           <Button variant="outline" size={"icon"}>
-            <RefreshCw className="w-4 h-4" />
+            <Edit3 className="w-4 h-4" />
           </Button>
         </DrawerTrigger>
         <DrawerContent>
@@ -212,7 +212,7 @@ export const ClientUpdateForm = ({ client }: { client: Client }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size={"icon"}>
-          <RefreshCw className="w-4 h-4" />
+          <Edit3 className="w-4 h-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">

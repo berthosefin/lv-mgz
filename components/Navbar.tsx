@@ -144,6 +144,14 @@ export const Navbar = () => {
               {user?.username}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                router.push("/store");
+              }}
+            >
+              Magasin
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleLogout()}>
               Logout
             </DropdownMenuItem>

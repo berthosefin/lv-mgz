@@ -1,11 +1,11 @@
 "use client";
 
+import { exportInvoiceToPdf } from "@/lib/export-invoice-to-pdf";
 import { ColumnDef } from "@tanstack/react-table";
+import { FileDown } from "lucide-react";
+import { InvoiceUpdateForm } from "./InvoiceUpdateForm";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Edit3, FileDown } from "lucide-react";
-import { exportInvoiceToPdf } from "@/lib/export-invoice-to-pdf";
-import Link from "next/link";
 
 export const invoiceColumns: ColumnDef<Invoice>[] = [
   {
@@ -75,11 +75,7 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
       const invoice = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <Button asChild size={"icon"} variant={"outline"}>
-            <Link href={`/invoices/${invoice.id}`}>
-              <Edit3 className="w-4 h-4" />
-            </Link>
-          </Button>
+          <InvoiceUpdateForm invoice={invoice} />
           <Button
             size={"icon"}
             variant={"outline"}

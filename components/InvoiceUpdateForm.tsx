@@ -1,6 +1,20 @@
-"use client";
-
-import { Loader } from "@/components/Loader";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Form,
   FormControl,
@@ -9,51 +23,35 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { fetcher } from "@/lib/fetcher";
-import { updateInvoice } from "@/lib/invoices.actions";
+import { updateInvoiceAction } from "@/lib/actions/update-invoice";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { Ban, Edit3, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import useSWR from "swr";
+import { useMediaQuery } from "react-responsive";
 import { z } from "zod";
-import ErrorMessage from "./ErrorMessage";
-import MyButton from "./MyButton";
+import { useServerAction } from "zsa-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
-import { useToast } from "./ui/use-toast";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   isPaid: z.boolean(),
 });
 
-type Props = {
-  invoiceId: string;
-};
-
-const InvoiceUpdateForm = ({ invoiceId }: Props) => {
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
-  const { toast } = useToast();
-  const router = useRouter();
-
-  const {
-    data: invoice,
-    isLoading,
-    error: invoiceError,
-  } = useSWR(`${API_URL}/invoices/${invoiceId}`, fetcher);
+export const InvoiceUpdateForm = ({ invoice }: { invoice: Invoice }) => {
+  const [open, setOpen] = useState(false);
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const { execute, isPending } = useServerAction(updateInvoiceAction);
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      isPaid: false,
-    },
+    mode: "onChange",
   });
 
-  // Update form values when invoice data is fetched
   useEffect(() => {
     if (invoice) {
       form.reset(invoice);
@@ -61,22 +59,25 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
   }, [invoice, form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setBtnLoading(true);
+    const [data, err] = await execute({
+      id: invoice.id,
+      updateInvoiceData: values,
+    });
 
-    try {
-      await updateInvoice(invoiceId, values);
-
+    if (err) {
       toast({
-        title: `Mise à jour de la facture de: ${invoice.client.name}`,
-        description: `La mise à jour a été effectuée avec succès !`,
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
       });
-
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      toast({
+        title: `Mise à jours`,
+        description: `Facture mise à jour avec succès !`,
+      });
+      setOpen(false);
       form.reset();
-      router.push("/invoices");
-    } catch (error) {
-      setErrorMessage("Erreur lors de la mise à jour de la facture.");
-    } finally {
-      setBtnLoading(false);
     }
   }
 
@@ -84,19 +85,7 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
     return invoice ? invoice[fieldName] : true;
   };
 
-  if (invoiceError) {
-    return (
-      <div className="mt-4">
-        <ErrorMessage errorMessage="Erreur lors du chargement des informations sur le commande" />
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return <Loader />; // Show loader while data is being fetched
-  }
-
-  return (
+  const Content = (
     <>
       <ScrollArea className="h-48 w-full rounded-md binvoice mb-4">
         <div className="p-4">
@@ -119,44 +108,90 @@ const InvoiceUpdateForm = ({ invoiceId }: Props) => {
       </ScrollArea>
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 mx-auto max-w-md"
-        >
-          {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+          <fieldset className="gap-6 rounded-lg border p-4">
+            <legend className="-ml-1 px-1 text-sm font-medium">Status</legend>
+            <FormField
+              control={form.control}
+              name="isPaid"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg binvoice p-4">
+                  <div className="space-y-0.5">
+                    <FormLabel>
+                      MONTANT: {invoice.amount.toLocaleString()} MGA
+                    </FormLabel>
+                  </div>
+                  <FormLabel>Payé</FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isSwitchDisabled("isPaid")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </fieldset>
 
-          <FormField
-            control={form.control}
-            name="isPaid"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg binvoice p-4">
-                <div className="space-y-0.5">
-                  <FormLabel>
-                    MONTANT: {invoice.amount.toLocaleString()} MGA
-                  </FormLabel>
-                </div>
-                <FormLabel>Payé</FormLabel>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isSwitchDisabled("isPaid")}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? (
+              <span className="flex">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Chargement...
+              </span>
+            ) : (
+              <span className="flex">
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Mettre à jour
+              </span>
             )}
-          />
-
-          <MyButton
-            label="Valider"
-            loading={btnLoading}
-            errorMessage={errorMessage}
-          />
+          </Button>
         </form>
       </Form>
     </>
   );
-};
 
-export default InvoiceUpdateForm;
+  if (isMobile) {
+    return (
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger asChild>
+          <Button variant="outline" size={"icon"}>
+            <Edit3 className="w-4 h-4" />
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Mise à jour</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4">{Content}</div>
+          <DrawerFooter className="pt-4">
+            <DrawerClose asChild>
+              <Button variant="outline">
+                <Ban className="mr-2 h-4 w-4" />
+                Annuler
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size={"icon"}>
+          <Edit3 className="w-4 h-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Mise à jour</DialogTitle>
+        </DialogHeader>
+        {Content}
+      </DialogContent>
+    </Dialog>
+  );
+};

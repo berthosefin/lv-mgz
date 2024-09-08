@@ -8,24 +8,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { API_URL, LIMIT } from "@/lib/constants";
-import { fetcher } from "@/lib/fetcher";
+import { LIMIT } from "@/lib/constants";
+import { getInvoices } from "@/lib/services/invoices";
 import { useUserStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import {
   flexRender,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { FileText, Search } from "lucide-react";
-import Link from "next/link";
+import { Search } from "lucide-react";
 import { useMemo, useState } from "react";
-import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { DataTablePagination } from "./DataTablePagination";
 import { invoiceColumns } from "./InvoiceColumn";
 import { Loader } from "./Loader";
-import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -45,16 +43,22 @@ export function InvoiceDataTable() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [isPaidFilter, setIsPaidFilter] = useState<string>("all");
 
-  const { data, isLoading } = useSWR(
-    `${API_URL}/invoices?storeId=${user?.storeId}&page=${
-      pagination.pageIndex
-    }&pageSize=${
-      pagination.pageSize
-    }&clientName=${debouncedSearchTerm}&isPaid=${
-      isPaidFilter === "all" ? "" : isPaidFilter
-    }`,
-    fetcher
-  );
+  const { data, isPending } = useQuery({
+    queryKey: [
+      "invoices",
+      debouncedSearchTerm,
+      isPaidFilter,
+      pagination.pageIndex,
+    ],
+    queryFn: async () =>
+      getInvoices(
+        user?.storeId as string,
+        pagination.pageIndex,
+        pagination.pageSize,
+        debouncedSearchTerm,
+        isPaidFilter
+      ),
+  });
 
   const columns = useMemo(() => invoiceColumns, []);
 
@@ -92,14 +96,8 @@ export function InvoiceDataTable() {
             <SelectItem value="false">Non payé</SelectItem>
           </SelectContent>
         </Select>
-        <Button className="ml-auto" asChild>
-          <Link href={"/invoices/headers"} className="btn">
-            <FileText size={16} className="sm:mr-2 h-4 w-4" />
-            <span className="hidden sm:block">En-têtes facture</span>
-          </Link>
-        </Button>
       </div>
-      {isLoading ? (
+      {isPending ? (
         <div className="rounded-md border">
           <Loader />
         </div>
