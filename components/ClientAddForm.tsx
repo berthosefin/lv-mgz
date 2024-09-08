@@ -24,11 +24,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { addArticleAction } from "@/lib/actions/add-article";
+import { addClientAction } from "@/lib/actions/add-client";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Ban, Loader2, PlusCircle, UserPlus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Ban, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
@@ -37,7 +37,6 @@ import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
-import { addClientAction } from "@/lib/actions/add-client";
 
 const formSchema = z.object({
   name: z.string(),
@@ -52,7 +51,7 @@ export const ClientAddForm = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const { user } = useUserStore.getState();
-  const { execute } = useServerAction(addClientAction);
+  const { execute, isPending } = useServerAction(addClientAction);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,32 +59,25 @@ export const ClientAddForm = () => {
     mode: "onChange",
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      values.storeId = user?.storeId;
-      const [data, err] = await execute(values);
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["clients"] });
-        toast({
-          title: `Ajout client`,
-          description: `Client ajouté avec succès !`,
-        });
-        setOpen(false);
-        form.reset();
-      }
-    },
-  });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     values.storeId = user?.storeId;
-    mutate(values);
+    const [data, err] = await execute(values);
+
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast({
+        title: `Ajout client`,
+        description: `Client ajouté avec succès !`,
+      });
+      setOpen(false);
+      form.reset();
+    }
   }
 
   const Content = (

@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { replenishArticleAction } from "@/lib/actions/replenish-article";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -47,7 +47,7 @@ const formSchema = z.object({
 export const ArticleUpdateForm = ({ article }: { article: Article }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
-  const { execute } = useServerAction(replenishArticleAction);
+  const { execute, isPending } = useServerAction(replenishArticleAction);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -64,33 +64,27 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
     }
   }, [article, form]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const [data, err] = await execute({
-        id: article.id,
-        replenishArticleData: values,
-      });
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["articles"] });
-        toast({
-          title: `Approvisionnement`,
-          description: `Article approvisionné avec succès !`,
-        });
-        setOpen(false);
-        form.reset();
-      }
-    },
-  });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    mutate(values);
+    const [data, err] = await execute({
+      id: article.id,
+      replenishArticleData: values,
+    });
+
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
+      toast({
+        title: `Approvisionnement`,
+        description: `Article approvisionné avec succès !`,
+      });
+      setOpen(false);
+      form.reset();
+    }
   }
 
   const Content = (

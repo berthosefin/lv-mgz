@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { updateClientAction } from "@/lib/actions/update-client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Edit3, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,7 +46,7 @@ const formSchema = z.object({
 export const ClientUpdateForm = ({ client }: { client: Client }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
-  const { execute } = useServerAction(updateClientAction);
+  const { execute, isPending } = useServerAction(updateClientAction);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,33 +60,27 @@ export const ClientUpdateForm = ({ client }: { client: Client }) => {
     }
   }, [client, form]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      const [data, err] = await execute({
-        id: client.id,
-        updateClientData: values,
-      });
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["clients"] });
-        toast({
-          title: `Mise à jours`,
-          description: `Informations du client mise à jour avec succès !`,
-        });
-        setOpen(false);
-        form.reset();
-      }
-    },
-  });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    mutate(values);
+    const [data, err] = await execute({
+      id: client.id,
+      updateClientData: values,
+    });
+
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast({
+        title: `Mise à jours`,
+        description: `Informations du client mise à jour avec succès !`,
+      });
+      setOpen(false);
+      form.reset();
+    }
   }
 
   const Content = (

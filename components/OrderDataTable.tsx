@@ -8,10 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { removeOrderAction } from "@/lib/actions/remove-order";
-import { API_URL, LIMIT } from "@/lib/constants";
-import { fetcher } from "@/lib/fetcher";
+import { LIMIT } from "@/lib/constants";
+import { getOrders } from "@/lib/services/orders";
 import { useUserStore } from "@/lib/store";
+import { useQuery } from "@tanstack/react-query";
 import {
   flexRender,
   getCoreRowModel,
@@ -20,10 +20,8 @@ import {
 } from "@tanstack/react-table";
 import { Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
-import { useServerAction } from "zsa-react";
 import { DataTablePagination } from "./DataTablePagination";
 import { Loader } from "./Loader";
 import { orderColumns } from "./OrderColumn";
@@ -36,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { toast } from "./ui/use-toast";
 
 export function OrderDataTable() {
   const { user } = useUserStore.getState();
@@ -48,44 +45,24 @@ export function OrderDataTable() {
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const { data, isLoading, mutate } = useSWR(
-    `${API_URL}/orders?storeId=${user?.storeId}&page=${
-      pagination.pageIndex
-    }&pageSize=${
-      pagination.pageSize
-    }&clientName=${debouncedSearchTerm}&status=${
-      statusFilter === "all" ? "" : statusFilter
-    }`,
-    fetcher
-  );
+  const { data, isPending } = useQuery({
+    queryKey: [
+      "orders",
+      debouncedSearchTerm,
+      pagination.pageIndex,
+      statusFilter,
+    ],
+    queryFn: () =>
+      getOrders(
+        user?.storeId as string,
+        pagination.pageIndex,
+        pagination.pageSize,
+        debouncedSearchTerm,
+        statusFilter
+      ),
+  });
 
-  const { execute } = useServerAction(removeOrderAction);
-
-  const handleRemoveOrder = useCallback(
-    async (id: string) => {
-      const [data, err] = await execute({ id });
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        toast({
-          title: `Suppression de commande`,
-          description: `La commande a été supprimé avec succès !`,
-        });
-        mutate();
-      }
-    },
-    [execute, mutate]
-  );
-
-  const columns = useMemo(
-    () => orderColumns(handleRemoveOrder),
-    [handleRemoveOrder]
-  );
+  const columns = useMemo(() => orderColumns, []);
 
   const table = useReactTable({
     data: data?.orders,
@@ -128,7 +105,7 @@ export function OrderDataTable() {
           </Link>
         </Button>
       </div>
-      {isLoading ? (
+      {isPending ? (
         <div className="rounded-md border">
           <Loader />
         </div>

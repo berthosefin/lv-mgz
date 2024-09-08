@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { removeClientAction } from "@/lib/actions/remove-client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
@@ -20,25 +20,23 @@ export const ClientRemoveAlertDialog = ({ client }: { client: Client }) => {
   const { execute } = useServerAction(removeClientAction);
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation({
-    mutationFn: async (id: string) => {
-      const [data, err] = await execute({ id });
+  const handeleRemoveClient = async (id: string) => {
+    const [data, err] = await execute({ id });
 
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["clients"] });
-        toast({
-          title: `Suppression réussie`,
-          description: `Client supprimé avec succès !`,
-        });
-      }
-    },
-  });
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast({
+        title: `Suppression réussie`,
+        description: `Client supprimé avec succès !`,
+      });
+    }
+  };
 
   return (
     <AlertDialog>
@@ -58,7 +56,7 @@ export const ClientRemoveAlertDialog = ({ client }: { client: Client }) => {
         <AlertDialogFooter>
           <AlertDialogCancel>Annuler</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => mutate(client.id)}
+            onClick={() => handeleRemoveClient(client.id)}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Supprimer

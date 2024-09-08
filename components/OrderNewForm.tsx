@@ -11,20 +11,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { fetcher } from "@/lib/fetcher";
 import { createOrder } from "@/lib/orders.actions";
+import { getArticles } from "@/lib/services/articles";
+import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
 import { Check, RotateCw, ShoppingCart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import Select from "react-select";
-import useSWR from "swr";
-import ErrorMessage from "./ErrorMessage";
 import { Loader } from "./Loader";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type OrderItem = {
   articleId: string;
@@ -47,15 +44,16 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
 
   const userStore = userData.store;
 
-  const {
-    data: articles,
-    isLoading,
-    error: articlesError,
-  } = useSWR(`${API_URL}/articles?storeId=${userStore.id}`, fetcher);
+  const { data, error, isPending } = useQuery({
+    queryKey: ["articles"],
+    queryFn: () => getArticles(userStore.id),
+  });
 
-  if (articlesError) {
-    setErrorMessage("Erreur lors du chargement des articles");
+  if (error) {
+    console.log(error);
   }
+
+  const articles = data?.articles;
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = parseInt(e.target.value);
@@ -155,13 +153,7 @@ const OrderNewForm = ({ userData }: { userData: User }) => {
 
   return (
     <>
-      {errorMessage && (
-        <div className="mb-4">
-          <ErrorMessage errorMessage={errorMessage} />
-        </div>
-      )}
-
-      {isLoading ? (
+      {isPending ? (
         <Loader />
       ) : (
         <div className="flex flex-col space-y-4 lg:flex-row lg:justify-between lg:space-y-0 lg:space-x-4">

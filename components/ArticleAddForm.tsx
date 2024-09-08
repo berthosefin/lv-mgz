@@ -27,7 +27,7 @@ import {
 import { addArticleAction } from "@/lib/actions/add-article";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Loader2, PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -51,7 +51,7 @@ export const ArticleAddForm = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const { user } = useUserStore.getState();
-  const { execute } = useServerAction(addArticleAction);
+  const { execute, isPending } = useServerAction(addArticleAction);
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,32 +59,25 @@ export const ArticleAddForm = () => {
     mode: "onChange",
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
-      values.storeId = user?.storeId;
-      const [data, err] = await execute(values);
-
-      if (err) {
-        toast({
-          title: `${err.code}`,
-          description: `${err.message}`,
-          variant: `destructive`,
-        });
-      } else if (data) {
-        queryClient.invalidateQueries({ queryKey: ["articles"] });
-        toast({
-          title: `Ajout article`,
-          description: `Article ajoutée avec succès !`,
-        });
-        setOpen(false);
-        form.reset();
-      }
-    },
-  });
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     values.storeId = user?.storeId;
-    mutate(values);
+    const [data, err] = await execute(values);
+
+    if (err) {
+      toast({
+        title: `${err.code}`,
+        description: `${err.message}`,
+        variant: `destructive`,
+      });
+    } else if (data) {
+      queryClient.invalidateQueries({ queryKey: ["articles"] });
+      toast({
+        title: `Ajout article`,
+        description: `Article ajoutée avec succès !`,
+      });
+      setOpen(false);
+      form.reset();
+    }
   }
 
   const Content = (

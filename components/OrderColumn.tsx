@@ -1,31 +1,16 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { OrderRemoveAlertDialog } from "./OrderRemoveAlertDialog";
+import { OrderUpdateForm } from "./OrderUpdateForm";
 import { Badge } from "./ui/badge";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Edit3, Trash } from "lucide-react";
-import Link from "next/link";
-import { Button } from "./ui/button";
 
-export const orderColumns = (
-  handleDelete: (id: string) => void
-): ColumnDef<Order>[] => [
+export const orderColumns: ColumnDef<Order>[] = [
   {
     accessorKey: "updatedAt",
     header: "Date",
-    cell: ({ row }) => {
-      return new Date(row.getValue("updatedAt")).toLocaleDateString("fr-FR");
-    },
+    cell: ({ row }) =>
+      new Date(row.getValue("updatedAt")).toLocaleDateString("fr-FR"),
   },
   {
     accessorKey: "client",
@@ -96,36 +81,8 @@ export const orderColumns = (
       const order = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <Button asChild size="icon" variant="outline">
-            <Link href={`/orders/${order.id}`}>
-              <Edit3 className="w-4 h-4" />
-            </Link>
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button size="icon" variant="outline">
-                <Trash className="w-4 h-4 text-destructive" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Êtes-vous absolument sûr ?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Cette action ne peut pas être annulée. Cela supprimera
-                  définitivement la commande et ses données de nos serveurs.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleDelete(order.id)}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Supprimer
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <OrderUpdateForm order={order} />
+          <OrderRemoveAlertDialog order={order} />
         </span>
       );
     },

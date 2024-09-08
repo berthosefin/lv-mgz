@@ -87,7 +87,7 @@ export const InvoiceUpdateForm = ({ invoice }: { invoice: Invoice }) => {
 
   const Content = (
     <>
-      <ScrollArea className="h-48 w-full rounded-md binvoice mb-4">
+      <ScrollArea className="h-48 w-full rounded-md border my-4 sm:my-0">
         <div className="p-4">
           <h4 className="mb-4 text-sm font-medium leading-none">
             Articles dans la commande de{" "}
@@ -109,31 +109,33 @@ export const InvoiceUpdateForm = ({ invoice }: { invoice: Invoice }) => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-          <fieldset className="gap-6 rounded-lg border p-4">
-            <legend className="-ml-1 px-1 text-sm font-medium">Status</legend>
-            <FormField
-              control={form.control}
-              name="isPaid"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg binvoice p-4">
-                  <div className="space-y-0.5">
-                    <FormLabel>
-                      MONTANT: {invoice.amount.toLocaleString()} MGA
-                    </FormLabel>
-                  </div>
+          <div className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <FormLabel>MONTANT</FormLabel>
+            </div>
+            <div className="space-y-0.5">
+              <FormLabel>{invoice.amount.toLocaleString()} MGA</FormLabel>
+            </div>
+          </div>
+          <FormField
+            control={form.control}
+            name="isPaid"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                <div className="space-y-0.5">
                   <FormLabel>Payé</FormLabel>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={isSwitchDisabled("isPaid")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </fieldset>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isSwitchDisabled("isPaid")}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? (
