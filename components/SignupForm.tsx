@@ -15,7 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signupAction } from "@/lib/actions/signup";
+import { signupAction } from "@/lib/actions/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useToast } from "./ui/use-toast";
+import { toast } from "./ui/use-toast";
 
 export const formSchema = z
   .object({
@@ -48,7 +48,6 @@ export const formSchema = z
 export const SignupForm = () => {
   const { isPending, execute } = useServerAction(signupAction);
   const router = useRouter();
-  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

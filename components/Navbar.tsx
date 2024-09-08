@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { logoutAction } from "@/lib/actions/logout";
+import { logoutAction } from "@/lib/actions/auth";
 import { useUserStore } from "@/lib/store";
 import { CircleUser, Menu, Store } from "lucide-react";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
-import { useToast } from "./ui/use-toast";
+import { toast } from "./ui/use-toast";
 
 const NavLinks = [
   { name: "Accueil", path: "/" },
@@ -30,9 +30,10 @@ const NavLinks = [
 
 export const Navbar = () => {
   const pathname = usePathname();
+  const user = useUserStore((state) => state.user);
   const { execute } = useServerAction(logoutAction);
+  const { unSetUser } = useUserStore.getState();
   const router = useRouter();
-  const { toast } = useToast();
 
   const isNavLinkActive = (path: string) => {
     if (path === "/") {
@@ -40,9 +41,6 @@ export const Navbar = () => {
     }
     return pathname.startsWith(path);
   };
-
-  const user = useUserStore((state) => state.user);
-  const unSetUser = useUserStore((state) => state.unSetUser);
 
   const handleLogout = async () => {
     const [data, err] = await execute();
@@ -153,7 +151,7 @@ export const Navbar = () => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleLogout()}>
-              Logout
+              Se déconnecter
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

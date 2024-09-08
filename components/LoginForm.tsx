@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { loginAction } from "@/lib/actions/login";
+import { loginAction } from "@/lib/actions/auth";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
-import { useToast } from "./ui/use-toast";
+import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   username: z.string(),
@@ -35,7 +35,6 @@ const formSchema = z.object({
 export const LoginForm = () => {
   const { isPending, execute } = useServerAction(loginAction);
   const router = useRouter();
-  const { toast } = useToast();
   const { setUser } = useUserStore.getState();
 
   const form = useForm<z.infer<typeof formSchema>>({
