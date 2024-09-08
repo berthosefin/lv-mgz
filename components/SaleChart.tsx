@@ -15,13 +15,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
-import { API_URL } from "@/lib/constants";
-import { useUserStore } from "@/lib/store";
-import { useQuery } from "@tanstack/react-query";
-import Cookies from "js-cookie";
 import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-import { Skeleton } from "./ui/skeleton";
 
 // Configuration du graphique
 const chartConfig = {
@@ -35,34 +30,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function SaleChart() {
-  const { user } = useUserStore.getState();
+export function SaleChart({
+  transactionsMonthlySummary,
+}: {
+  transactionsMonthlySummary: TransactionsMonthlySummary[];
+}) {
   const currentYear = new Date().getFullYear();
-  const accessToken = Cookies.get("access_token");
-
-  const { data: transactionsMonthlySummary, isPending } = useQuery({
-    queryKey: ["monthly-summary"],
-    queryFn: async () => {
-      const res = await fetch(
-        `${API_URL}/transactions/monthly-summary?storeId=${user?.storeId}&year=${currentYear}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          cache: "no-store",
-        }
-      );
-      return await res.json();
-    },
-  });
-
-  if (isPending)
-    return (
-      <Card x-chunk="dashboard-01-chunk-5">
-        <Skeleton className="h-full w-full rounded-lg" />
-      </Card>
-    );
 
   const { revenueDifference } = calculateMonthlyData(
     transactionsMonthlySummary

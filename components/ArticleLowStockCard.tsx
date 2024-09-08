@@ -7,10 +7,20 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectSeparator } from "@/components/ui/select";
-import { getArticlesLowStock } from "@/lib/get-articles-low-stock";
+import { getHeaders } from "@/lib/actions/headers";
+import { API_URL } from "@/lib/constants";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
+
+const getArticlesLowStock = async (storeId: string) => {
+  const res = await fetch(`${API_URL}/articles/low?storeId=${storeId}`, {
+    headers: getHeaders(),
+    cache: "no-store",
+  });
+
+  return await res.json();
+};
 
 export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
   const lowStockArticles = await getArticlesLowStock(storeId);

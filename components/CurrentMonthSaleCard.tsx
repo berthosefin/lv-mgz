@@ -1,16 +1,12 @@
 import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
-import { getTransactionsMonthlySummary } from "@/lib/get-transactions-monthly-summary";
 import { CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export const CurrentMonthSaleCard = async ({
-  storeId,
+  transactionsMonthlySummary,
 }: {
-  storeId: string;
+  transactionsMonthlySummary: TransactionsMonthlySummary[];
 }) => {
-  const transactionsMonthlySummary = await getTransactionsMonthlySummary(
-    storeId
-  );
   const { currentMonthSales, salesDifference } = calculateMonthlyData(
     transactionsMonthlySummary
   );

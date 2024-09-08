@@ -5,19 +5,32 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getTransactionsRecents } from "@/lib/get-transactionsRecents";
+import { getHeaders } from "@/lib/actions/headers";
+import { API_URL } from "@/lib/constants";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { transactionColumns } from "./TransactionColumn";
 import { Button } from "./ui/button";
 import { DataTable } from "./ui/data-table";
 
+const getTransactionsRecents = async (cashDeskId: string) => {
+  const res = await fetch(
+    `${API_URL}/transactions/?cashDeskId=${cashDeskId}&page=1&pageSize=5`,
+    {
+      headers: getHeaders(),
+      cache: "no-store",
+    }
+  );
+
+  return await res.json();
+};
+
 export const TransactionCard = async ({
   cashDeskId,
 }: {
   cashDeskId: string;
 }) => {
-  const data = await getTransactionsRecents(cashDeskId, 1, 5);
+  const data = await getTransactionsRecents(cashDeskId);
 
   return (
     <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">

@@ -1,6 +1,16 @@
-import { getArtcilesCount } from "@/lib/get-articles-count";
+import { getHeaders } from "@/lib/actions/headers";
+import { API_URL } from "@/lib/constants";
 import { Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+
+const getArtcilesCount = async (storeId: string) => {
+  const res = await fetch(`${API_URL}/articles/count?storeId=${storeId}`, {
+    headers: getHeaders(),
+    cache: "no-store",
+  });
+
+  return await res.json();
+};
 
 export const ArticleCountCard = async ({ storeId }: { storeId: string }) => {
   const articlesCount = await getArtcilesCount(storeId);

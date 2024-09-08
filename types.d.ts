@@ -62,6 +62,12 @@ interface Transaction {
   updatedAt: string;
 }
 
+interface TransactionsMonthlySummary {
+  month: number;
+  sales: number;
+  purchases: number;
+}
+
 // CASHDESK
 interface CashDesk {
   id: string;

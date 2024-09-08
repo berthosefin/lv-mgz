@@ -104,7 +104,7 @@ export const LoginForm = () => {
                 <FormLabel>Mot de passe</FormLabel>
                 <Link
                   href="#"
-                  className="ml-auto inline-block text-sm underline"
+                  className="ml-auto inline-block text-sm underline text-muted-foreground"
                 >
                   Mot de passe oublié ?
                 </Link>
