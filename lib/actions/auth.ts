@@ -59,6 +59,13 @@ export const loginAction = createServerAction()
     return decodedToken;
   });
 
+export async function refreshAccessToken(refreshToken: string) {
+  return await fetchWithoutAuth(`/auth/refresh`, {
+    method: "POST",
+    body: { refresh_token: refreshToken },
+  });
+}
+
 export const logoutAction = createServerAction().handler(async () => {
   const accessToken = cookies().get("access_token")?.value;
   const refreshToken = cookies().get("refresh_token")?.value;
