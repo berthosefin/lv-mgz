@@ -7,23 +7,17 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SelectSeparator } from "@/components/ui/select";
-import { getHeaders } from "@/lib/actions/headers";
-import { API_URL } from "@/lib/constants";
+import { fetchWithAuth } from "@/lib/api-utils";
+import { getSession } from "@/lib/get-session";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 
-const getArticlesLowStock = async (storeId: string) => {
-  const res = await fetch(`${API_URL}/articles/low?storeId=${storeId}`, {
-    headers: getHeaders(),
-    cache: "no-store",
-  });
-
-  return await res.json();
-};
-
-export const ArticleLowStockCard = async ({ storeId }: { storeId: string }) => {
-  const lowStockArticles = await getArticlesLowStock(storeId);
+export const ArticleLowStockCard = async () => {
+  const { storeId } = await getSession();
+  const lowStockArticles = await fetchWithAuth(
+    `/articles/low?storeId=${storeId}`
+  );
 
   return (
     <Card x-chunk="dashboard-01-chunk-4">

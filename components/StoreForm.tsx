@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { updateStoreAction } from "@/lib/actions/store";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,7 +22,6 @@ import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "./ui/use-toast";
-import { getStore } from "@/lib/services/stores";
 
 const formSchema = z.object({
   name: z.string(),
@@ -43,7 +43,7 @@ export const StoreForm = () => {
 
   const { data, isPending: isQueryPending } = useQuery({
     queryKey: ["store"],
-    queryFn: () => getStore(user?.storeId as string),
+    queryFn: () => fetchWithAuth(`/store/${user?.storeId || ""}`),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,7 +60,7 @@ export const StoreForm = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const [data, err] = await execute({
       id: user?.storeId as string,
-      storeData: values,
+      updateStoreData: values,
     });
 
     if (err) {

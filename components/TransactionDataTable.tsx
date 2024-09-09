@@ -8,9 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LIMIT } from "@/lib/constants";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { exportTransactionsToPdf } from "@/lib/export-transactions-to-pdf";
-import { getTransactions } from "@/lib/get-transactions";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -38,21 +37,24 @@ export function TransactionDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: LIMIT,
+    pageSize: 10,
   });
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
   const { data, isPending } = useQuery({
     queryKey: ["transactions", pagination.pageIndex, endDate],
-    queryFn: () =>
-      getTransactions(
-        user?.cashDeskId as string,
-        pagination.pageIndex,
-        pagination.pageSize,
+    queryFn: () => {
+      const params = new URLSearchParams({
+        cashDeskId: user?.cashDeskId || "",
+        page: pagination.pageIndex.toString(),
+        pageSize: pagination.pageSize.toString(),
         startDate,
-        endDate
-      ),
+        endDate,
+      });
+
+      return fetchWithAuth(`/transactions?${params.toString()}`);
+    },
   });
 
   const columns = useMemo(() => transactionColumns, []);

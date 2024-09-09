@@ -55,13 +55,13 @@ export const LoginForm = () => {
       });
     }
 
-    if (data) {
-      router.push("/");
-      toast({
-        title: `Connexion`,
-        description: `Utilisateur connectée avec succès !`,
-      });
+    router.push("/");
+    toast({
+      title: `Connexion`,
+      description: `Utilisateur connectée avec succès !`,
+    });
 
+    if (data) {
       setUser(
         data.sub as string,
         data.username as string,

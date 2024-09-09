@@ -9,7 +9,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { removeOrderAction } from "@/lib/actions/remove-order";
+import { removeOrderAction } from "@/lib/actions/orders";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useServerAction } from "zsa-react";

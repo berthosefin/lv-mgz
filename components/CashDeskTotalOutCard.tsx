@@ -1,19 +1,16 @@
+import { fetchWithAuth } from "@/lib/api-utils";
 import { getCurrentYearDates } from "@/lib/get-current-year-dates";
-import { getTransactionsTotalOut } from "@/lib/get-transactions-total-out";
+import { getSession } from "@/lib/get-session";
 import { ArrowDownRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-export const CashDeskTotalOutCard = async ({
-  cashDeskId,
-}: {
-  cashDeskId: string;
-}) => {
+export const CashDeskTotalOutCard = async () => {
+  const { cashDeskId } = await getSession();
   const { startDate, endDate } = getCurrentYearDates();
-  const totalOut = await getTransactionsTotalOut(
-    cashDeskId,
-    startDate,
-    endDate
+  const totalOut = await fetchWithAuth(
+    `/transactions/totalOut?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`
   );
+
   return (
     <Card x-chunk="dashboard-01-chunk-0">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

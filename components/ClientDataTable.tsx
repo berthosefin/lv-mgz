@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LIMIT } from "@/lib/constants";
-import { getClients } from "@/lib/get-clients";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -31,20 +30,23 @@ export function ClientDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: LIMIT,
+    pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
   const { data, isPending } = useQuery({
     queryKey: ["clients", debouncedSearchTerm, pagination.pageIndex],
-    queryFn: () =>
-      getClients(
-        user?.storeId as string,
-        pagination.pageIndex,
-        pagination.pageSize,
-        debouncedSearchTerm
-      ),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        storeId: user?.storeId || "",
+        page: pagination.pageIndex.toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: debouncedSearchTerm,
+      });
+
+      return fetchWithAuth(`/clients?${params.toString()}`);
+    },
   });
 
   const columns = useMemo(() => clientColumns, []);

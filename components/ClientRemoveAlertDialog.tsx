@@ -9,12 +9,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { removeClientAction } from "@/lib/actions/remove-client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { toast } from "./ui/use-toast";
+import { removeClientAction } from "@/lib/actions/clients";
 
 export const ClientRemoveAlertDialog = ({ client }: { client: Client }) => {
   const { execute } = useServerAction(removeClientAction);

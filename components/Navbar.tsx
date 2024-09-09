@@ -15,6 +15,7 @@ import { CircleUser, Menu, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useServerAction } from "zsa-react";
+import CartSheet from "./CartSheet";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
 import { toast } from "./ui/use-toast";
@@ -53,14 +54,11 @@ export const Navbar = () => {
       });
     }
 
-    if (data) {
-      router.push("/login");
-      toast({
-        title: `Déconnexion`,
-        description: `Utilisateur déconnectée avec succès !`,
-      });
-      unSetUser();
-    }
+    toast({
+      title: `Déconnexion`,
+      description: `Utilisateur déconnectée avec succès !`,
+    });
+    unSetUser();
   };
 
   return (
@@ -130,6 +128,7 @@ export const Navbar = () => {
             />
           </div> */}
         </form>
+        <CartSheet />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full">

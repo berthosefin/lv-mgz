@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { replenishArticleAction } from "@/lib/actions/replenish-article";
+import { replenishArticleAction } from "@/lib/actions/articles";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Loader2, RefreshCw } from "lucide-react";

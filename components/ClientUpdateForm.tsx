@@ -24,7 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { updateClientAction } from "@/lib/actions/update-client";
+import { updateClientAction } from "@/lib/actions/clients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Edit3, Loader2, RefreshCw } from "lucide-react";

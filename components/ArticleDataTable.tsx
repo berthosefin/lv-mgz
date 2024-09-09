@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LIMIT } from "@/lib/constants";
-import { getArtciles } from "@/lib/get-articles";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -30,21 +29,24 @@ import { Input } from "./ui/input";
 export function ArticleDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: LIMIT,
+    pageIndex: 1,
+    pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
   const { data, isPending } = useQuery({
     queryKey: ["articles", debouncedSearchTerm, pagination.pageIndex],
-    queryFn: () =>
-      getArtciles(
-        user?.storeId as string,
-        pagination.pageIndex,
-        pagination.pageSize,
-        debouncedSearchTerm
-      ),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        storeId: user?.storeId || "",
+        page: pagination.pageIndex.toString(),
+        pageSize: pagination.pageSize.toString(),
+        search: debouncedSearchTerm,
+      });
+
+      return fetchWithAuth(`/articles?${params.toString()}`);
+    },
   });
 
   const columns = useMemo(() => articleColumns, []);
@@ -73,7 +75,9 @@ export function ArticleDataTable() {
             className="pl-8"
           />
         </div>
-        <ArticleAddForm />
+        <div className="ml-auto flex gap-2">
+          <ArticleAddForm />
+        </div>
       </div>
       {isPending ? (
         <div className="rounded-md border">

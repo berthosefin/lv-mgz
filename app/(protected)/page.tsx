@@ -7,32 +7,23 @@ import { SaleChart } from "@/components/SaleChart";
 import { TransactionCard } from "@/components/TransactionCard";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getHeaders } from "@/lib/actions/headers";
-import { API_URL } from "@/lib/constants";
-import { getUserData } from "@/lib/get-user-data";
+import { fetchWithAuth } from "@/lib/api-utils";
+import { getSession } from "@/lib/get-session";
 import { Metadata } from "next";
 import { Suspense } from "react";
-
-const getTransactionsMonthlySummary = async (storeId: string) => {
-  const res = await fetch(
-    `${API_URL}/transactions/monthly-summary?storeId=${storeId}&year=${new Date().getFullYear()}`,
-    {
-      headers: getHeaders(),
-      cache: "no-store",
-    }
-  );
-
-  return await res.json();
-};
 
 export const metadata: Metadata = {
   title: `Accueil`,
 };
 
 export default async function HomePage() {
-  const userData = await getUserData();
+  const { storeId } = await getSession();
+  const params = new URLSearchParams({
+    storeId: storeId || "",
+    year: new Date().getFullYear().toString(),
+  });
   const transactionsMonthlySummary: TransactionsMonthlySummary[] =
-    await getTransactionsMonthlySummary(userData.store.id);
+    await fetchWithAuth(`/transactions/monthly-summary?${params.toString()}`);
 
   return (
     <main className="flex flex-1 flex-col gap-4 md:gap-8 md:p-4">
@@ -53,7 +44,7 @@ export default async function HomePage() {
           />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
-          <ArticleCountCard storeId={userData.store.id} />
+          <ArticleCountCard />
         </Suspense>
       </div>
 
@@ -65,7 +56,7 @@ export default async function HomePage() {
             </Card>
           }
         >
-          <TransactionCard cashDeskId={userData.store.cashDesk.id} />
+          <TransactionCard />
         </Suspense>
 
         <Suspense
@@ -85,7 +76,7 @@ export default async function HomePage() {
             </Card>
           }
         >
-          <ArticleLowStockCard storeId={userData.store.id} />
+          <ArticleLowStockCard />
         </Suspense>
       </div>
     </main>

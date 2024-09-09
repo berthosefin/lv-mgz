@@ -23,7 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { updateInvoiceAction } from "@/lib/actions/update-invoice";
+import { updateInvoiceAction } from "@/lib/actions/invoices";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { Ban, Edit3, Loader2, RefreshCw } from "lucide-react";

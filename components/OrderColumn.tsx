@@ -39,6 +39,20 @@ export const orderColumns: ColumnDef<Order>[] = [
     },
   },
   {
+    accessorKey: "amount",
+    header: () => <div className="text-right">Montant</div>,
+    cell: ({ row }) => {
+      const orderItems: OrderItem[] = row.getValue("orderItems");
+      const totalAmount = orderItems.reduce(
+        (total, item) => total + item.article.sellingPrice * item.quantity,
+        0
+      );
+      return (
+        <div className={`text-right`}>{totalAmount.toLocaleString()} MGA</div>
+      );
+    },
+  },
+  {
     accessorKey: "isPaid",
     header: "Paiement",
     cell: ({ row }) => {

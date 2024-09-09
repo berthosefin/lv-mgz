@@ -1,6 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { ArticleAddToCart } from "./ArticleAddToCart";
 import { ArticleRemoveAlertDialog } from "./ArticleRemoveAlertDialog";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
@@ -32,7 +33,11 @@ export const articleColumns: ColumnDef<Article>[] = [
     header: () => <div className="text-right">Stock réel</div>,
     cell: ({ row }) => {
       const stock: number = row.getValue("stock");
-      return <div className={`text-right`}>{stock}</div>;
+      return (
+        <div className={`text-right ${stock < 10 ? "text-destructive" : ""}`}>
+          {stock}
+        </div>
+      );
     },
   },
   {
@@ -67,6 +72,7 @@ export const articleColumns: ColumnDef<Article>[] = [
       const article = row.original;
       return (
         <span className="flex justify-end gap-2">
+          <ArticleAddToCart article={article} />
           <ArticleUpdateForm article={article} />
           <ArticleRemoveAlertDialog article={article} />
         </span>

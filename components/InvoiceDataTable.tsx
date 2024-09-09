@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LIMIT } from "@/lib/constants";
-import { getInvoices } from "@/lib/services/invoices";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -18,12 +17,14 @@ import {
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
+import { FileText, Search } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { DataTablePagination } from "./DataTablePagination";
 import { invoiceColumns } from "./InvoiceColumn";
 import { Loader } from "./Loader";
+import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -37,7 +38,7 @@ export function InvoiceDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: LIMIT,
+    pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
@@ -50,14 +51,17 @@ export function InvoiceDataTable() {
       isPaidFilter,
       pagination.pageIndex,
     ],
-    queryFn: async () =>
-      getInvoices(
-        user?.storeId as string,
-        pagination.pageIndex,
-        pagination.pageSize,
-        debouncedSearchTerm,
-        isPaidFilter
-      ),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        storeId: user?.storeId || "",
+        page: pagination.pageIndex.toString(),
+        pageSize: pagination.pageSize.toString(),
+        clientName: debouncedSearchTerm,
+        isPaid: isPaidFilter,
+      });
+
+      return fetchWithAuth(`/invoices?${params.toString()}`);
+    },
   });
 
   const columns = useMemo(() => invoiceColumns, []);
@@ -96,6 +100,12 @@ export function InvoiceDataTable() {
             <SelectItem value="false">Non payé</SelectItem>
           </SelectContent>
         </Select>
+        <Button className="ml-auto" asChild>
+          <Link href={"/cashdesks"} className="btn">
+            <FileText size={16} className="sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:block">List des transactions</span>
+          </Link>
+        </Button>
       </div>
       {isPending ? (
         <div className="rounded-md border">

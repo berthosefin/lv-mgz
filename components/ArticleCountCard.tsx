@@ -1,19 +1,13 @@
-import { getHeaders } from "@/lib/actions/headers";
-import { API_URL } from "@/lib/constants";
+import { fetchWithAuth } from "@/lib/api-utils";
+import { getSession } from "@/lib/get-session";
 import { Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
-const getArtcilesCount = async (storeId: string) => {
-  const res = await fetch(`${API_URL}/articles/count?storeId=${storeId}`, {
-    headers: getHeaders(),
-    cache: "no-store",
-  });
-
-  return await res.json();
-};
-
-export const ArticleCountCard = async ({ storeId }: { storeId: string }) => {
-  const articlesCount = await getArtcilesCount(storeId);
+export const ArticleCountCard = async () => {
+  const { storeId } = await getSession();
+  const articlesCount = await fetchWithAuth(
+    `/articles/count?storeId=${storeId}`
+  );
 
   return (
     <Card x-chunk="dashboard-01-chunk-0">

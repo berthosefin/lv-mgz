@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LIMIT } from "@/lib/constants";
-import { getOrders } from "@/lib/services/orders";
+import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -39,7 +38,7 @@ export function OrderDataTable() {
   const { user } = useUserStore.getState();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: LIMIT,
+    pageSize: 10,
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
@@ -52,14 +51,17 @@ export function OrderDataTable() {
       pagination.pageIndex,
       statusFilter,
     ],
-    queryFn: () =>
-      getOrders(
-        user?.storeId as string,
-        pagination.pageIndex,
-        pagination.pageSize,
-        debouncedSearchTerm,
-        statusFilter
-      ),
+    queryFn: () => {
+      const params = new URLSearchParams({
+        storeId: user?.storeId || "",
+        page: pagination.pageIndex.toString(),
+        pageSize: pagination.pageSize.toString(),
+        clientName: debouncedSearchTerm,
+        status: statusFilter,
+      });
+
+      return fetchWithAuth(`/orders?${params.toString()}`);
+    },
   });
 
   const columns = useMemo(() => orderColumns, []);
@@ -99,7 +101,7 @@ export function OrderDataTable() {
           </SelectContent>
         </Select>
         <Button className="ml-auto" asChild>
-          <Link href={"/orders/new"} className="btn">
+          <Link href={"/articles"} className="btn">
             <ShoppingCart size={16} className="sm:mr-2 h-4 w-4" />
             <span className="hidden sm:block">Ajouter commande</span>
           </Link>

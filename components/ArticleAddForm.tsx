@@ -24,7 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { addArticleAction } from "@/lib/actions/add-article";
+import { addArticleAction } from "@/lib/actions/articles";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";

@@ -2,10 +2,10 @@
 
 import * as jose from "jose";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createServerAction } from "zsa";
-import { API_URL } from "../constants";
-import { getHeaders } from "./headers";
+import { fetchWithAuth, fetchWithoutAuth } from "../api-utils";
 
 export const signupAction = createServerAction()
   .input(
@@ -16,28 +16,10 @@ export const signupAction = createServerAction()
     })
   )
   .handler(async ({ input }) => {
-    try {
-      const res = await fetch(`${API_URL}/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: input.username,
-          password: input.password,
-          storeName: input.storeName,
-        }),
-      });
-
-      if (!res.ok) {
-        const { message } = await res.json();
-        throw message;
-      }
-
-      return await res.json();
-    } catch (error: any) {
-      throw new Error(error);
-    }
+    return fetchWithoutAuth("/users", {
+      method: "POST",
+      body: input,
+    });
   });
 
 export const loginAction = createServerAction()
@@ -48,55 +30,38 @@ export const loginAction = createServerAction()
     })
   )
   .handler(async ({ input }) => {
-    try {
-      const res = await fetch(`${API_URL}/auth/login`, {
+    const { access_token, refresh_token } = await fetchWithoutAuth(
+      "/auth/login",
+      {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: input.username,
-          password: input.password,
-        }),
-      });
-
-      if (!res.ok) {
-        const { message } = await res.json();
-        throw message;
+        body: input,
       }
-
-      const { access_token, refresh_token } = await res.json();
-      cookies().set("access_token", access_token, { path: "/" });
-      cookies().set("refresh_token", refresh_token, { path: "/" });
-      const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token);
-
-      return decodedToken;
-    } catch (error: any) {
-      throw new Error(error);
-    }
-  });
-
-export const logoutAction = createServerAction().handler(async () => {
-  try {
-    const res = await fetch(`${API_URL}/auth/logout`, {
-      method: "POST",
-      headers: getHeaders(),
-    });
-
-    if (!res.ok) {
-      const { message } = await res.json();
-      throw message;
-    }
+    );
 
     const cookieOptions = {
       path: "/",
-      expires: new Date(0),
+      httpOnly: true, // Empêche l'accès au cookie via JavaScript
+      secure: process.env.NODE_ENV === "production", // Utilise secure uniquement en production
+      sameSite: "strict" as const, // Empêche les requêtes cross-origin avec le cookie
     };
-    cookies().set("access_token", "", cookieOptions);
-    cookies().set("refresh_token", "", cookieOptions);
+    cookies().set("access_token", access_token, cookieOptions);
+    cookies().set("refresh_token", refresh_token, cookieOptions);
 
-    return await res.json();
-  } catch (error: any) {
-    throw new Error(error);
-  }
+    const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token);
+    return decodedToken;
+  });
+
+export const logoutAction = createServerAction().handler(async () => {
+  await fetchWithAuth("/auth/logout", {
+    method: "POST",
+  });
+
+  const cookieOptions = {
+    path: "/",
+    expires: new Date(0),
+  };
+  cookies().set("access_token", "", cookieOptions);
+  cookies().set("refresh_token", "", cookieOptions);
+
+  redirect("/login");
 });

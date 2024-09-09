@@ -2,8 +2,29 @@
 
 import { z } from "zod";
 import { createServerAction } from "zsa";
-import { API_URL } from "../constants";
-import { getHeaders } from "./headers";
+import { fetchWithAuth } from "../api-utils";
+
+export const addOrderAction = createServerAction()
+  .input(
+    z.object({
+      storeId: z.string(),
+      clientName: z.string(),
+      isPaid: z.boolean(),
+      isDelivered: z.boolean(),
+      orderItems: z.array(
+        z.object({
+          articleId: z.string(),
+          quantity: z.number(),
+        })
+      ),
+    })
+  )
+  .handler(async ({ input }) => {
+    return fetchWithAuth(`/orders`, {
+      method: "POST",
+      body: input,
+    });
+  });
 
 export const updateOrderAction = createServerAction()
   .input(
@@ -16,20 +37,20 @@ export const updateOrderAction = createServerAction()
     })
   )
   .handler(async ({ input }) => {
-    try {
-      const res = await fetch(`${API_URL}/orders/${input.id}`, {
-        method: "PATCH",
-        headers: getHeaders(),
-        body: JSON.stringify(input.updateOrderData),
-      });
+    return fetchWithAuth(`/orders/${input.id}`, {
+      method: "PATCH",
+      body: input.updateOrderData,
+    });
+  });
 
-      if (!res.ok) {
-        const { message } = await res.json();
-        throw message;
-      }
-
-      return await res.json();
-    } catch (error: any) {
-      throw new Error(error);
-    }
+export const removeOrderAction = createServerAction()
+  .input(
+    z.object({
+      id: z.string(),
+    })
+  )
+  .handler(async ({ input }) => {
+    return fetchWithAuth(`/orders/${input.id}`, {
+      method: "DELETE",
+    });
   });
