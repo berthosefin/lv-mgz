@@ -52,8 +52,12 @@ export const loginAction = createServerAction()
   });
 
 export const logoutAction = createServerAction().handler(async () => {
+  const accessToken = cookies().get("access_token")?.value;
+  const refreshToken = cookies().get("refresh_token")?.value;
+
   await fetchWithAuth("/auth/logout", {
     method: "POST",
+    body: { access_token: accessToken, refresh_token: refreshToken },
   });
 
   const cookieOptions = {
