@@ -38,14 +38,22 @@ export const loginAction = createServerAction()
       }
     );
 
-    const cookieOptions = {
+    const cookieOptionsAccessToken = {
       path: "/",
-      httpOnly: true, // Empêche l'accès au cookie via JavaScript
-      secure: process.env.NODE_ENV === "production", // Utilise secure uniquement en production
-      sameSite: "strict" as const, // Empêche les requêtes cross-origin avec le cookie
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
     };
-    cookies().set("access_token", access_token, cookieOptions);
-    cookies().set("refresh_token", refresh_token, cookieOptions);
+
+    const cookieOptionsRefreshToken = {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
+    };
+
+    cookies().set("access_token", access_token, cookieOptionsAccessToken);
+    cookies().set("refresh_token", refresh_token, cookieOptionsRefreshToken);
 
     const decodedToken: jose.JWTPayload = jose.decodeJwt(access_token);
     return decodedToken;
