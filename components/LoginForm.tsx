@@ -53,15 +53,15 @@ export const LoginForm = () => {
         description: `${err.message}`,
         variant: `destructive`,
       });
+      return;
     }
 
-    router.push("/");
-    toast({
-      title: `Connexion`,
-      description: `Utilisateur connectée avec succès !`,
-    });
-
     if (data) {
+      toast({
+        title: `Connexion`,
+        description: `Utilisateur connectée avec succès !`,
+      });
+
       setUser(
         data.sub as string,
         data.username as string,
@@ -69,6 +69,7 @@ export const LoginForm = () => {
         data.cashDeskId as string
       );
       form.reset();
+      router.push("/");
     }
   }
 

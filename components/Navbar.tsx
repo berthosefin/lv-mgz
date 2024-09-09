@@ -52,13 +52,18 @@ export const Navbar = () => {
         description: `${err.message}`,
         variant: `destructive`,
       });
+      return;
     }
 
-    toast({
-      title: `Déconnexion`,
-      description: `Utilisateur déconnectée avec succès !`,
-    });
-    unSetUser();
+    if (data) {
+      toast({
+        title: `Déconnexion`,
+        description: `Utilisateur déconnectée avec succès !`,
+      });
+
+      unSetUser();
+      router.push("/login");
+    }
   };
 
   return (

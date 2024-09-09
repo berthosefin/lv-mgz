@@ -66,15 +66,17 @@ export const SignupForm = () => {
         description: `${err.message}`,
         variant: `destructive`,
       });
+      return;
     }
 
     if (data) {
-      router.push("/login");
       toast({
         title: `Création de compte`,
         description: `Compte utilisateur crée avec succès !`,
       });
+
       form.reset();
+      router.push("/login");
     }
   }
 
