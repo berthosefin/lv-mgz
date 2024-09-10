@@ -1,5 +1,3 @@
-import Cookies from "js-cookie";
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -17,26 +15,31 @@ class ApiError extends Error {
 }
 
 async function getAccessToken(): Promise<string | undefined> {
-  if (typeof window !== "undefined") {
-    // Client-side
-    return Cookies.get("access_token");
-  } else {
+  if (typeof window === "undefined") {
     // Server-side
     const { cookies } = await import("next/headers");
     return cookies().get("access_token")?.value;
   }
+  // Client-side
+  return undefined;
 }
 
 export async function fetchWithAuth<T = any>(
   endpoint: string,
   options: FetchOptions = { method: "GET" }
 ): Promise<T> {
-  const accessToken = await getAccessToken();
   const headers = new Headers(options.headers);
   headers.set("Content-Type", "application/json");
 
-  if (accessToken) {
-    headers.set("Authorization", `Bearer ${accessToken}`);
+  if (typeof window === "undefined") {
+    // Server-side
+    const accessToken = await getAccessToken();
+    if (accessToken) {
+      headers.set("Authorization", `Bearer ${accessToken}`);
+    }
+  } else {
+    // Client-side
+    options.credentials = "include";
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {

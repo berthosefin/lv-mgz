@@ -62,12 +62,7 @@ export const LoginForm = () => {
         description: `Utilisateur connectée avec succès !`,
       });
 
-      setUser(
-        data.sub as string,
-        data.username as string,
-        data.storeId as string,
-        data.cashDeskId as string
-      );
+      setUser(data.id, data.username, data.storeId, data.cashDeskId);
       form.reset();
       router.push("/");
     }
