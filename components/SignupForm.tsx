@@ -36,6 +36,7 @@ export const formSchema = z
         message:
           "Le nom d'utilisateur doit contenir uniquement des lettres minuscules, des chiffres, des tirets bas et des tirets.",
       }),
+    email: z.string().email(),
     password: z.string().min(6).max(255),
     confirmPassword: z.string(),
     storeName: z.string().min(3).max(31),
@@ -56,6 +57,7 @@ export const SignupForm = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const [data, err] = await execute({
       username: values.username,
+      email: values.email,
       password: values.password,
       storeName: values.storeName,
     });
@@ -122,6 +124,21 @@ export const SignupForm = () => {
                   )}
                 />
               </div>
+            </div>
+            <div className="grid gap-2">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="grid gap-2">
               <FormField

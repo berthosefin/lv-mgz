@@ -10,6 +10,7 @@ export const signupAction = createServerAction()
   .input(
     z.object({
       username: z.string(),
+      email: z.string().email(),
       password: z.string(),
       storeName: z.string(),
     })
@@ -24,7 +25,7 @@ export const signupAction = createServerAction()
 export const loginAction = createServerAction()
   .input(
     z.object({
-      username: z.string(),
+      email: z.string().email(),
       password: z.string(),
     })
   )

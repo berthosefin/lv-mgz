@@ -28,7 +28,7 @@ import { Button } from "./ui/button";
 import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
-  username: z.string(),
+  email: z.string().email(),
   password: z.string(),
 });
 
@@ -43,7 +43,7 @@ export const LoginForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const [data, err] = await execute({
-      username: values.username,
+      email: values.email,
       password: values.password,
     });
 
@@ -83,12 +83,12 @@ export const LoginForm = () => {
             <div className="grid gap-2">
               <FormField
                 control={form.control}
-                name="username"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nom d&apos;utilisateur</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nom d'utilisateur" {...field} />
+                      <Input placeholder="Email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
