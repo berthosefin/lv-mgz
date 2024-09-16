@@ -40,6 +40,7 @@ export const formSchema = z
     password: z.string().min(6).max(255),
     confirmPassword: z.string(),
     storeName: z.string().min(3).max(31),
+    currency: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Les mots de passe ne correspondent pas",
@@ -60,6 +61,7 @@ export const SignupForm = () => {
       email: values.email,
       password: values.password,
       storeName: values.storeName,
+      currency: values.currency,
     });
 
     if (err) {
@@ -83,7 +85,7 @@ export const SignupForm = () => {
   }
 
   return (
-    <Card className="mx-auto max-w-md">
+    <Card className="mx-auto max-w-lg">
       <CardHeader>
         <CardTitle className="text-xl">S&apos;inscrire</CardTitle>
         <CardDescription>
@@ -112,6 +114,23 @@ export const SignupForm = () => {
               <div className="grid gap-2">
                 <FormField
                   control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
                   name="storeName"
                   render={({ field }) => (
                     <FormItem>
@@ -124,21 +143,21 @@ export const SignupForm = () => {
                   )}
                 />
               </div>
-            </div>
-            <div className="grid gap-2">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input type="email" placeholder="Email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="currency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Devise</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Devise" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             <div className="grid gap-2">
               <FormField

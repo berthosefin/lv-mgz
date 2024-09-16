@@ -18,6 +18,7 @@ export const updateStoreAction = createServerAction()
         city: z.string().optional(),
         phone: z.string().optional(),
         email: z.string().optional(),
+        currency: z.string(),
       }),
     })
   )

@@ -13,6 +13,7 @@ export const signupAction = createServerAction()
       email: z.string().email(),
       password: z.string(),
       storeName: z.string(),
+      currency: z.string(),
     })
   )
   .handler(async ({ input }) => {

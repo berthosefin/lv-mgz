@@ -33,6 +33,7 @@ const formSchema = z.object({
   city: z.string().optional(),
   phone: z.string().optional(),
   email: z.string().email().optional(),
+  currency: z.string(),
 });
 
 export const StoreForm = () => {
@@ -109,9 +110,23 @@ export const StoreForm = () => {
 
               <FormField
                 control={form.control}
-                name="status"
+                name="currency"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Devise</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Devise" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
                     <FormLabel>Status</FormLabel>
                     <FormControl>
                       <Input placeholder="Status" {...field} />
