@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CashDeskPage() {
-  const { username } = await getSession();
+  const { username, currency } = await getSession();
   const user = await fetchWithAuth(`/users/${username}`);
 
   return (
@@ -21,6 +21,7 @@ export default async function CashDeskPage() {
       <div className="grid gap-4 md:grid-cols-1 md:gap-8 lg:grid-cols-3">
         <CashDeskCurrentAmountCard
           currentAmount={user.store.cashDesk.currentAmount}
+          currency={currency}
         />
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
           <CashDeskTotalInCard />

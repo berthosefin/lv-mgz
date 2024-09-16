@@ -64,7 +64,10 @@ export function OrderDataTable() {
     },
   });
 
-  const columns = useMemo(() => orderColumns, []);
+  const columns = useMemo(
+    () => orderColumns(user?.currency as string),
+    [user?.currency]
+  );
 
   const table = useReactTable({
     data: data?.orders,

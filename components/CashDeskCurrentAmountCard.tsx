@@ -3,8 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export const CashDeskCurrentAmountCard = ({
   currentAmount,
+  currency,
 }: {
   currentAmount: number;
+  currency: string;
 }) => {
   return (
     <Card x-chunk="dashboard-01-chunk-0">
@@ -14,7 +16,7 @@ export const CashDeskCurrentAmountCard = ({
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {currentAmount.toLocaleString() + " MGA"}
+          {currentAmount.toLocaleString() + " " + currency}
         </div>
         <p className="text-xs text-muted-foreground">Solde de caisse</p>
       </CardContent>

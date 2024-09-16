@@ -7,6 +7,7 @@ export const getSession = async (): Promise<{
   username: string;
   storeId: string;
   cashDeskId: string;
+  currency: string;
 }> => {
   const accessToken = cookies().get("access_token");
 
@@ -19,6 +20,7 @@ export const getSession = async (): Promise<{
         username: session.username as string,
         storeId: session.storeId as string,
         cashDeskId: session.cashDeskId as string,
+        currency: session.currency as string,
       };
     } catch (error) {}
   }

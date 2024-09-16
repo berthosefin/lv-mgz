@@ -49,7 +49,10 @@ export function ArticleDataTable() {
     },
   });
 
-  const columns = useMemo(() => articleColumns, []);
+  const columns = useMemo(
+    () => articleColumns(user?.currency as string),
+    [user?.currency]
+  );
 
   const table = useReactTable({
     data: data?.articles,

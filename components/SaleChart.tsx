@@ -15,6 +15,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { calculateMonthlyData } from "@/lib/calculate-monthly-data";
+import { useUserStore } from "@/lib/store";
 import { Activity, TrendingDown, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
@@ -35,6 +36,7 @@ export function SaleChart({
 }: {
   transactionsMonthlySummary: TransactionsMonthlySummary[];
 }) {
+  const { user } = useUserStore.getState();
   const currentYear = new Date().getFullYear();
 
   const { revenueDifference } = calculateMonthlyData(
@@ -90,13 +92,13 @@ export function SaleChart({
           ) : isGrowth ? (
             <>
               Accroissement du revenu de {revenueDifference.toLocaleString()}{" "}
-              MGA ce mois-ci <TrendingUp className="h-4 w-4" />
+              {user?.currency} ce mois-ci <TrendingUp className="h-4 w-4" />
             </>
           ) : (
             <>
               Décroissement du revenu de{" "}
-              {Math.abs(revenueDifference).toLocaleString()} MGA ce mois-ci{" "}
-              <TrendingDown className="h-4 w-4" />
+              {Math.abs(revenueDifference).toLocaleString()} {user?.currency} ce
+              mois-ci <TrendingDown className="h-4 w-4" />
             </>
           )}
         </div>

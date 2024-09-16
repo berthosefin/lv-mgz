@@ -2,7 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 
-export const transactionColumns: ColumnDef<Transaction>[] = [
+export const transactionColumns = (
+  currency: string
+): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
     header: "Date",
@@ -39,7 +41,11 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     header: () => <div className="text-right">Montant</div>,
     cell: ({ row }) => {
       const amount: number = row.getValue("amount");
-      return <div className={`text-right`}>{amount.toLocaleString()} MGA</div>;
+      return (
+        <div className={`text-right`}>
+          {amount.toLocaleString()} {currency}
+        </div>
+      );
     },
   },
 ];

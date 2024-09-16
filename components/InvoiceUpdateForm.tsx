@@ -41,7 +41,13 @@ const formSchema = z.object({
   isPaid: z.boolean(),
 });
 
-export const InvoiceUpdateForm = ({ invoice }: { invoice: Invoice }) => {
+export const InvoiceUpdateForm = ({
+  invoice,
+  currency,
+}: {
+  invoice: Invoice;
+  currency: string;
+}) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const { execute, isPending } = useServerAction(updateInvoiceAction);
@@ -114,7 +120,9 @@ export const InvoiceUpdateForm = ({ invoice }: { invoice: Invoice }) => {
               <FormLabel>MONTANT</FormLabel>
             </div>
             <div className="space-y-0.5">
-              <FormLabel>{invoice.amount.toLocaleString()} MGA</FormLabel>
+              <FormLabel>
+                {invoice.amount.toLocaleString() + " " + currency}
+              </FormLabel>
             </div>
           </div>
           <FormField

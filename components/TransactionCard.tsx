@@ -5,23 +5,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { fetchWithAuth } from "@/lib/api-utils";
-import { getSession } from "@/lib/get-session";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-import { transactionColumns } from "./TransactionColumn";
+import { TransactionDataTableLast } from "./TransactionDataTableLast";
 import { Button } from "./ui/button";
-import { DataTable } from "./ui/data-table";
 
 export const TransactionCard = async () => {
-  const { cashDeskId } = await getSession();
-  const params = new URLSearchParams({
-    cashDeskId: cashDeskId || "",
-    page: "1",
-    pageSize: "5",
-  });
-  const data = await fetchWithAuth(`/transactions?${params.toString()}`);
-
   return (
     <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
       <CardHeader className="flex flex-row items-center">
@@ -39,7 +28,7 @@ export const TransactionCard = async () => {
         </Button>
       </CardHeader>
       <CardContent>
-        <DataTable columns={transactionColumns} data={data.transactions} />
+        <TransactionDataTableLast />
       </CardContent>
     </Card>
   );

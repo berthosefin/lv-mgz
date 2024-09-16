@@ -7,12 +7,14 @@ interface UserState {
     username: string;
     storeId: string;
     cashDeskId: string;
+    currency: string;
   };
   setUser: (
     id: string,
     username: string,
     storeId: string,
-    cashDeskId: string
+    cashDeskId: string,
+    currency: string
   ) => void;
   unSetUser: () => void;
 }
@@ -41,8 +43,9 @@ export const useUserStore = create<UserState>()(
         id: string,
         username: string,
         storeId: string,
-        cashDeskId: string
-      ) => set({ user: { id, username, storeId, cashDeskId } }),
+        cashDeskId: string,
+        currency: string
+      ) => set({ user: { id, username, storeId, cashDeskId, currency } }),
       unSetUser: () => set({ user: null }),
     }),
     { name: "user-storage" }

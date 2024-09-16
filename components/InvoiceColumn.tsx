@@ -7,7 +7,7 @@ import { InvoiceUpdateForm } from "./InvoiceUpdateForm";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 
-export const invoiceColumns: ColumnDef<Invoice>[] = [
+export const invoiceColumns = (currency: string): ColumnDef<Invoice>[] => [
   {
     accessorKey: "updatedAt",
     header: "Date",
@@ -47,7 +47,11 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
     header: () => <div className="text-right">Montant</div>,
     cell: ({ row }) => {
       const amount: number = row.getValue("amount");
-      return <div className={`text-right`}>{amount.toLocaleString()} MGA</div>;
+      return (
+        <div className={`text-right`}>
+          {amount.toLocaleString()} {currency}
+        </div>
+      );
     },
   },
   {
@@ -75,12 +79,12 @@ export const invoiceColumns: ColumnDef<Invoice>[] = [
       const invoice = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <InvoiceUpdateForm invoice={invoice} />
+          <InvoiceUpdateForm invoice={invoice} currency={currency} />
           <Button
             size={"icon"}
             variant={"outline"}
             onClick={() => {
-              exportInvoiceToPdf(invoice);
+              exportInvoiceToPdf(invoice, currency);
             }}
           >
             <FileDown className="w-4 h-4" />

@@ -5,7 +5,7 @@ import { OrderRemoveAlertDialog } from "./OrderRemoveAlertDialog";
 import { OrderUpdateForm } from "./OrderUpdateForm";
 import { Badge } from "./ui/badge";
 
-export const orderColumns: ColumnDef<Order>[] = [
+export const orderColumns = (currency: string): ColumnDef<Order>[] => [
   {
     accessorKey: "updatedAt",
     header: "Date",
@@ -48,7 +48,9 @@ export const orderColumns: ColumnDef<Order>[] = [
         0
       );
       return (
-        <div className={`text-right`}>{totalAmount.toLocaleString()} MGA</div>
+        <div className={`text-right`}>
+          {totalAmount.toLocaleString()} {currency}
+        </div>
       );
     },
   },
@@ -95,7 +97,7 @@ export const orderColumns: ColumnDef<Order>[] = [
       const order = row.original;
       return (
         <span className="flex justify-end gap-2">
-          <OrderUpdateForm order={order} />
+          <OrderUpdateForm order={order} currency={currency} />
           <OrderRemoveAlertDialog order={order} />
         </span>
       );

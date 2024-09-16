@@ -131,8 +131,10 @@ export default function CartSheet() {
                     <div className="flex flex-1 flex-col">
                       <span className="font-medium">{item.name}</span>
                       <span className="text-sm text-gray-500">
-                        {item.price.toFixed(2)} MGA x {item.quantity} ={" "}
-                        {(item.price * item.quantity).toFixed(2)} MGA
+                        {item.price.toFixed(2)} {user?.currency} x{" "}
+                        {item.quantity} ={" "}
+                        {(item.price * item.quantity).toFixed(2)}{" "}
+                        {user?.currency}
                       </span>
                     </div>
                     <div className="mt-2 flex items-center gap-2">
@@ -169,7 +171,7 @@ export default function CartSheet() {
               <Separator />
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span>{totalAmount.toFixed(2)} MGA</span>
+                <span>{totalAmount.toFixed(2) + " " + user?.currency}</span>
               </div>
               <div className="flex justify-end gap-2 text-lg font-semibold">
                 <Label className="flex items-center text-primary">

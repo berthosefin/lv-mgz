@@ -42,7 +42,13 @@ const formSchema = z.object({
   isDelivered: z.boolean(),
 });
 
-export const OrderUpdateForm = ({ order }: { order: Order }) => {
+export const OrderUpdateForm = ({
+  order,
+  currency,
+}: {
+  order: Order;
+  currency: string;
+}) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
   const { execute, isPending } = useServerAction(updateOrderAction);
@@ -127,7 +133,7 @@ export const OrderUpdateForm = ({ order }: { order: Order }) => {
               <FormLabel>MONTANT</FormLabel>
             </div>
             <div className="space-y-0.5">
-              <FormLabel>{calculateTotalAmount()} MGA</FormLabel>
+              <FormLabel>{calculateTotalAmount() + " " + currency}</FormLabel>
             </div>
           </div>
           <FormField

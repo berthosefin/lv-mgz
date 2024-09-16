@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const { storeId } = await getSession();
+  const { storeId, currency } = await getSession();
   const params = new URLSearchParams({
     storeId: storeId || "",
     year: new Date().getFullYear().toString(),
@@ -31,16 +31,19 @@ export default async function HomePage() {
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
           <CurrentMonthRevenueCard
             transactionsMonthlySummary={transactionsMonthlySummary}
+            currency={currency}
           />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
           <CurrentMonthSaleCard
             transactionsMonthlySummary={transactionsMonthlySummary}
+            currency={currency}
           />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>
           <CurrentMonthPurchaseCard
             transactionsMonthlySummary={transactionsMonthlySummary}
+            currency={currency}
           />
         </Suspense>
         <Suspense fallback={<Skeleton className="h-full w-full rounded-lg" />}>

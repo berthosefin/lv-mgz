@@ -57,7 +57,10 @@ export function TransactionDataTable() {
     },
   });
 
-  const columns = useMemo(() => transactionColumns, []);
+  const columns = useMemo(
+    () => transactionColumns(user?.currency as string),
+    [user?.currency]
+  );
 
   const table = useReactTable({
     data: data?.transactions,
@@ -98,7 +101,12 @@ export function TransactionDataTable() {
           {startDate && endDate && (
             <Button
               onClick={() => {
-                exportTransactionsToPdf(data?.transactions, startDate, endDate);
+                exportTransactionsToPdf(
+                  data?.transactions,
+                  user?.currency as string,
+                  startDate,
+                  endDate
+                );
               }}
             >
               <FileDown className="mr-2 h-4 w-4" />

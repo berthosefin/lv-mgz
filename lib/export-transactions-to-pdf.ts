@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 
 export const exportTransactionsToPdf = (
   transactions: Transaction[],
+  currency: string,
   startDate: string,
   endDate: string
 ) => {
@@ -40,7 +41,7 @@ export const exportTransactionsToPdf = (
   );
 
   autoTable(doc, {
-    head: [["#", "Date", "Libellé", "Article(s)", "Montant (MGA)"]],
+    head: [["#", "Date", "Libellé", "Article(s)", `Montant (${currency})`]],
     body: tableData,
     startY: 20,
     columnStyles: {

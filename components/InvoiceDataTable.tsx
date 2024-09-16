@@ -64,7 +64,10 @@ export function InvoiceDataTable() {
     },
   });
 
-  const columns = useMemo(() => invoiceColumns, []);
+  const columns = useMemo(
+    () => invoiceColumns(user?.currency as string),
+    [user?.currency]
+  );
 
   const table = useReactTable({
     data: data?.invoices,

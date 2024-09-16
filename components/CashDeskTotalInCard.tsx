@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export const CashDeskTotalInCard = async () => {
-  const { cashDeskId } = await getSession();
+  const { cashDeskId, currency } = await getSession();
   const { startDate, endDate } = getCurrentYearDates();
   const totalIn = await fetchWithAuth(
     `/transactions/totalIn?cashDeskId=${cashDeskId}&startDate=${startDate}&endDate=${endDate}`
@@ -19,7 +19,7 @@ export const CashDeskTotalInCard = async () => {
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
-          {totalIn.toLocaleString() + " MGA"}
+          {totalIn.toLocaleString() + " " + currency}
         </div>
         <p className="text-xs text-muted-foreground">
           Total des Entrées de cette année

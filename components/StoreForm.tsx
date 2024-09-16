@@ -9,18 +9,20 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { logoutAction } from "@/lib/actions/auth";
 import { updateStoreAction } from "@/lib/actions/store";
 import { fetchWithAuth } from "@/lib/api-utils";
 import { useUserStore } from "@/lib/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit3, Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { ToastAction } from "./ui/toast";
 import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
@@ -41,6 +43,8 @@ export const StoreForm = () => {
   const { execute, isPending: isServerAction } =
     useServerAction(updateStoreAction);
   const queryClient = useQueryClient();
+  const [initialCurrency, setInitialCurrency] = useState<string | null>(null);
+  const { execute: executeLogoutAction } = useServerAction(logoutAction);
 
   const { data, isPending: isQueryPending } = useQuery({
     queryKey: ["store"],
@@ -55,6 +59,7 @@ export const StoreForm = () => {
   useEffect(() => {
     if (data) {
       form.reset(data);
+      setInitialCurrency(data.currency);
     }
   }, [data, form]);
 
@@ -72,10 +77,27 @@ export const StoreForm = () => {
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["store"] });
-      toast({
-        title: `Mise à jour`,
-        description: `La mise à jour des informations sur le magasin a été effectuée avec succès !`,
-      });
+
+      if (values.currency !== initialCurrency) {
+        toast({
+          title: "La devise a été mise à jour",
+          description: `Le changement de devise ne sera totalement appliqué qu'après reconnexion.`,
+          action: (
+            <ToastAction
+              onClick={() => executeLogoutAction()}
+              altText="Se déconnecter"
+            >
+              Se déconnecter
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({
+          title: "Mise à jour",
+          description: `La mise à jour des informations sur le magasin a été effectuée avec succès !`,
+        });
+      }
+
       form.reset();
     }
   }

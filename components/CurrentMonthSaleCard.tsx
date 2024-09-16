@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export const CurrentMonthSaleCard = async ({
   transactionsMonthlySummary,
+  currency,
 }: {
   transactionsMonthlySummary: TransactionsMonthlySummary[];
+  currency: string;
 }) => {
   const { currentMonthSales, salesDifference } = calculateMonthlyData(
     transactionsMonthlySummary
@@ -20,16 +22,16 @@ export const CurrentMonthSaleCard = async ({
       <CardContent>
         <div className="text-2xl font-bold">{`${currentMonthSales.toLocaleString(
           "fr-FR"
-        )} MGA`}</div>
+        )} ${currency}`}</div>
         <p className="text-xs text-muted-foreground">
           {`${
             salesDifference > 0
               ? `+${salesDifference.toLocaleString(
                   "fr-FR"
-                )} MGA depuis le mois dernier`
+                )} ${currency} depuis le mois dernier`
               : `-${Math.abs(salesDifference).toLocaleString(
                   "fr-FR"
-                )} MGA depuis le mois dernier`
+                )} ${currency} depuis le mois dernier`
           }`}
         </p>
       </CardContent>

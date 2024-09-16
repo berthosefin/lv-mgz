@@ -5,7 +5,7 @@ import { ArticleAddToCart } from "./ArticleAddToCart";
 import { ArticleRemoveAlertDialog } from "./ArticleRemoveAlertDialog";
 import { ArticleUpdateForm } from "./ArticleUpdateForm";
 
-export const articleColumns: ColumnDef<Article>[] = [
+export const articleColumns = (currency: string): ColumnDef<Article>[] => [
   {
     accessorKey: "name",
     header: "Nom",
@@ -51,7 +51,9 @@ export const articleColumns: ColumnDef<Article>[] = [
     cell: ({ row }) => {
       const purchasePrice: number = row.getValue("purchasePrice");
       return (
-        <div className={`text-right`}>{purchasePrice.toLocaleString()} MGA</div>
+        <div className={`text-right`}>
+          {purchasePrice.toLocaleString()} {currency}
+        </div>
       );
     },
   },
@@ -61,7 +63,9 @@ export const articleColumns: ColumnDef<Article>[] = [
     cell: ({ row }) => {
       const sellingPrice: number = row.getValue("sellingPrice");
       return (
-        <div className={`text-right`}>{sellingPrice.toLocaleString()} MGA</div>
+        <div className={`text-right`}>
+          {sellingPrice.toLocaleString()} {currency}
+        </div>
       );
     },
   },

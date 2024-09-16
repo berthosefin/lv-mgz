@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { ToWords } from "to-words";
 
-export const exportInvoiceToPdf = (invoice: Invoice) => {
+export const exportInvoiceToPdf = (invoice: Invoice, currency: string) => {
   const doc = new jsPDF();
 
   // En-tête de la facture
@@ -63,11 +63,18 @@ export const exportInvoiceToPdf = (invoice: Invoice) => {
 
   autoTable(doc, {
     head: [
-      ["#", "Désignation", "Quantité", "Prix Unitaire (MGA)", "Montant (MGA)"],
+      [
+        "#",
+        "Désignation",
+        `Quantité`,
+        `Prix Unitaire (${currency})`,
+        `Montant (${currency})`,
+      ],
     ],
     body: tableData,
     startY: startY,
     columnStyles: {
+      0: { halign: "right" },
       2: { halign: "right" },
       3: { halign: "right" },
       4: { halign: "right" },
@@ -84,12 +91,12 @@ export const exportInvoiceToPdf = (invoice: Invoice) => {
       ignoreZeroCurrency: false,
       doNotAddOnly: false,
       currencyOptions: {
-        name: "Ariary",
-        plural: "Ariary",
-        symbol: "MGA",
+        name: `${currency}`,
+        plural: `${currency}`,
+        symbol: `${currency}`,
         fractionalUnit: {
-          name: "Ariary",
-          plural: "Ariary",
+          name: `${currency}`,
+          plural: `${currency}`,
           symbol: "",
         },
       },
