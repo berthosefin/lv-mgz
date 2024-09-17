@@ -52,25 +52,9 @@ export default async function HomePage() {
       </div>
 
       <div className="grid gap-4 md:gap-8 xl:grid-cols-4">
-        <Suspense
-          fallback={
-            <Card className="xl:col-span-2" x-chunk="dashboard-01-chunk-4">
-              <Skeleton className="h-full w-full rounded-lg" />
-            </Card>
-          }
-        >
-          <TransactionCard />
-        </Suspense>
+        <TransactionCard />
 
-        <Suspense
-          fallback={
-            <Card x-chunk="dashboard-01-chunk-5">
-              <Skeleton className="h-full w-full rounded-lg" />
-            </Card>
-          }
-        >
-          <SaleChart transactionsMonthlySummary={transactionsMonthlySummary} />
-        </Suspense>
+        <SaleChart />
 
         <Suspense
           fallback={
