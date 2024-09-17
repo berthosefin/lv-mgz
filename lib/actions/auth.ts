@@ -42,18 +42,22 @@ export const loginAction = createServerAction()
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict" as const,
+      maxAge: process.env.JWT_EXPIRATION_TIME
+        ? Number(process.env.JWT_EXPIRATION_TIME)
+        : undefined,
     };
 
     if (access_token) {
       cookies().set("access_token", access_token, {
         ...cookieOptions,
-        maxAge: parseExpirationTime(process.env.JWT_EXPIRATION_TIME),
       });
     }
     if (refresh_token) {
       cookies().set("refresh_token", refresh_token, {
         ...cookieOptions,
-        maxAge: parseExpirationTime(process.env.JWT_REFRESH_EXPIRATION_TIME),
+        maxAge: process.env.JWT_REFRESH_EXPIRATION_TIME
+          ? Number(process.env.JWT_REFRESH_EXPIRATION_TIME)
+          : undefined,
       });
     }
 
@@ -85,21 +89,3 @@ export const logoutAction = createServerAction().handler(async () => {
 
   redirect("/login");
 });
-
-const parseExpirationTime = (expirationTime: string | undefined): number => {
-  if (!expirationTime) throw new Error("expirationTime is undefined");
-
-  const unit = expirationTime.slice(-1); // 'm', 'h', 'd', etc.
-  const amount = parseInt(expirationTime.slice(0, -1), 10); // La partie numérique
-
-  switch (unit) {
-    case "m": // minutes
-      return amount * 60;
-    case "h": // hours
-      return amount * 60 * 60;
-    case "d": // days
-      return amount * 24 * 60 * 60;
-    default:
-      throw new Error("Unsupported expiration time format");
-  }
-};
