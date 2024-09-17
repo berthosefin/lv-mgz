@@ -1,6 +1,5 @@
 import * as jose from "jose";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export const getSession = async (): Promise<{
   id: string;
@@ -25,5 +24,11 @@ export const getSession = async (): Promise<{
     } catch (error) {}
   }
 
-  redirect("/login");
+  return {
+    id: "",
+    username: "",
+    storeId: "",
+    cashDeskId: "",
+    currency: "",
+  };
 };

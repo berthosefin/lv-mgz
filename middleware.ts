@@ -2,57 +2,63 @@ import * as jose from "jose";
 import { NextRequest, NextResponse } from "next/server";
 import { refreshAccessToken } from "./lib/actions/auth";
 
-const publicRoutes = ["/login", "/signup"];
-const isPublicRoute = (path: string) => publicRoutes.includes(path);
-const isProtectedRoute = (path: string) => !isPublicRoute(path);
+const PUBLIC_ROUTES = ["/login", "/signup"];
+const JWT_EXPIRATION_TIME = process.env.JWT_EXPIRATION_TIME
+  ? Number(process.env.JWT_EXPIRATION_TIME)
+  : 3600;
+
+function isPublicRoute(path: string): boolean {
+  return PUBLIC_ROUTES.includes(path);
+}
 
 function isTokenExpired(token: string): boolean {
   const decoded = jose.decodeJwt(token);
-  const expirationTime = decoded.exp;
-  const currentTime = Math.floor(Date.now() / 1000);
-  return expirationTime ? expirationTime < currentTime : true;
+  return (decoded.exp ?? 0) < Math.floor(Date.now() / 1000);
 }
 
-export async function middleware(req: NextRequest) {
+function createRedirectResponse(req: NextRequest, path: string): NextResponse {
+  const url = new URL(path, req.url);
+  url.searchParams.set("redirected", "true");
+  return NextResponse.redirect(url);
+}
+
+function setAccessTokenCookie(response: NextResponse, token: string): void {
+  response.cookies.set("access_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: JWT_EXPIRATION_TIME,
+  });
+}
+
+export async function middleware(req: NextRequest): Promise<NextResponse> {
   const { pathname, searchParams } = req.nextUrl;
   const accessToken = req.cookies.get("access_token")?.value;
   const refreshToken = req.cookies.get("refresh_token")?.value;
 
-  const publicPage = isPublicRoute(pathname);
-  const protectedPage = isProtectedRoute(pathname);
-
-  // Si aucun access token n'est présent et c'est une page protégée, rediriger
-  if (!accessToken) {
-    if (protectedPage && !searchParams.get("redirected")) {
-      const url = new URL("/login", req.url);
-      url.searchParams.set("redirected", "true");
-      return NextResponse.redirect(url);
-    }
-    return NextResponse.next();
+  // Allow public routes
+  if (isPublicRoute(pathname)) {
+    return accessToken && !isTokenExpired(accessToken)
+      ? createRedirectResponse(req, "/")
+      : NextResponse.next();
   }
 
-  // Vérifier si le token est expiré localement
-  if (isTokenExpired(accessToken)) {
-    if (refreshToken) {
-      const tokens = await refreshAccessToken(refreshToken);
-      if (tokens) {
-        const response = NextResponse.next();
-        response.cookies.set("access_token", tokens.accessToken, { path: "/" });
-        return response;
+  // Handle protected routes
+  if (!accessToken || isTokenExpired(accessToken)) {
+    if (refreshToken && !searchParams.get("redirected")) {
+      try {
+        const tokens = await refreshAccessToken(refreshToken);
+        if (tokens?.access_token) {
+          const response = NextResponse.redirect(req.url);
+          setAccessTokenCookie(response, tokens.access_token);
+          response.headers.set("x-middleware-rewrite", req.url);
+          return response;
+        }
+      } catch (error) {
+        console.error("Token refresh failed:", error);
       }
     }
-
-    // Si le refresh token est également expiré, rediriger vers login
-    if (protectedPage && !searchParams.get("redirected")) {
-      const url = new URL("/login", req.url);
-      url.searchParams.set("redirected", "true");
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // Si l'utilisateur est déjà authentifié, rediriger depuis une page publique
-  if (accessToken && !isTokenExpired(accessToken) && publicPage) {
-    return NextResponse.redirect(new URL("/", req.url));
+    return createRedirectResponse(req, "/login");
   }
 
   return NextResponse.next();
