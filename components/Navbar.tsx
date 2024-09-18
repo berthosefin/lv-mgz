@@ -14,11 +14,11 @@ import { useUserStore } from "@/lib/store";
 import { CircleUser, Menu, Store } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 import CartSheet from "./CartSheet";
 import { ModeToggle } from "./ModeToggle";
 import { Button } from "./ui/button";
-import { toast } from "./ui/use-toast";
 
 const NavLinks = [
   { name: "Accueil", path: "/" },
@@ -47,17 +47,14 @@ export const Navbar = () => {
     const [data, err] = await execute();
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
       return;
     }
 
     if (data) {
-      toast({
-        title: `Déconnexion`,
+      toast.success(`Déconnexion`, {
         description: `Utilisateur déconnectée avec succès !`,
       });
 

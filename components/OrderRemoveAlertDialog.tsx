@@ -12,9 +12,9 @@ import {
 import { removeOrderAction } from "@/lib/actions/orders";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
+import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
-import { toast } from "./ui/use-toast";
 
 export const OrderRemoveAlertDialog = ({ order }: { order: Order }) => {
   const { execute } = useServerAction(removeOrderAction);
@@ -24,15 +24,12 @@ export const OrderRemoveAlertDialog = ({ order }: { order: Order }) => {
     const [data, err] = await execute({ id });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
-      toast({
-        title: `Suppression réussie`,
+      toast.success(`Suppression réussie`, {
         description: `Order supprimé avec succès !`,
       });
     }

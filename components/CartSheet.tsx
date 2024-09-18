@@ -14,11 +14,11 @@ import { useCartStore, useUserStore } from "@/lib/store";
 import { useQueryClient } from "@tanstack/react-query";
 import { Check, RotateCw, ShoppingCart, Trash, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 import { Checkbox } from "./ui/checkbox";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { toast } from "./ui/use-toast";
 
 export default function CartSheet() {
   const cart = useCartStore((state) => state.cart);
@@ -51,11 +51,9 @@ export default function CartSheet() {
 
   const handleSubmitOrder = async () => {
     if (!isQuantityValid()) {
-      toast({
-        title: "Erreur de quantité",
+      toast.error("Erreur de quantité", {
         description:
           "La quantité de certains articles dépasse les limites autorisées.",
-        variant: "destructive",
       });
       return;
     }
@@ -74,14 +72,11 @@ export default function CartSheet() {
     const [data, err] = await execute(newOrder);
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
-      toast({
-        title: "Nouvelle commande",
+      toast.success("Nouvelle commande", {
         description: "La commande a été créée avec succès !",
       });
       queryClient.invalidateQueries({ queryKey: ["articles"] });

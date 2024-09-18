@@ -32,11 +32,11 @@ import { Ban, Loader2, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
@@ -64,15 +64,12 @@ export const ClientAddForm = () => {
     const [data, err] = await execute(values);
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: `Ajout client`,
+      toast.success(`Ajout client`, {
         description: `Client ajouté avec succès !`,
       });
       setOpen(false);

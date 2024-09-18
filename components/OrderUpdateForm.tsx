@@ -30,12 +30,12 @@ import { Ban, Edit3, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
-import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   isPaid: z.boolean(),
@@ -72,15 +72,12 @@ export const OrderUpdateForm = ({
     });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryOrder.invalidateQueries({ queryKey: ["orders"] });
-      toast({
-        title: `Mise à jours`,
+      toast.success(`Mise à jours`, {
         description: `Informations du order mise à jour avec succès !`,
       });
       setOpen(false);

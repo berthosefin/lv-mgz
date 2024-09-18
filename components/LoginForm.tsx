@@ -22,10 +22,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
-import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -48,17 +48,14 @@ export const LoginForm = () => {
     });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
       return;
     }
 
     if (data) {
-      toast({
-        title: `Connexion`,
+      toast.success(`Connexion`, {
         description: `Utilisateur connectée avec succès !`,
       });
 

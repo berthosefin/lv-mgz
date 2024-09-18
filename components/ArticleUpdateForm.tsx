@@ -31,9 +31,9 @@ import { Ban, Loader2, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
-import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
@@ -71,15 +71,12 @@ export const ArticleUpdateForm = ({ article }: { article: Article }) => {
     });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["articles"] });
-      toast({
-        title: `Approvisionnement`,
+      toast.success(`Approvisionnement`, {
         description: `Article approvisionné avec succès !`,
       });
       setOpen(false);

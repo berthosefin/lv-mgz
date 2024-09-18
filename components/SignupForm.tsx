@@ -20,11 +20,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { toast } from "./ui/use-toast";
 
 export const formSchema = z
   .object({
@@ -65,17 +65,14 @@ export const SignupForm = () => {
     });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
       return;
     }
 
     if (data) {
-      toast({
-        title: `Création de compte`,
+      toast.success(`Création de compte`, {
         description: `Compte utilisateur crée avec succès !`,
       });
 

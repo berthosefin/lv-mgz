@@ -9,12 +9,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { removeClientAction } from "@/lib/actions/clients";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
+import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
-import { toast } from "./ui/use-toast";
-import { removeClientAction } from "@/lib/actions/clients";
 
 export const ClientRemoveAlertDialog = ({ client }: { client: Client }) => {
   const { execute } = useServerAction(removeClientAction);
@@ -24,15 +24,12 @@ export const ClientRemoveAlertDialog = ({ client }: { client: Client }) => {
     const [data, err] = await execute({ id });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
-      toast({
-        title: `Suppression réussie`,
+      toast.success(`Suppression réussie`, {
         description: `Client supprimé avec succès !`,
       });
     }

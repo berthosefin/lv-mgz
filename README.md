@@ -8,7 +8,7 @@ This project is a frontend part of [Store Management Backend](https://github.com
 
 <ul>
 	<li>- [x] Dashboard</li>
-	<li>- [x] User Management</li>
+	<li>- [x] User management</li>
 	<li>- [x] Article management</li>
 	<li>- [x] Order management</li>
 	<li>- [x] Customer management</li>

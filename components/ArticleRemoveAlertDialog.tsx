@@ -9,12 +9,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { removeArticleAction } from "@/lib/actions/articles";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
+import { toast } from "sonner";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
-import { toast } from "./ui/use-toast";
-import { removeArticleAction } from "@/lib/actions/articles";
 
 export const ArticleRemoveAlertDialog = ({ article }: { article: Article }) => {
   const { execute } = useServerAction(removeArticleAction);
@@ -24,15 +24,12 @@ export const ArticleRemoveAlertDialog = ({ article }: { article: Article }) => {
     const [data, err] = await execute({ id });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["articles"] });
-      toast({
-        title: `Suppression réussie`,
+      toast.success(`Suppression réussie`, {
         description: `Article supprimé avec succès !`,
       });
     }

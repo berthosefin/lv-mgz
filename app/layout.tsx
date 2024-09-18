@@ -1,7 +1,7 @@
 import { Footer } from "@/components/Footer";
 import { ReactQueryProvider } from "@/components/ReactQueryProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
@@ -41,7 +41,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <main className="flex-grow">{children}</main>
-            <Toaster />
+            <Toaster
+              closeButton
+              position="bottom-right"
+              // richColors
+              // toastOptions={{}}
+            />
             <Footer />
           </ThemeProvider>
         </ReactQueryProvider>

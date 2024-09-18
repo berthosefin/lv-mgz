@@ -18,12 +18,11 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Edit3, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useServerAction } from "zsa-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { ToastAction } from "./ui/toast";
-import { toast } from "./ui/use-toast";
 
 const formSchema = z.object({
   name: z.string(),
@@ -70,30 +69,22 @@ export const StoreForm = () => {
     });
 
     if (err) {
-      toast({
-        title: `${err.code}`,
+      toast.error(`${err.code}`, {
         description: `${err.message}`,
-        variant: `destructive`,
       });
     } else if (data) {
       queryClient.invalidateQueries({ queryKey: ["store"] });
 
       if (values.currency !== initialCurrency) {
-        toast({
-          title: "La devise a été mise à jour",
+        toast.info("La devise a été mise à jour", {
           description: `Le changement de devise ne sera totalement appliqué qu'après reconnexion.`,
-          action: (
-            <ToastAction
-              onClick={() => executeLogoutAction()}
-              altText="Se déconnecter"
-            >
-              Se déconnecter
-            </ToastAction>
-          ),
+          action: {
+            label: "Se déconnecter",
+            onClick: () => executeLogoutAction(),
+          },
         });
       } else {
-        toast({
-          title: "Mise à jour",
+        toast.success("Mise à jour", {
           description: `La mise à jour des informations sur le magasin a été effectuée avec succès !`,
         });
       }
