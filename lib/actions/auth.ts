@@ -41,7 +41,7 @@ export const loginAction = createServerAction()
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict" as const,
+      sameSite: "none" as const,
       maxAge: process.env.JWT_EXPIRATION_TIME
         ? Number(process.env.JWT_EXPIRATION_TIME)
         : undefined,

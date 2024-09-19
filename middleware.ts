@@ -26,7 +26,7 @@ function setAccessTokenCookie(response: NextResponse, token: string): void {
   response.cookies.set("access_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
     maxAge: JWT_EXPIRATION_TIME,
   });
 }
